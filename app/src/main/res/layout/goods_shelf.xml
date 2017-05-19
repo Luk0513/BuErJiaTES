@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_adpictuer"
+        android:layout_width="match_parent"
+        android:layout_height="430px"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        android:src="@mipmap/malllogo" />
+
+    <TextView
+        android:id="@+id/tv_backHome"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@+id/iv_adpictuer"
+        android:background="@drawable/custombg"
+        android:gravity="center"
+        android:text="返回首页"
+        android:textColor="@color/color_1"
+        android:textSize="36sp" />
+
+    <GridView
+        android:id="@+id/gv_goodslist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/tv_backHome"
+        android:background="@color/color_1"
+        android:numColumns="4" />
+
+    <ImageView
+        android:id="@+id/iv_popuBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_2"
+        android:visibility="gone" />
+</RelativeLayout>

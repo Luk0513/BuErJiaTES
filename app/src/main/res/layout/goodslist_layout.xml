@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_1"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="40dp"
+        android:paddingEnd="5dp"
+        android:paddingStart="5dp"
+        android:paddingTop="3dp">
+
+        <ImageView
+            android:id="@+id/iv_goodsIV"
+            android:layout_width="wrap_content"
+            android:layout_height="220dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:src="@mipmap/file_photo" />
+
+        <ImageView
+            android:id="@+id/iv_cube"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
+
+        <ImageView
+            android:id="@+id/iv_cube_xs"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
+
+        <TextView
+            android:id="@+id/tv_goods_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv_goodsIV"
+            android:lines="3"
+            android:paddingBottom="5dp"
+            android:paddingEnd="15dp"
+            android:paddingStart="15dp"
+            android:paddingTop="5dp"
+            android:text="香草星星宝 3芙 42克/罐Gerber 嘉宝 3段 香草星星泡芙 42克/罐Gerber 嘉宝 3段 香草星星泡芙 42克/罐"
+            android:textColor="@color/color_2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_goods_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/tv_goods_name"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="18dp"
+            android:lines="1"
+            android:text="价格：RMB"
+            android:textColor="@color/color_7"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+</LinearLayout>

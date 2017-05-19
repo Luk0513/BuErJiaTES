@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_1"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:id="@+id/rl"
+        android:layout_width="match_parent"
+        android:layout_height="375px"
+        android:background="@color/color_1"
+        android:padding="3dp">
+
+        <LinearLayout
+            android:id="@+id/ll_layout"
+            android:layout_width="290px"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingEnd="5dp"
+            android:paddingStart="5dp"
+            android:paddingTop="18dp">
+
+            <ImageView
+                android:id="@+id/iv_goodsPic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:src="@mipmap/file_photo" />
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/iv_countryPic"
+            android:layout_width="30px"
+            android:layout_height="30px"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="20dp"
+            android:layout_toEndOf="@id/ll_layout"
+            android:src="@mipmap/file_photo" />
+
+        <TextView
+            android:id="@+id/tv_countryName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="25dp"
+            android:layout_toEndOf="@id/iv_countryPic"
+            android:text="海外直邮"
+            android:textSize="12sp" />
+
+        <!--<ImageView-->
+        <!--android:id="@+id/iv_close"-->
+        <!--android:layout_width="75px"-->
+        <!--android:layout_height="75px"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:src="@drawable/close_selet" />-->
+
+        <TextView
+            android:id="@+id/tv_goodsName"
+            android:layout_width="520px"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv_countryPic"
+            android:layout_marginTop="7dp"
+            android:layout_toEndOf="@id/ll_layout"
+            android:text="【保税仓】荷兰本土牛栏"
+            android:textColor="@color/color_22"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_goodsBrief"
+            android:layout_width="510px"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_goodsName"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@id/ll_layout"
+            android:text="【保税仓】荷兰本土牛栏Nutrilon 婴幼儿奶粉4段 1岁以上 2罐装"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:id="@+id/ll_ewm"
+            android:layout_width="160px"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_goodsBrief"
+            android:layout_marginTop="8dp"
+            android:layout_toEndOf="@id/ll_layout"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="1dp">
+
+            <ImageView
+                android:id="@+id/iv_ewm"
+                android:layout_width="160px"
+                android:layout_height="160px"
+                android:src="@mipmap/ewm2" />
+
+            <TextView
+                android:id="@+id/tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="微信扫码一键下单"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_goodsPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/ll_ewm"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="25dp"
+            android:layout_toEndOf="@+id/ll_ewm"
+            android:text="价格：RMB"
+            android:textColor="@color/color_4"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/tv_tips"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_goodsPrice"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_toEndOf="@id/ll_ewm"
+            android:text="提示：扫描左边二维码跳转到不二家微信商城下单付款"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/iv_close2"
+            android:layout_width="75px"
+            android:layout_height="75px"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/close2_selet" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:background="@color/color_5" />
+
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/lv_goodsSrc"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/rl"
+        android:clickable="true"
+        android:divider="@null"
+        android:padding="5dp"
+        android:scrollbarStyle="outsideOverlay" />
+
+</RelativeLayout>

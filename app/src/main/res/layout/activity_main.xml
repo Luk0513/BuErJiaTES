@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_2_1">
+
+    <fragment
+        android:id="@+id/fg_banner"
+        android:name="com.fierce.buerjiates.ui.fragments.BannerFragment"
+        android:layout_width="match_parent"
+        android:layout_height="450px"
+        android:layout_alignParentTop="true"
+        android:tag="2"
+        tools:layout="@layout/banner_layout" />
+
+    <SurfaceView
+        android:id="@+id/suv_advideo"
+        android:layout_width="match_parent"
+        android:layout_height="560px"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginStart="1dp"
+        android:background="@drawable/custom_bg"
+        android:padding="1dp" />
+
+    <fragment
+        android:id="@+id/fl_goods"
+        android:name="com.fierce.buerjiates.ui.fragments.GoodsListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/suv_advideo"
+        android:layout_below="@id/fg_banner"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="1dp"
+        android:tag="1"
+        tools:layout="@layout/goodslayout" />
+
+    <View
+        android:id="@+id/v_hideView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+</RelativeLayout>
