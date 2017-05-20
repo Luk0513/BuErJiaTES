@@ -51,7 +51,7 @@ public class MyApp extends Application {
     //返回Gson
     public Retrofit getGsonRetrofit() {
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(500, TimeUnit.MILLISECONDS) //设置请求超时
+                .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
                 .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -63,7 +63,7 @@ public class MyApp extends Application {
     //返回字符串
     public Retrofit getStringRetrofit() {
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(500, TimeUnit.MILLISECONDS) //设置请求超时
+                .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
                 .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.BASE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -169,15 +169,15 @@ public class MyApp extends Application {
         return null;
     }
 
-    public void saveGoodsInfoJson(String json) {
+    public void saveGoodsInfoJson(String key, String json) {
         SPHelper spHelper = new SPHelper(getApplicationContext(), "GoodsInfoJson");
-        spHelper.save(new SPHelper.ContentValue("GoodsInfoJson", json));
+        spHelper.save(new SPHelper.ContentValue(key, json));
     }
 
-    public String getGoodsInfoJson() {
+    public String getGoodsInfoJson(String key) {
         SPHelper spHelper = new SPHelper(getApplicationContext(), "GoodsInfoJson");
         if (spHelper != null) {
-            String json = spHelper.getString("GoodsInfoJson");
+            String json = spHelper.getString(key);
             return json;
         }
         return null;

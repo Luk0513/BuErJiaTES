@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -130,6 +131,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
                     } else if (bean.getState() == 2) {
                         String goodsUrl = bean.getPic();
                         String goodsId = goodsUrl.substring(goodsUrl.indexOf("=") + 1);
+                        Log.e(TAG, "jumpActivity: ++++++++++++++>>>" + goodsId);
                         if (!popupWindow.isShowing())
                             initPopuwindow(goodsId);
                         break;
@@ -256,10 +258,12 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
 
             @Override
             public void getPriceFailure(String msg) {
-
+                tvGoodsPrice.setText("价格：有惊喜！");
             }
         });
-        getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn());
+        if (proJsonCodeBean.getGoods_sn() != null) {
+            getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn());
+        }
         tvGoodsName.setText(proJsonCodeBean.getGoods_name());
         tvGoodsBrief.setText(proJsonCodeBean.getGoods_brief());
         String html = proJsonCodeBean.getGoods_desc();
@@ -351,7 +355,8 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
 
     @Override
     public void getGoogsInfoFailure(String msg) {
-        String goodsInfoJson = MyApp.getInstance().getGoodsInfoJson();
+        Log.e(TAG, "getGoogsInfoFailure: " + msg);
+        String goodsInfoJson = MyApp.getInstance().getGoodsInfoJson(msg);
         Gson gson = new Gson();
         GoodsBean goodsBean = gson.fromJson(goodsInfoJson, GoodsBean.class);
         goodsList = goodsBean.getList();

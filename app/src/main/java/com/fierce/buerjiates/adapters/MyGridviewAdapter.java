@@ -48,6 +48,8 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         }
         final GoodsList_Bean.ListBean bean = getItem(position);
         final String imgUrl = bean.getProJsonCode().getGoods_img();
+//        Log.e("TAG", "getView:     ?????????????????????? ....>>>" + bean.getAdmcNum());
+
         /**
          *  调取微信商城的价格
          */
@@ -59,10 +61,12 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
 
             @Override
             public void getPriceFailure(String msg) {
-
+                holder.tvGoodsPrice.setText("价格：有惊喜！");
             }
         });
-        getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn());
+        if (bean.getProJsonCode().getGoods_sn() != null) {
+            getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn());
+        }
         holder.ivGoodsIV.setTag(imgUrl);
         cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
         holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());

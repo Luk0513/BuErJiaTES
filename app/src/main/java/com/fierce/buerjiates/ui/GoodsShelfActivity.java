@@ -85,6 +85,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     @Override
     protected void initView() {
         //自定义字体
+        goodsListBean=new ArrayList<>();
         typeface = Typeface.createFromAsset(getAssets(), "fonnts/mnkt.TTF");
         tvBackHome.setTypeface(typeface);
         mHandler = new MyHandler(this);
@@ -120,7 +121,11 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         Gson gson = new Gson();
         if (goodsListJson != null) {
             GoodsList_Bean goodsList_bean = gson.fromJson(goodsListJson, GoodsList_Bean.class);
-            this.goodsListBean = goodsList_bean.getList();
+            for (GoodsList_Bean.ListBean bean : goodsList_bean.getList()) {
+                if (bean.getAdmcNum().equals(MyApp.getInstance().getDevice_id())) {
+                    goodsListBean.add(bean);
+                }
+            }
             adapter = new MyGridviewAdapter(getApplicationContext(), goodsListBean, gvGoodslist, cacheUtils);
             gvGoodslist.setAdapter(adapter);
             gvGoodslist.setOnItemClickListener(this);
@@ -134,8 +139,12 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
 
     @Override
     public void setGoodsListView(List<GoodsList_Bean.ListBean> goodsListBean) {
-        this.goodsListBean = goodsListBean;
-        adapter = new MyGridviewAdapter(getApplicationContext(), goodsListBean, gvGoodslist, cacheUtils);
+        for (GoodsList_Bean.ListBean bean : goodsListBean) {
+            if (bean.getAdmcNum().equals(MyApp.getInstance().getDevice_id())) {
+                this.goodsListBean.add(bean);
+            }
+        }
+        adapter = new MyGridviewAdapter(getApplicationContext(), this.goodsListBean, gvGoodslist, cacheUtils);
         gvGoodslist.setAdapter(adapter);
         gvGoodslist.setOnItemClickListener(this);
     }
@@ -295,10 +304,12 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
 
             @Override
             public void getPriceFailure(String msg) {
-
+                tvGoodsPrice.setText("价格：有惊喜！");
             }
         });
-        getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn());
+        if (proJsonCodeBean.getGoods_sn() != null) {
+            getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn());
+        }
         tvGoodsName.setText(proJsonCodeBean.getGoods_name());
         tvGoodsBrief.setText(proJsonCodeBean.getGoods_brief());
         String html = proJsonCodeBean.getGoods_desc();

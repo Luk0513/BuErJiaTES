@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -24,9 +23,7 @@ import com.fierce.buerjiates.views.IGetBannerView;
 import com.google.gson.Gson;
 
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -62,17 +59,7 @@ public class BannerFragment extends BaseFragment implements IGetBannerView, View
         vpBanner.addOnPageChangeListener(this);
         handler = new MyHandler(this);
         registrBodcast();
-        timeUtils();
 
-    }
-
-    private void timeUtils() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm");
-        String format = simpleDateFormat.format(new Date(System.currentTimeMillis()));
-        Log.e("TAG", "timeUtils: " + format);
-        if (format.equals("00") || format.equals("30")) {
-            bannerPresent.getBanners();
-        }
     }
 
     @Override
@@ -106,7 +93,7 @@ public class BannerFragment extends BaseFragment implements IGetBannerView, View
                 }
             }
         }
-        if (urlList.size() > 1) {
+        if (urlList.size() > 0) {
             urlList.add(0, urlList.get(urlList.size() - 1));
             imgUrl.add(0, imgUrl.get(imgUrl.size() - 1));
             urlList.add(urlList.get(1));
@@ -127,7 +114,6 @@ public class BannerFragment extends BaseFragment implements IGetBannerView, View
             hidImage.setVisibility(View.VISIBLE);
         }
     }
-
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -179,6 +165,10 @@ public class BannerFragment extends BaseFragment implements IGetBannerView, View
             switch (msg.what) {
                 case 1:
                     mWeakReference.get().setVpCurrtPager();
+                    break;
+                case 2:
+                    mWeakReference.get().bannerPresent.getBanners();
+                    mWeakReference.get().handler.sendEmptyMessageDelayed(2, 1000 * 60);
                     break;
             }
         }

@@ -17,6 +17,9 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -129,7 +132,7 @@ public class RequestInterfaceModel implements IRequestInterface {
     }
 
     @Override
-    public void getGoodsInfo(@NonNull String goodsId, final IBeanCallback<GoodsBean> callback) {
+    public void getGoodsInfo(@NonNull final String goodsId, final IBeanCallback<GoodsBean> callback) {
         Retrofit retrofit = MyApp.getInstance().getGsonRetrofit();
         Call<GoodsBean> call = retrofit.create(HttpManage.class).getGoodsInfo(goodsId);
         call.enqueue(new Callback<GoodsBean>() {
@@ -138,7 +141,7 @@ public class RequestInterfaceModel implements IRequestInterface {
                 Log.e(TAG, "onResponse: getGoodsInfo   " + response.body().toString());
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
-                MyApp.getInstance().saveGoodsInfoJson(json);
+                MyApp.getInstance().saveGoodsInfoJson(goodsId,json);
                 callback.onSuccesd(response.body());
             }
 
@@ -152,24 +155,34 @@ public class RequestInterfaceModel implements IRequestInterface {
 
     @Override
     public void getGoodsPrice(String c, String a, String key, String goodsSn, final IBeanCallback callback) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
+                .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.PRICE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
+                .client(client)
                 .build();
         Call<String> call = retrofit.create(HttpManage.class).getGoodsPrice(c, a, key, goodsSn);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response.body());
-                    String price = jsonObject.optString("marketprice");
-                    callback.onSuccesd(price);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                Log.e(TAG, "onResponse:   ,.,.,.,.,.,.,.,.,,,," + response.body());
+
+                if (response.body() != null) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response.body());
+                        String price = jsonObject.optString("marketprice");
+                        callback.onSuccesd(price);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else
+                    callback.onError("价格跑了……");
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                callback.onError("价格跑了……");
                 Log.e(TAG, "onFailure: :::::::::::::::::::::::::" + t.toString());
             }
         });

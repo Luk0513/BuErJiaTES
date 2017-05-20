@@ -160,7 +160,7 @@ public class LoadDataSevice extends IntentService {
 
     List<String> imgUrlList1;
 
-    private void getGoodsInfo(String goodId) {
+    private void getGoodsInfo(final String goodId) {
 
         Retrofit retrofit = MyApp.getInstance().getStringRetrofit();
         Call<String> call = retrofit.create(HttpManage.class).getGoodsInfos(goodId);
@@ -168,7 +168,7 @@ public class LoadDataSevice extends IntentService {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String goodsInfo = response.body().toString();
-                MyApp.getInstance().saveGoodsInfoJson(goodsInfo);
+                MyApp.getInstance().saveGoodsInfoJson(goodId,goodsInfo);
                 Gson gson = new Gson();
                 GoodsBean bean = gson.fromJson(goodsInfo, GoodsBean.class);
                 for (GoodsBean.ListBean listBean : bean.getList()) {

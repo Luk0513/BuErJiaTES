@@ -110,7 +110,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
-                    Log.e("TAG", "onResponse: __________" + response.body());
+//                    Log.e("TAG", "onResponse: __________" + response.body());
                     try {
                         JSONObject object = new JSONObject(response.body());
                         JSONArray array = object.getJSONArray("list");

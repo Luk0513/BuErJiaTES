@@ -19,7 +19,7 @@ public class IGetGoodsPresent {
         requestInterface = new RequestInterfaceModel();
     }
 
-    public void getGoodsInfo(String goodsId) {
+    public void getGoodsInfo(final String goodsId) {
         requestInterface.getGoodsInfo(goodsId, new IBeanCallback<GoodsBean>() {
                     @Override
                     public void onSuccesd(GoodsBean goodsBean) {
@@ -28,7 +28,7 @@ public class IGetGoodsPresent {
 
                     @Override
                     public void onError(String msg) {
-                        getGoodsInfoView.getGoogsInfoFailure(msg);
+                        getGoodsInfoView.getGoogsInfoFailure(goodsId);
                     }
                 }
 
