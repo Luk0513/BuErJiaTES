@@ -48,9 +48,8 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 /**
- * Created by Administrator on 2017/3/12.
+ *
  */
-
 public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView, IGetGoodsInfoView, View.OnTouchListener {
     private static final String TAG = "GoodsListFragment";
 
@@ -131,7 +130,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
                     } else if (bean.getState() == 2) {
                         String goodsUrl = bean.getPic();
                         String goodsId = goodsUrl.substring(goodsUrl.indexOf("=") + 1);
-                        Log.e(TAG, "jumpActivity: ++++++++++++++>>>" + goodsId);
+//                        Log.e(TAG, "jumpActivity: ++++++++++++++>>>" + goodsId);
                         if (!popupWindow.isShowing())
                             initPopuwindow(goodsId);
                         break;
@@ -254,9 +253,9 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
             @Override
             public void getPriceSucceed(String price) {
                 tvGoodsPrice.setText("心动价：RMB" + price);
+//                Log.e(TAG, "getPriceSucceed: >>>>>>>>>>>>>>>>>+" + tvGoodsPrice.getText().toString());
             }
 
-            @Override
             public void getPriceFailure(String msg) {
                 tvGoodsPrice.setText("价格：有惊喜！");
             }

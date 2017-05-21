@@ -79,66 +79,74 @@ public abstract class BaseActivity extends AppCompatActivity {
         //先检查本地文件夹有没有apk文件
         File[] mfile = new File(savePath).listFiles();
         //查看apk版本号
-        final File apk = mfile[0];
-        String apkPath = apk.getAbsolutePath();
-        PackageManager pm = this.getPackageManager();
-        //获取本地apk文件的包名 版本号
-        PackageInfo packageInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
-        int code = packageInfo.versionCode;
-        String packageName = packageInfo.packageName;
-//        Log.e("TAG", "updateAPP:<>><><><><><><><>< >>" + code + "    " + packageName);
-        if (code > getAppVersion() && packageName.equals(this.getPackageName())) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("更新提示：")
-                    .setMessage("发现新版本安装包！" +
-                            "\n请立即更新")
-                    .setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            installApk(apk);
-                        }
-                    });
-            builder.setCancelable(false);
-            builder.show();
-
+        if (mfile.length <= 0) {
+            getApkfromeNet();
         } else {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://120.76.159.2:8090/admin/")
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .build();
-            Call<String> call = retrofit.create(HttpManage.class).updateApp();
-            call.enqueue(new Callback<String>() {
-                @Override
-                public void onResponse(Call<String> call, Response<String> response) {
-//                    Log.e("TAG", "onResponse: __________" + response.body());
-                    try {
-                        JSONObject object = new JSONObject(response.body());
-                        JSONArray array = object.getJSONArray("list");
-                        JSONObject object2 = array.getJSONObject(0);
-                        String versionTexe = object2.optString("versionText");
-                        //服务器Apk 版本号
-                        double versionCode = Double.valueOf(versionTexe).doubleValue();
-//                    Log.e("TAG", "onResponse: " + versionCode);
-                        //本地应用版本号
-                        if (versionCode > getAppVersion()) {
-                            //后台下载Apk
-                            String apkUrl = object2.optString("filePath");
-                            Intent intent = new Intent(getBaseContext(), DownAPKService.class);
-                            intent.putExtra("url", apkUrl);
-                            startService(intent);
-//                        Log.e("TAG", "onResponse: versionCode > getAppVersion())");
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+            final File apk = mfile[0];
+            String apkPath = apk.getAbsolutePath();
+            PackageManager pm = this.getPackageManager();
+            //获取本地apk文件的包名 版本号
+            PackageInfo packageInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
+            int code = packageInfo.versionCode;
+            String packageName = packageInfo.packageName;
+//        Log.e("TAG", "updateAPP:<>><><><><><><><>< >>" + code + "    " + packageName);
+            if (code > getAppVersion() && packageName.equals(this.getPackageName())) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("更新提示：")
+                        .setMessage("发现新版本安装包！" +
+                                "\n请立即更新")
+                        .setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                installApk(apk);
+                            }
+                        });
+                builder.setCancelable(false);
+                builder.show();
 
-                @Override
-                public void onFailure(Call<String> call, Throwable t) {
-                    Log.e("TAG", "onFailure: ::::::::::::::" + t.toString());
-                }
-            });
+            } else {
+                getApkfromeNet();
+            }
         }
+    }
+
+    private void getApkfromeNet() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://120.76.159.2:8090/admin/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        Call<String> call = retrofit.create(HttpManage.class).updateApp();
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+//                    Log.e("TAG", "onResponse: __________" + response.body());
+                try {
+                    JSONObject object = new JSONObject(response.body());
+                    JSONArray array = object.getJSONArray("list");
+                    JSONObject object2 = array.getJSONObject(0);
+                    String versionTexe = object2.optString("versionText");
+                    //服务器Apk 版本号
+                    double versionCode = Double.valueOf(versionTexe).doubleValue();
+//                    Log.e("TAG", "onResponse: " + versionCode);
+                    //本地应用版本号
+                    if (versionCode > getAppVersion()) {
+                        //后台下载Apk
+                        String apkUrl = object2.optString("filePath");
+                        Intent intent = new Intent(getBaseContext(), DownAPKService.class);
+                        intent.putExtra("url", apkUrl);
+                        startService(intent);
+//                        Log.e("TAG", "onResponse: versionCode > getAppVersion())");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("TAG", "onFailure: ::::::::::::::" + t.toString());
+            }
+        });
     }
 
     /**

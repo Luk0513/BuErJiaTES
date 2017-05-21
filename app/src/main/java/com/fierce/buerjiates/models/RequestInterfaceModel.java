@@ -167,7 +167,6 @@ public class RequestInterfaceModel implements IRequestInterface {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
 //                Log.e(TAG, "onResponse:   ,.,.,.,.,.,.,.,.,,,," + response.body());
-
                 if (response.body() != null) {
                     try {
                         JSONObject jsonObject = new JSONObject(response.body());
