@@ -82,7 +82,6 @@ public class RequestInterfaceModel implements IRequestInterface {
                 } catch (Exception e) {
                     callback.onError("获取数据失败");
                 }
-
             }
 
             @Override
