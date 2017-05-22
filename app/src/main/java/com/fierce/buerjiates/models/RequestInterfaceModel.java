@@ -75,9 +75,14 @@ public class RequestInterfaceModel implements IRequestInterface {
             @Override
             public void onResponse(Call<Banners_Bean> call, Response<Banners_Bean> response) {
                 Gson gson = new Gson();
-                String json = gson.toJson(response.body());
-                MyApp.getInstance().saveBannerJson(json);
-                callback.onSuccesd(response.body());
+                try {
+                    String json = gson.toJson(response.body());
+                    MyApp.getInstance().saveBannerJson(json);
+                    callback.onSuccesd(response.body());
+                } catch (Exception e) {
+                    callback.onError("获取数据失败");
+                }
+
             }
 
             @Override
@@ -141,7 +146,7 @@ public class RequestInterfaceModel implements IRequestInterface {
                 Log.e(TAG, "onResponse: getGoodsInfo   " + response.body().toString());
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
-                MyApp.getInstance().saveGoodsInfoJson(goodsId,json);
+                MyApp.getInstance().saveGoodsInfoJson(goodsId, json);
                 callback.onSuccesd(response.body());
             }
 

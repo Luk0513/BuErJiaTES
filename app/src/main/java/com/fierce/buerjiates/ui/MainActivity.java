@@ -77,7 +77,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             inputDid();
         }
 
-        Log.e(TAG, "initView: " + MyApp.getInstance().getDevice_id());
+//        Log.e(TAG, "initView: " + MyApp.getInstance().getDevice_id());
         vHideView.setOnTouchListener(this);
 //        if (!videoIsExsit()) {
 //            Log.e("TAG", "onCreate: --开始下载视频--");

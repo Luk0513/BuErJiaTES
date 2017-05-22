@@ -79,6 +79,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         //先检查本地文件夹有没有apk文件
         File[] mfile = new File(savePath).listFiles();
         //查看apk版本号
+//        Log.e("TAG", "updateAPP: ——-————————>>>" + mfile.length);
         if (mfile.length <= 0) {
             getApkfromeNet();
         } else {
