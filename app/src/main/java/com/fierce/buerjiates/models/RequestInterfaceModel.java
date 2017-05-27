@@ -176,12 +176,12 @@ public class RequestInterfaceModel implements IRequestInterface {
                         JSONObject jsonObject = new JSONObject(response.body());
                         String price = "";
                         if (categoryId.equals("2")) {
-                            Log.e(TAG, "onResponse: >>>>"+goodsSn );
+//                            Log.e(TAG, "onResponse: >>>>"+goodsSn );
                             price = jsonObject.optString("xsg_price");
-                            Log.e(TAG, "onResponse: " + price);
+//                            Log.e(TAG, "onResponse: " + price);
                         } else if (categoryId.equals("5")) {
                             price = jsonObject.optString("marketprice");
-                            Log.e(TAG, "onResponse: ++" + price);
+//                            Log.e(TAG, "onResponse: ++" + price);
                         }
 
                         callback.onSuccesd(price);

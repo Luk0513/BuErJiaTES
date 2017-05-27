@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Gravity;
@@ -427,6 +428,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
     private void sendBrocat(Boolean isShowe) {
         Intent intent = new Intent("PupoState");
         intent.putExtra("isPopuShowe", isShowe);
+        Bundle bundle=new Bundle();
         getActivity().sendBroadcast(intent);
     }
 

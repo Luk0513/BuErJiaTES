@@ -7,12 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -65,6 +66,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void initView() {
+
         mHandler = new MyHandler(this);
         suvAdvideo.getHolder().addCallback(this);
         initGuideDialog();
@@ -77,7 +79,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             inputDid();
         }
 
-//        Log.e(TAG, "initView: " + MyApp.getInstance().getDevice_id());
         vHideView.setOnTouchListener(this);
 //        if (!videoIsExsit()) {
 //            Log.e("TAG", "onCreate: --开始下载视频--");
@@ -386,6 +387,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         @Override
         public void onReceive(Context context, Intent intent) {
             isPopuShowe = intent.getBooleanExtra("isPopuShowe", false);
+            boolean isDone = intent.getBooleanExtra("isDone", false);
             if (isPopuShowe) {
                 vHideView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -406,7 +408,35 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             Boolean isShowDialog = intent.getBooleanExtra("isshowDialog", false);
             if (isShowDialog)
                 showGuideDialog();
+
+            if (isDone) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("更新提示：")
+                        .setMessage("发现新版本安装包！" +
+                                "\n请立即更新")
+                        .setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                installApk();
+                            }
+                        });
+                builder.setCancelable(false);
+                builder.show();
+            }
         }
+    }
+
+    //打开APK程序代码
+    private void installApk() {
+        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
+        File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
+        File apk = files[0];
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(apk),
+                "application/vnd.android.package-archive");
+        startActivity(intent);
     }
 
     private void registrBodcast() {
@@ -415,12 +445,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         broadReceiver = new MyBroadcastReceiver();
         registerReceiver(broadReceiver, intentFilter);
 
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        Log.e(TAG, "onPrepareOptionsMenu: ");
-        return super.onPrepareOptionsMenu(menu);
     }
 
     /**

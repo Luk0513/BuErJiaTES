@@ -183,4 +183,15 @@ public class MyApp extends Application {
         return null;
     }
 
+    public void saveApKVersionCode(String code) {
+        SPHelper spHelper = new SPHelper(getApplicationContext(), "ApkVersion");
+        spHelper.save(new SPHelper.ContentValue("apkVersion", code));
+    }
+    public String getVersionCode(){
+        SPHelper spHelper=new SPHelper(getApplicationContext(),"ApkVersion");
+        return spHelper.getString("apkVersion");
+    }
+
+
+
 }

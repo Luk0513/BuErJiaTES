@@ -1,22 +1,20 @@
 package com.fierce.buerjiates.base;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.services.DownAPKService;
 
@@ -75,41 +73,16 @@ public abstract class BaseActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        String savePath = downloadFile.getAbsolutePath();
+//        String savePath = downloadFile.getAbsolutePath();
         //先检查本地文件夹有没有apk文件
-        File[] mfile = new File(savePath).listFiles();
+//        File[] mfile = new File(savePath).listFiles();
         //查看apk版本号
 //        Log.e("TAG", "updateAPP: ——-————————>>>" + mfile.length);
-        if (mfile.length <= 0) {
-            getApkfromeNet();
-        } else {
-            final File apk = mfile[0];
-            String apkPath = apk.getAbsolutePath();
-            PackageManager pm = this.getPackageManager();
-            //获取本地apk文件的包名 版本号
-            PackageInfo packageInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
-            int code = packageInfo.versionCode;
-            String packageName = packageInfo.packageName;
-//        Log.e("TAG", "updateAPP:<>><><><><><><><>< >>" + code + "    " + packageName);
-            if (code > getAppVersion() && packageName.equals(this.getPackageName())) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("更新提示：")
-                        .setMessage("发现新版本安装包！" +
-                                "\n请立即更新")
-                        .setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                installApk(apk);
-                            }
-                        });
-                builder.setCancelable(false);
-                builder.show();
-
-            } else {
-                getApkfromeNet();
-            }
-        }
+        getApkfromeNet();
+//        SPHelper sp = new SPHelper(this, "ApkVersion");
+//        sp.clear();
     }
+
 
     private void getApkfromeNet() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -130,12 +103,21 @@ public abstract class BaseActivity extends AppCompatActivity {
                     double versionCode = Double.valueOf(versionTexe).doubleValue();
 //                    Log.e("TAG", "onResponse: " + versionCode);
                     //本地应用版本号
-                    if (versionCode > getAppVersion()) {
+                    double appCode = getAppVersion();
+                    if (versionCode > appCode) {
                         //后台下载Apk
                         String apkUrl = object2.optString("filePath");
                         Intent intent = new Intent(getBaseContext(), DownAPKService.class);
                         intent.putExtra("url", apkUrl);
-                        startService(intent);
+//                        intent.putExtra("apkcode", "" + versionCode);
+                        String code = versionCode + "";
+                        if (code.equals(MyApp.getInstance().getVersionCode())) {
+                            Log.e("TAG", "onResponse: >>>>下载中……");
+                        } else {
+                            startService(intent);
+                            appCode = versionCode;
+                            MyApp.getInstance().saveApKVersionCode(appCode + "");
+                        }
 //                        Log.e("TAG", "onResponse: versionCode > getAppVersion())");
                     }
                 } catch (JSONException e) {
@@ -204,17 +186,5 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         getWindow().getDecorView().setSystemUiVisibility(uiFlags);
-    }
-
-    //打开APK程序代码
-    private void installApk(File file) {
-        // TODO Auto-generated method stub
-        Log.e("OpenFile", file.getName());
-        Intent intent = new Intent();
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setAction(android.content.Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(file),
-                "application/vnd.android.package-archive");
-        startActivity(intent);
     }
 }
