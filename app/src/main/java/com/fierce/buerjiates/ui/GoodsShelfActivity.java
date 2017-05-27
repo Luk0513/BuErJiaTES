@@ -85,7 +85,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     @Override
     protected void initView() {
         //自定义字体
-        goodsListBean=new ArrayList<>();
+        goodsListBean = new ArrayList<>();
         typeface = Typeface.createFromAsset(getAssets(), "fonnts/mnkt.TTF");
         tvBackHome.setTypeface(typeface);
         mHandler = new MyHandler(this);
@@ -299,6 +299,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
             @Override
             public void getPriceSucceed(String price) {
+                Log.e(TAG, "getPriceSucceed: " + price);
                 tvGoodsPrice.setText("心动价：RMB" + price);
             }
 
@@ -308,7 +309,8 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
             }
         });
         if (proJsonCodeBean.getGoods_sn() != null) {
-            getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn());
+            Log.e(TAG, "onItemClick: +" + categoryId);
+            getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn(), categoryId);
         }
         tvGoodsName.setText(proJsonCodeBean.getGoods_name());
         tvGoodsBrief.setText(proJsonCodeBean.getGoods_brief());

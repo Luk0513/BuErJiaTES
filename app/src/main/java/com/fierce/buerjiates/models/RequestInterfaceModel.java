@@ -158,7 +158,7 @@ public class RequestInterfaceModel implements IRequestInterface {
     }
 
     @Override
-    public void getGoodsPrice(String c, String a, String key, String goodsSn, final IBeanCallback callback) {
+    public void getGoodsPrice(String c, String a, String key, final String goodsSn, final String categoryId, final IBeanCallback callback) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
                 .build();
@@ -174,7 +174,16 @@ public class RequestInterfaceModel implements IRequestInterface {
                 if (response.body() != null) {
                     try {
                         JSONObject jsonObject = new JSONObject(response.body());
-                        String price = jsonObject.optString("marketprice");
+                        String price = "";
+                        if (categoryId.equals("2")) {
+                            Log.e(TAG, "onResponse: >>>>"+goodsSn );
+                            price = jsonObject.optString("xsg_price");
+                            Log.e(TAG, "onResponse: " + price);
+                        } else if (categoryId.equals("5")) {
+                            price = jsonObject.optString("marketprice");
+                            Log.e(TAG, "onResponse: ++" + price);
+                        }
+
                         callback.onSuccesd(price);
                     } catch (JSONException e) {
                         e.printStackTrace();

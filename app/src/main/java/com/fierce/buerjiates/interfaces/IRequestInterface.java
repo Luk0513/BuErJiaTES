@@ -24,5 +24,5 @@ public interface IRequestInterface {
 
      void getGoodsInfo(@NonNull String goodsId, IBeanCallback<GoodsBean> callback);
 
-     void getGoodsPrice(String c, String a, String key, String goodsSn, IBeanCallback callback);
+     void getGoodsPrice(String c, String a, String key, String goodsSn,String categoryId, IBeanCallback callback);
 }

@@ -65,7 +65,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             }
         });
         if (bean.getProJsonCode().getGoods_sn() != null) {
-            getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn());
+            getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn(),bean.getProductCategoryId());
         }
         holder.ivGoodsIV.setTag(imgUrl);
         cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);

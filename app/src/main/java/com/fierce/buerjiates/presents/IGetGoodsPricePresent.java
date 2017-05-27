@@ -19,8 +19,8 @@ public class IGetGoodsPricePresent {
     }
 
 
-    public void getGoodsPrice(String goodsSN) {
-        requestInterface.getGoodsPrice("user", "login", "b214af95fab423cc843792c70a199f09", goodsSN, new IBeanCallback() {
+    public void getGoodsPrice(String goodsSN,String categoryId) {
+        requestInterface.getGoodsPrice("user", "login", "b214af95fab423cc843792c70a199f09", goodsSN ,categoryId ,new IBeanCallback() {
             @Override
             public void onSuccesd(Object o) {
                 getGoodsPriceView.getPriceSucceed(o.toString());

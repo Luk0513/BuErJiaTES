@@ -235,7 +235,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
         getGoodsPresent.getGoodsInfo(goodsId);
     }
 
-    private void setPopuContent() {
+    private void setPopuContent(String pcategoryId) {
         tvCountryName.setText(proJsonCodeBean.getCountry_name());
         String countryLogo = proJsonCodeBean.getCountry_logo();
         if (!countryLogo.startsWith("http://")) {
@@ -261,7 +261,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
             }
         });
         if (proJsonCodeBean.getGoods_sn() != null) {
-            getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn());
+            getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn(), pcategoryId);
         }
         tvGoodsName.setText(proJsonCodeBean.getGoods_name());
         tvGoodsBrief.setText(proJsonCodeBean.getGoods_brief());
@@ -340,6 +340,8 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
         setIvImage(goodsSortListBean);
     }
 
+    private final String categoryId = "2";
+
     @Override
     public void getGoodsInfoSucceed(List<GoodsBean.ListBean> goodsList) {
         /**
@@ -348,7 +350,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
         this.goodsList = goodsList;
         if (goodsList.size() != 0) {
             proJsonCodeBean = goodsList.get(0).getProJsonCode();
-            setPopuContent();
+            setPopuContent(categoryId);
         }
     }
 
@@ -360,7 +362,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
         GoodsBean goodsBean = gson.fromJson(goodsInfoJson, GoodsBean.class);
         goodsList = goodsBean.getList();
         proJsonCodeBean = goodsList.get(0).getProJsonCode();
-        setPopuContent();
+        setPopuContent(categoryId);
     }
 
     @Override
