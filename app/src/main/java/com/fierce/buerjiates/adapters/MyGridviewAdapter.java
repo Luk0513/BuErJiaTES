@@ -1,6 +1,7 @@
 package com.fierce.buerjiates.adapters;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -13,6 +14,8 @@ import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.presents.IGetGoodsPricePresent;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
 import com.fierce.buerjiates.views.IGetGoodsPriceView;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -48,6 +51,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         }
         final GoodsList_Bean.ListBean bean = getItem(position);
         final String imgUrl = bean.getProJsonCode().getGoods_img();
+        final String categoryId = bean.getProductCategoryId();
 //        Log.e("TAG", "getView:     ?????????????????????? ....>>>" + bean.getAdmcNum());
 
         /**
@@ -55,8 +59,18 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
          */
         IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
             @Override
-            public void getPriceSucceed(String price) {
-                holder.tvGoodsPrice.setText("活动价格：RMB" + price);
+            public void getPriceSucceed(Object o) {
+                String price;
+                JSONObject jsonObject = (JSONObject) o;
+                if (categoryId.equals("2")) {
+                    price = jsonObject.optString("xsg_price");
+                    holder.tvMarketPrice.setVisibility(View.VISIBLE);
+                    holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG|Paint.ANTI_ALIAS_FLAG);
+                    holder.tvMarketPrice.setText("原价：¥"+jsonObject.optString("marketprice"));
+                } else {
+                    price = jsonObject.optString("marketprice");
+                }
+                holder.tvGoodsPrice.setText("活动价格：¥" + price);
             }
 
             @Override
@@ -65,7 +79,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             }
         });
         if (bean.getProJsonCode().getGoods_sn() != null) {
-            getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn(),bean.getProductCategoryId());
+            getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn(), bean.getProductCategoryId());
         }
         holder.ivGoodsIV.setTag(imgUrl);
         cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
@@ -91,6 +105,8 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         ImageView ivCube;
         @BindView(R.id.iv_cube_xs)
         ImageView ivCube_xs;
+        @BindView(R.id.tv_market_price)
+        TextView tvMarketPrice;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

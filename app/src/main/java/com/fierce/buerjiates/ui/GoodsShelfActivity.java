@@ -3,6 +3,7 @@ package com.fierce.buerjiates.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
@@ -36,6 +37,7 @@ import com.fierce.buerjiates.views.IGetGoodsPriceView;
 import com.google.gson.Gson;
 import com.google.zxing.WriterException;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -230,6 +232,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     TextView tvGoodsName;
     TextView tvGoodsBrief;
     TextView tvGoodsPrice;
+    TextView tvMarketPrice;
     ImageView ewm;
     ListView listView;
     View v;
@@ -242,6 +245,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         tvGoodsName = (TextView) v.findViewById(R.id.tv_goodsName);
         tvGoodsBrief = (TextView) v.findViewById(R.id.tv_goodsBrief);
         tvGoodsPrice = (TextView) v.findViewById(R.id.tv_goodsPrice);
+        tvMarketPrice = (TextView) v.findViewById(R.id.tv_marketPrice);
         close2 = (ImageView) v.findViewById(R.id.iv_close2);
         ewm = (ImageView) v.findViewById(R.id.iv_ewm);
         ivGoodsPic = (ImageView) v.findViewById(R.id.iv_goodsPic);
@@ -298,9 +302,18 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
 
         IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
             @Override
-            public void getPriceSucceed(String price) {
-                Log.e(TAG, "getPriceSucceed: " + price);
-                tvGoodsPrice.setText("心动价：RMB" + price);
+            public void getPriceSucceed(Object object) {
+                JSONObject jsonObject = (JSONObject) object;
+                String price = "";
+                if (categoryId.equals("2")) {
+                    price = jsonObject.optString("xsg_price");
+                    String marketPrice = jsonObject.optString("marketprice");
+                    tvMarketPrice.setVisibility(View.VISIBLE);
+                    tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG|Paint.ANTI_ALIAS_FLAG); //中划线
+                    tvMarketPrice.setText("原价：¥"+marketPrice);
+                }
+//                Log.e(TAG, "getPriceSucceed: " + price);
+                tvGoodsPrice.setText("心动价：¥" + price);
             }
 
             @Override
