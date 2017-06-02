@@ -272,7 +272,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(final AdapterView<?> parent, View view, int position, long id) {
         Log.e(TAG, "onItemClick: " + position + " // " + id);
         String ctLogo;
         close2.setOnClickListener(new View.OnClickListener() {
@@ -305,15 +305,17 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
             public void getPriceSucceed(Object object) {
                 JSONObject jsonObject = (JSONObject) object;
                 String price = "";
+                String marketPrice = jsonObject.optString("marketprice");
                 if (categoryId.equals("2")) {
                     price = jsonObject.optString("xsg_price");
-                    String marketPrice = jsonObject.optString("marketprice");
+                    tvGoodsPrice.setText("限时优惠：¥" + price);
                     tvMarketPrice.setVisibility(View.VISIBLE);
-                    tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG|Paint.ANTI_ALIAS_FLAG); //中划线
-                    tvMarketPrice.setText("原价：¥"+marketPrice);
+                    tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG); //中划线
+                    tvMarketPrice.setText("原价：¥" + marketPrice);
+                } else {
+                    tvGoodsPrice.setText("心动价：¥" + marketPrice);
                 }
 //                Log.e(TAG, "getPriceSucceed: " + price);
-                tvGoodsPrice.setText("心动价：¥" + price);
             }
 
             @Override
