@@ -5,7 +5,7 @@ package com.fierce.buerjiates.views;
  */
 
 public interface IGetGoodsPriceView {
-    public void getPriceSucceed(Object o);
+    void getPriceSucceed(Object o);
 
-    public void getPriceFailure(String msg);
+    void getPriceFailure(String msg);
 }
