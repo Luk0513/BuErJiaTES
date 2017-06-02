@@ -38,7 +38,7 @@ public class BannerFragment extends BaseFragment implements IGetBannerView, View
     ViewPager vpBanner;
     @BindView(R.id.hid_banner)
     ImageView hidImage;
-
+    //啊大家看好看见
     private List<View> mList = new ArrayList<>();
     private List<Banners_Bean.ListBean> listBeen;
     private BannerPagerAdapter adapter;
@@ -127,15 +127,9 @@ public class BannerFragment extends BaseFragment implements IGetBannerView, View
         }
     }
 
-    private int index;
 
     @Override
     public void onPageSelected(final int position) {
-        index = position;
-//        if (position == mList.size() - 1)
-//            vpBanner.setCurrentItem(1, false);
-//        if (position == 0)
-//            vpBanner.setCurrentItem(mList.size() - 2, false);
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -37,6 +38,7 @@ import com.fierce.buerjiates.views.IGetGoodsSorView;
 import com.google.gson.Gson;
 import com.google.zxing.WriterException;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -197,6 +199,8 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
     private TextView tvGoodsName;
     private TextView tvGoodsBrief;
     private TextView tvGoodsPrice;
+    private TextView tvMarketPrice;
+
     private ImageView ewm;
     private ListView listView;
     private View v;
@@ -208,6 +212,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
         tvGoodsName = (TextView) v.findViewById(R.id.tv_goodsName);
         tvGoodsBrief = (TextView) v.findViewById(R.id.tv_goodsBrief);
         tvGoodsPrice = (TextView) v.findViewById(R.id.tv_goodsPrice);
+        tvMarketPrice = (TextView) v.findViewById(R.id.tv_marketPrice);
         close2 = (ImageView) v.findViewById(R.id.iv_close2);
         ewm = (ImageView) v.findViewById(R.id.iv_ewm);
         ivGoodsPic = (ImageView) v.findViewById(R.id.iv_goodsPic);
@@ -252,9 +257,13 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
         }
         IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
             @Override
-            public void getPriceSucceed(String price) {
-                tvGoodsPrice.setText("心动价：RMB" + price);
-//                Log.e(TAG, "getPriceSucceed: >>>>>>>>>>>>>>>>>+" + tvGoodsPrice.getText().toString());
+            public void getPriceSucceed(Object o) {
+                JSONObject jsonObject = (JSONObject) o;
+                String price = jsonObject.optString("xsg_price");
+                tvGoodsPrice.setText("限时优惠：¥" + price);
+                tvMarketPrice.setVisibility(View.VISIBLE);
+                tvMarketPrice.setText("原价：¥"+jsonObject.optString("marketprice"));
+                tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG|Paint.ANTI_ALIAS_FLAG); //中划线
             }
 
             public void getPriceFailure(String msg) {
@@ -428,7 +437,7 @@ public class GoodsListFragment extends BaseFragment implements IGetGoodsSorView,
     private void sendBrocat(Boolean isShowe) {
         Intent intent = new Intent("PupoState");
         intent.putExtra("isPopuShowe", isShowe);
-        Bundle bundle=new Bundle();
+        Bundle bundle = new Bundle();
         getActivity().sendBroadcast(intent);
     }
 
