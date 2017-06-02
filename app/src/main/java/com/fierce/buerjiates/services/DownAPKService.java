@@ -23,7 +23,6 @@ public class DownAPKService extends IntentService {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.e("TAG", "onHandleIntent: :::::::::::::DownAPKService:::::::::后台服务");
