@@ -71,6 +71,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     private IGetGoodsListPresent present;
     private List<GoodsList_Bean.ListBean> goodsListBean;
     private String goodsId;
+    private String goods_sn;
     private String d_Id;
     private String shopUrl;
     private ImageCacheUtils cacheUtils;
@@ -226,18 +227,18 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////
-    ImageView ivGoodsPic;
-    ImageView ivCountryLogo;
-    TextView tvCountryName;
-    TextView tvGoodsName;
-    TextView tvGoodsBrief;
-    TextView tvGoodsPrice;
-    TextView tvMarketPrice;
-    ImageView ewm;
-    ListView listView;
-    View v;
-    ImageView close2;
-    GoodsList_Bean.ListBean.ProJsonCodeBean proJsonCodeBean;
+    private ImageView ivGoodsPic;
+    private ImageView ivCountryLogo;
+    private TextView tvCountryName;
+    private TextView tvGoodsName;
+    private TextView tvGoodsBrief;
+    private TextView tvGoodsPrice;
+    private TextView tvMarketPrice;
+    private ImageView ewm;
+    private ListView listView;
+    private View v;
+    private ImageView close2;
+    private GoodsList_Bean.ListBean.ProJsonCodeBean proJsonCodeBean;
 
     private void initDetailsView() {
         v = View.inflate(this, R.layout.goods_details, null);
@@ -344,6 +345,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         srcListAdapter = new GoodsSrcListAdapter(this, imgUrlList, cacheUtils, listView);
         listView.setAdapter(srcListAdapter);
         goodsId = proJsonCodeBean.getGoods_id();
+        goods_sn = proJsonCodeBean.getGoods_sn();
         createQRcode(goodsId, d_Id);//二维码
     }
 
@@ -351,8 +353,18 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
      * 二维码生成
      */
     private void createQRcode(String goodsId, String d_Id) {
-        shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-                "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId + "&d_id=" + d_Id;
+//        Log.e(TAG, "createQRcode: >>>>>>>>>>>>>>>>" + goods_sn);
+        if (categoryId.equals("2")) {
+            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+                    "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId + "&d_id=" + d_Id;
+        } else if (categoryId.equals("5")) {
+            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+                    "&m=ewei_shopv2&do=mobile&r=groups.goods&erw_gsn=" + goods_sn;
+//            + "&d_id=" + d_Id;
+            //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=groups.goods&id=17
+            //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile
+        }
+
         try {
             Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 160);
             ewm.setImageBitmap(bitmap);
