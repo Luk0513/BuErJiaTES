@@ -367,7 +367,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
 //        }
 
         String m_id = MyApp.getInstance().getM_id();
-        Log.e(TAG, "createQRcode: "+m_id );
+//        Log.e(TAG, "createQRcode: "+m_id );
         int mid = Integer.parseInt(m_id);
         shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
                 "&m=ewei_shopv2&do=mobile&r=goods.detail&id="
