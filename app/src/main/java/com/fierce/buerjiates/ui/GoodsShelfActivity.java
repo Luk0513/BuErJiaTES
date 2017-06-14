@@ -354,16 +354,24 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
      */
     private void createQRcode(String goodsId, String d_Id) {
 //        Log.e(TAG, "createQRcode: >>>>>>>>>>>>>>>>" + goods_sn);
-        if (categoryId.equals("2")) {
-            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-                    "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId + "&d_id=" + d_Id;
-        } else if (categoryId.equals("5")) {
-            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-                    "&m=ewei_shopv2&do=mobile&r=groups.goods&erw_gsn=" + goods_sn;
+//        if (categoryId.equals("2")) {
+//            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+//                    "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId + "&d_id=" + d_Id;
+//        } else if (categoryId.equals("5")) {
+//            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+//                    "&m=ewei_shopv2&do=mobile&r=groups.goods&erw_gsn=" + goods_sn;
 //            + "&d_id=" + d_Id;
-            //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=groups.goods&id=17
-            //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile
-        }
+        //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=groups.goods&id=17
+        //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile
+        //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=goods.detail&id=1988&mid=3219
+//        }
+
+        String m_id = MyApp.getInstance().getM_id();
+        Log.e(TAG, "createQRcode: "+m_id );
+        int mid = Integer.parseInt(m_id);
+        shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+                "&m=ewei_shopv2&do=mobile&r=goods.detail&id="
+                + goodsId + "&d_id=" + d_Id+"&mid="+mid;
 
         try {
             Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 160);

@@ -14,6 +14,7 @@ import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,7 +35,7 @@ public class RequestInterfaceModel implements IRequestInterface {
     private final static String TAG = "RequestInterfaceModel";
 
     @Override
-    public void activeDevice(@NonNull String device_Id, @NonNull String device_Key,
+    public void activeDevice(@NonNull final String device_Id, @NonNull String device_Key,
                              final IBeanCallback callback) {
         Retrofit retrofit = MyApp.getInstance().getStringRetrofit();
 
@@ -48,6 +49,12 @@ public class RequestInterfaceModel implements IRequestInterface {
                     JSONObject jsonObject = new JSONObject(response.body());
 //                    Log.e(TAG, "onResponse: :::::::::::::" + jsonObject.optString("objMessage"));
                     if (jsonObject.optString("resCode").equals("0")) {
+                        JSONArray array = jsonObject.getJSONArray("listMassage");
+                        JSONObject object2 = array.getJSONObject(0);
+                        //分销商ID
+                        String mid = object2.optString("mId");
+//                    Log.e(TAG, "onResponse: >>>>>>>" + mid);
+                        MyApp.getInstance().saveDevice_id(device_Id, mid);
                         callback.onSuccesd("设备激活成功");
                     } else {
                         if (jsonObject.optString("objMessage").equals("2")) {

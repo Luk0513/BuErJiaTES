@@ -110,9 +110,10 @@ public abstract class BaseActivity extends AppCompatActivity {
                         Intent intent = new Intent(getBaseContext(), DownAPKService.class);
                         intent.putExtra("url", apkUrl);
 //                        intent.putExtra("apkcode", "" + versionCode);
+                        //服务器上的版本号
                         String code = versionCode + "";
                         if (code.equals(MyApp.getInstance().getVersionCode())) {
-                            Log.e("TAG", "onResponse: >>>>下载中……");
+                            Log.e("TAG", "onResponse: >>>>不需要重复下载……");
                         } else {
                             startService(intent);
                             appCode = versionCode;

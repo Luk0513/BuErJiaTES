@@ -148,10 +148,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     @Override
     public void onSucceed() {
         if (actDialog.isShowing()) {
-
             actDialog.dismiss();
         }
-        MyApp.getInstance().saveDevice_id(deviceId);
         showGuideDialog();
 
     }

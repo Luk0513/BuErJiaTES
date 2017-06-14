@@ -87,11 +87,18 @@ public class MyApp extends Application {
         return device_id;
     }
 
+    public String getM_id() {
+        SPHelper spHelper = new SPHelper(this, "M_id");
+        return spHelper.getString("mid");
+    }
+
     //保存数据
-    public void saveDevice_id(String device_id) {
+    public void saveDevice_id(String device_id, String mid) {
         this.device_id = device_id;
         SPHelper sp = new SPHelper(this, "Device_id");
         sp.save(new SPHelper.ContentValue("d_id", device_id));
+        SPHelper spHelper = new SPHelper(this, "M_id");
+        spHelper.save(new SPHelper.ContentValue("mid", mid));
     }
 
     //清除数据
@@ -187,11 +194,9 @@ public class MyApp extends Application {
         SPHelper spHelper = new SPHelper(getApplicationContext(), "ApkVersion");
         spHelper.save(new SPHelper.ContentValue("apkVersion", code));
     }
-    public String getVersionCode(){
-        SPHelper spHelper=new SPHelper(getApplicationContext(),"ApkVersion");
+
+    public String getVersionCode() {
+        SPHelper spHelper = new SPHelper(getApplicationContext(), "ApkVersion");
         return spHelper.getString("apkVersion");
     }
-
-
-
 }

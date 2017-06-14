@@ -8,8 +8,6 @@ import android.util.Log;
 
 import com.fierce.buerjiates.utils.DownloadUtil;
 
-import java.io.File;
-
 public class DownAPKService extends IntentService {
 
     DownloadUtil downloadUtil;
@@ -23,10 +21,17 @@ public class DownAPKService extends IntentService {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.e("TAG", "onHandleIntent: :::::::::::::DownAPKService:::::::::后台服务");
         downloadApk(intent);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        downloadUtil = DownloadUtil.get();
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void downloadApk(@Nullable final Intent intent) {
@@ -34,13 +39,10 @@ public class DownAPKService extends IntentService {
         downloadUtil.download(apkUrl, "update", new DownloadUtil.OnDownloadListener() {
             @Override
             public void onDownloadSuccess(Object o) {
-                File apkFile = (File) o;
                 Log.e("TAG", "onDownloadSuccess: <><><><><><<<<>>>");
                 Intent in = new Intent("PupoState");
-                String path = apkFile.getAbsolutePath();
                 in.putExtra("isDone", true);
                 sendBroadcast(in);
-//                installApk(apkFile);
             }
 
             @Override
@@ -50,16 +52,11 @@ public class DownAPKService extends IntentService {
 
             @Override
             public void onDownloadFailed() {
+                //重新下载
                 Intent in = new Intent("PupoState");
                 sendBroadcast(in);
             }
         });
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        downloadUtil = DownloadUtil.get();
-        return super.onStartCommand(intent, flags, startId);
     }
 
 //    //打开APK程序代码
