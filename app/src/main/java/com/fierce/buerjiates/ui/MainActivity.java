@@ -87,7 +87,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     }
 
-    // TODO: 2017/3/18 surfaceview
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 //        mediaPlayer = new MediaPlayer();
@@ -206,7 +205,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     /**
      * 显示引导页
      */
-// TODO: 2017/3/7 showGuideDialog
     private void initGuideDialog() {
         View layout = View.inflate(this, R.layout.dialog_layout, null);
         ImageView iv = (ImageView) layout.findViewById(R.id.iv_image);

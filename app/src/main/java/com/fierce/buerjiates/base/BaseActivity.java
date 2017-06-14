@@ -169,7 +169,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         hideNavigationBar();
     }
 
-    //todo 隐藏导航栏
     public void hideNavigationBar() {
         int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
