@@ -41,6 +41,8 @@ public class MyApp extends Application {
         super.onCreate();
         instance = this;
         context = getApplicationContext();
+        SPHelper spHelper = new SPHelper(getContext(), "ServerState");
+        spHelper.clear();
     }
 
     public Context getContext() {
@@ -190,13 +192,15 @@ public class MyApp extends Application {
         return null;
     }
 
-    public void saveApKVersionCode(String code) {
-        SPHelper spHelper = new SPHelper(getApplicationContext(), "ApkVersion");
-        spHelper.save(new SPHelper.ContentValue("apkVersion", code));
+    public void saveisRunning(boolean isRunning) {
+        SPHelper spHelper = new SPHelper(getContext(), "ServerState");
+        spHelper.save(new SPHelper.ContentValue("state", isRunning));
     }
 
-    public String getVersionCode() {
-        SPHelper spHelper = new SPHelper(getApplicationContext(), "ApkVersion");
-        return spHelper.getString("apkVersion");
+    public boolean getisRunning() {
+        SPHelper spHelper = new SPHelper(getContext(), "ServerState");
+        return spHelper.getBoolean("state");
     }
+
+
 }

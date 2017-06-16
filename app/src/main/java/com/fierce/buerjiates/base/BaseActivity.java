@@ -1,36 +1,15 @@
 package com.fierce.buerjiates.base;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.fierce.buerjiates.config.MyApp;
-import com.fierce.buerjiates.https.HttpManage;
-import com.fierce.buerjiates.services.DownAPKService;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
-
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * Created by Administrator on 2017/3/11.
@@ -44,7 +23,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getLayoutRes());
         ButterKnife.bind(this);
         initView();
-        updateAPP();
     }
 
     protected abstract int getLayoutRes();
@@ -63,92 +41,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         });
     }
 
-    public void updateAPP() {
-        //先检查本地文件夹是否存在
-        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
-        if (!downloadFile.mkdirs()) {
-            try {
-                downloadFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-//        String savePath = downloadFile.getAbsolutePath();
-        //先检查本地文件夹有没有apk文件
-//        File[] mfile = new File(savePath).listFiles();
-        //查看apk版本号
-//        Log.e("TAG", "updateAPP: ——-————————>>>" + mfile.length);
-        getApkfromeNet();
-//        SPHelper sp = new SPHelper(this, "ApkVersion");
-//        sp.clear();
-    }
-
-
-    private void getApkfromeNet() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://120.76.159.2:8090/admin/")
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build();
-        Call<String> call = retrofit.create(HttpManage.class).updateApp();
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-//                    Log.e("TAG", "onResponse: __________" + response.body());
-                try {
-                    JSONObject object = new JSONObject(response.body());
-                    JSONArray array = object.getJSONArray("list");
-                    JSONObject object2 = array.getJSONObject(0);
-                    String versionTexe = object2.optString("versionText");
-                    //服务器Apk 版本号
-                    double versionCode = Double.valueOf(versionTexe).doubleValue();
-//                    Log.e("TAG", "onResponse: " + versionCode);
-                    //本地应用版本号
-                    double appCode = getAppVersion();
-                    if (versionCode > appCode) {
-                        //后台下载Apk
-                        String apkUrl = object2.optString("filePath");
-                        Intent intent = new Intent(getBaseContext(), DownAPKService.class);
-                        intent.putExtra("url", apkUrl);
-//                        intent.putExtra("apkcode", "" + versionCode);
-                        //服务器上的版本号
-                        String code = versionCode + "";
-                        if (code.equals(MyApp.getInstance().getVersionCode())) {
-                            Log.e("TAG", "onResponse: >>>>不需要重复下载……");
-                        } else {
-                            startService(intent);
-                            appCode = versionCode;
-                            MyApp.getInstance().saveApKVersionCode(appCode + "");
-                        }
-//                        Log.e("TAG", "onResponse: versionCode > getAppVersion())");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Log.e("TAG", "onFailure: ::::::::::::::" + t.toString());
-            }
-        });
-    }
-
-    /**
-     * 获取单个App版本号
-     **/
-    public double getAppVersion() {
-        PackageManager pManager = this.getPackageManager();
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = pManager.getPackageInfo(this.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        int appVersion = packageInfo.versionCode;
-        double version = Double.valueOf(appVersion).doubleValue();
-        Log.e("TAG", "getAppVersion: " + appVersion + "   " + version);
-        return version;
-    }
 
     public Activity getActivity() {
         return this;

@@ -1,0 +1,5 @@
+<root>
+    <item name='android.Manifest.permission INSTALL_PACKAGES'>
+        <annotation name='java.lang.Deprecated' />
+    </item>
+</root>

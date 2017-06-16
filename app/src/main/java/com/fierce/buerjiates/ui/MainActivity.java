@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -24,20 +26,29 @@ import android.widget.ImageView;
 import com.fierce.buerjiates.R;
 import com.fierce.buerjiates.base.BaseActivity;
 import com.fierce.buerjiates.config.MyApp;
+import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.presents.IActdevicePresent;
+import com.fierce.buerjiates.services.DownAPKService;
 import com.fierce.buerjiates.services.LoadDataSevice;
 import com.fierce.buerjiates.utils.DownloadUtil;
 import com.fierce.buerjiates.utils.NetWorkUtils;
 import com.fierce.buerjiates.views.IActiveDeviceView;
 import com.fierce.buerjiates.widget.CustomDialog;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import butterknife.BindView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class MainActivity extends BaseActivity implements SurfaceHolder.Callback, IActiveDeviceView, View.OnTouchListener {
     private final String TAG = "MainActivity";
@@ -66,7 +77,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void initView() {
-
         mHandler = new MyHandler(this);
         suvAdvideo.getHolder().addCallback(this);
         initGuideDialog();
@@ -78,7 +88,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             startService(new Intent(this, LoadDataSevice.class));
             inputDid();
         }
-
+        updateAPP();
         vHideView.setOnTouchListener(this);
 //        if (!videoIsExsit()) {
 //            Log.e("TAG", "onCreate: --开始下载视频--");
@@ -173,7 +183,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     }
 
-    //todo video////////////////////////////////////////////////////////////////////////////////////////////
     private boolean videoIsExsit() {
         File file = new File("/storage/emulated/0/adVideo",
                 videoUrl.substring(videoUrl.lastIndexOf("/") + 1));
@@ -236,7 +245,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-    //todo 激活设备 inputDid()
+    // 激活设备 inputDid()
     private void inputDid() {
         index = 0;
         final View layout = View.inflate(this, R.layout.input_d_id, null);
@@ -297,7 +306,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         return false;
     }
 
-    //todo Handler////////////////////////////////////////////////////////////////////////////////
+
     private static class MyHandler extends Handler {
         private WeakReference<MainActivity> mWeakReference;
 
@@ -319,7 +328,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-    //todo onWindowFocusChanged////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -373,7 +381,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-
     /**
      * 接受Fragment发来的广播
      */
@@ -418,6 +425,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                         });
                 builder.setCancelable(false);
                 builder.show();
+            } else {
+
             }
         }
     }
@@ -435,6 +444,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         startActivity(intent);
     }
 
+
     private void registrBodcast() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("PupoState");
@@ -443,29 +453,70 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     }
 
+    public void updateAPP() {
+        //先检查本地文件夹是否存在
+        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
+        if (!downloadFile.mkdirs()) {
+            try {
+                downloadFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        getApkfromeNet();
+    }
+
+    private void getApkfromeNet() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://120.76.159.2:8090/admin/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        Call<String> call = retrofit.create(HttpManage.class).updateApp();
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+                    JSONObject object = new JSONObject(response.body());
+                    JSONArray array = object.getJSONArray("list");
+                    JSONObject object2 = array.getJSONObject(0);
+                    String versionTexe = object2.optString("versionText");
+                    //服务器Apk 版本号
+                    double versionCode = Double.valueOf(versionTexe).doubleValue();
+                    //本地应用版本号
+                    double appCode = getAppVersion();
+                    if (versionCode > appCode) {
+                        //后台下载Apk
+                        String apkUrl = object2.optString("filePath");
+                        Intent intent = new Intent(getBaseContext(), DownAPKService.class);
+                        intent.putExtra("url", apkUrl);
+                        startService(intent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("TAG", "onFailure: ::::::::::::::" + t.toString());
+            }
+        });
+    }
+
     /**
-     * 使用MD5算法对传入的key进行加密并返回。
-     */
-    public static String stringToMD5(String string) {
-        byte[] hash;
-
+     * 获取单个App版本号
+     **/
+    public double getAppVersion() {
+        PackageManager pManager = this.getPackageManager();
+        PackageInfo packageInfo = null;
         try {
-            hash = MessageDigest.getInstance("MD5").digest(string.getBytes("UTF-8"));
-        } catch (NoSuchAlgorithmException e) {
+            packageInfo = pManager.getPackageInfo(this.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
-            return null;
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
         }
-
-        StringBuilder hex = new StringBuilder(hash.length * 2);
-        for (byte b : hash) {
-            if ((b & 0xFF) < 0x10)
-                hex.append("0");
-            hex.append(Integer.toHexString(b & 0xFF));
-        }
-
-        return hex.toString().substring(8, 24);
+        int appVersion = packageInfo.versionCode;
+        double version = Double.valueOf(appVersion).doubleValue();
+        Log.e("TAG", "getAppVersion: " + appVersion + "   " + version);
+        return version;
     }
 }

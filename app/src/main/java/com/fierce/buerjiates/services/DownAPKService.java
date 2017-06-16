@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.utils.DownloadUtil;
 
 public class DownAPKService extends IntentService {
@@ -24,8 +25,11 @@ public class DownAPKService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Log.e("TAG", "onHandleIntent: :::::::::::::DownAPKService:::::::::后台服务");
-        downloadApk(intent);
+        if (!MyApp.getInstance().getisRunning()) {
+            Log.e("TAG", "onHandleIntent: <<<<<" + "下载……");
+            downloadApk(intent);
+            MyApp.getInstance().saveisRunning(true);
+        }
     }
 
     @Override
@@ -43,6 +47,7 @@ public class DownAPKService extends IntentService {
                 Intent in = new Intent("PupoState");
                 in.putExtra("isDone", true);
                 sendBroadcast(in);
+                MyApp.getInstance().saveisRunning(false);
             }
 
             @Override
@@ -52,23 +57,12 @@ public class DownAPKService extends IntentService {
 
             @Override
             public void onDownloadFailed() {
-                //重新下载
-                Intent in = new Intent("PupoState");
-                sendBroadcast(in);
             }
         });
     }
 
-//    //打开APK程序代码
-//    private void installApk(File file) {
-//        Log.e("OpenFile", file.getName());
-//        Intent intent = new Intent();
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.setAction(android.content.Intent.ACTION_VIEW);
-//        intent.setDataAndType(Uri.fromFile(file),
-//                "application/vnd.android.package-archive");
-//        startActivity(intent);
-//    }
-
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

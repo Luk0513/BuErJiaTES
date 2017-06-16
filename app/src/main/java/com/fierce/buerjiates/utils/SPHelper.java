@@ -35,7 +35,6 @@ public class SPHelper {
             }
         }
         et.apply();
-        et.commit();
     }
 
     public int getInt(String key) {
@@ -65,7 +64,6 @@ public class SPHelper {
 
     public void clear() {
         sp.edit().clear().apply();
-
     }
 
     public static class ContentValue {
