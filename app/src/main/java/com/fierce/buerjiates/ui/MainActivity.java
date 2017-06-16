@@ -391,6 +391,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         public void onReceive(Context context, Intent intent) {
             isPopuShowe = intent.getBooleanExtra("isPopuShowe", false);
             boolean isDone = intent.getBooleanExtra("isDone", false);
+            final String apkPath = intent.getStringExtra("apk");
+            Log.e(TAG, "onReceive: >>>>>>>>>>>>>" + apkPath);
             if (isPopuShowe) {
                 vHideView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -420,7 +422,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                         .setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                installApk();
+                                installApk(apkPath);
                             }
                         });
                 builder.setCancelable(false);
@@ -432,10 +434,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     }
 
     //打开APK程序代码
-    private void installApk() {
-        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
-        File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
-        File apk = files[0];
+    private void installApk(String apkPath) {
+//        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
+//        File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
+        File apk = new File(apkPath);
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(android.content.Intent.ACTION_VIEW);
