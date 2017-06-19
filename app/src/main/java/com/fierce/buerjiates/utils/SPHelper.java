@@ -32,6 +32,8 @@ public class SPHelper {
                 et.putInt(value.key, Integer.parseInt(value.value.toString()));
             else if (value.value instanceof Boolean) {
                 et.putBoolean(value.key, Boolean.parseBoolean(value.value.toString()));
+            } else if (value.value instanceof Long) {
+                et.putLong(value.key, Long.parseLong(value.value.toString()));
             }
         }
         et.apply();
@@ -59,6 +61,14 @@ public class SPHelper {
 
     public String getString(String key, String defValue) {
         return sp.getString(key, defValue);
+    }
+
+    public long getLong(String key) {
+        return sp.getLong(key, -1);
+    }
+
+    public long getLong(String key, long defvalue) {
+        return sp.getLong(key, defvalue);
     }
 
 

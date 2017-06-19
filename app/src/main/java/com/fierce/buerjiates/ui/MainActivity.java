@@ -465,6 +465,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 e.printStackTrace();
             }
         }
+        //下载apk
         getApkfromeNet();
     }
 
