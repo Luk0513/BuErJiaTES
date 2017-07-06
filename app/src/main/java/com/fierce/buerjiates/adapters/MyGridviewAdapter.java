@@ -38,7 +38,6 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         this.gridView = gridView;
     }
 
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
@@ -52,7 +51,6 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         final GoodsList_Bean.ListBean bean = getItem(position);
         final String imgUrl = bean.getProJsonCode().getGoods_img();
         final String categoryId = bean.getProductCategoryId();
-//        Log.e("TAG", "getView:     ?????????????????????? ....>>>" + bean.getAdmcNum());
 
         /**
          *  调取微信商城的价格
@@ -65,9 +63,9 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
                 if (categoryId.equals("2")) {
                     price = jsonObject.optString("xsg_price");
                     holder.tvMarketPrice.setVisibility(View.VISIBLE);
-                    holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG|Paint.ANTI_ALIAS_FLAG);
-                    holder.tvMarketPrice.setText("原价：¥"+jsonObject.optString("marketprice"));
-                    holder.tvGoodsPrice.setText("限时优惠：¥"+price);
+                    holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+                    holder.tvMarketPrice.setText("原价：¥" + jsonObject.optString("marketprice"));
+                    holder.tvGoodsPrice.setText("限时优惠：¥" + price);
                 } else {
                     price = jsonObject.optString("marketprice");
                     holder.tvGoodsPrice.setText("活动价格：¥" + price);
@@ -85,9 +83,8 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         holder.ivGoodsIV.setTag(imgUrl);
         cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
         holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());
-        if (bean.getCube().startsWith("http")) {
-//            Glide.with(getContext()).load(bean.getCube())
-//                    .diskCacheStrategy(DiskCacheStrategy.RESULT).into(holder.ivCube);
+        //设置商品列表角标
+        if (bean.getProductCategoryId().equals("5")) {
             holder.ivCube.setBackgroundResource(R.mipmap.ping);
         } else {
             holder.ivCube_xs.setBackgroundResource(R.mipmap.xs_48);

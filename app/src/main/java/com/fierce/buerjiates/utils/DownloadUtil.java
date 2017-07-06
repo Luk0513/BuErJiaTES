@@ -47,6 +47,7 @@ public class DownloadUtil {
      * @param url      下载连接
      * @param saveDir  储存下载文件的SDCard目录
      * @param listener 下载监听
+     *                 OKhttp3 文件下载
      */
     public void download(final String url, final String saveDir, final OnDownloadListener listener) {
         Request request = new Request.Builder().url(url).build();
@@ -64,18 +65,14 @@ public class DownloadUtil {
                 FileOutputStream fos = null;
                 // 储存下载文件的目录
                 String savePath = isExistDir(saveDir);
-//                Log.e("TAG", "savePath: ++++++++++++" + savePath);
                 try {
                     is = response.body().byteStream();
                     long total = response.body().contentLength();
                     File file = new File(savePath, getNameFromUrl(url));
-
-//                    Log.e("TAG", "getNameFromUrl(url)(): ++++++++++++" +getNameFromUrl(url));
-//                    Log.e("TAG", "file.getAbsoluteFile(): ++++++++++++" +file.getAbsoluteFile());
-
+                    //Log.e("TAG", "file.getAbsoluteFile(): ++++++++++++" +file.getAbsoluteFile());
                     filePhath = file.getAbsolutePath();
                     fos = new FileOutputStream(file);
-                    long sum = 0;
+                    long sum =0;
                     while ((len = is.read(buf)) != -1) {
                         fos.write(buf, 0, len);
                         sum += len;

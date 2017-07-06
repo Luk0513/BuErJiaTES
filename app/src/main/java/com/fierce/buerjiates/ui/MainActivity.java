@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -56,6 +57,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     SurfaceView suvAdvideo;
     @BindView(R.id.v_hideView)
     View vHideView;
+//    @BindView(R.id.imge_money)
+//    ImageView imageMoney;
 
     private CustomDialog actDialog;
     private CustomDialog guideDialog;
@@ -307,6 +310,11 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     }
 
 
+    @OnClick(R.id.imge_money)
+    public void onViewClicked() {
+        startActivity(new Intent(this, Lottery_activity.class));
+    }
+
     private static class MyHandler extends Handler {
         private WeakReference<MainActivity> mWeakReference;
 
@@ -440,7 +448,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         File apk = new File(apkPath);
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(apk),
                 "application/vnd.android.package-archive");
         startActivity(intent);
