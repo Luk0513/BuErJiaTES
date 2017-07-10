@@ -17,6 +17,8 @@ import com.fierce.buerjiates.views.IGetGoodsPriceView;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -37,6 +39,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         this.cacheUtils = cacheUtils;
         this.gridView = gridView;
     }
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -62,6 +65,14 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
                 JSONObject jsonObject = (JSONObject) o;
                 if (categoryId.equals("2")) {
                     price = jsonObject.optString("xsg_price");
+                    String starTime = jsonObject.optString("timestart");
+                    String endTime = jsonObject.optString("timeend");
+                    long times = System.currentTimeMillis();
+                    if (Long.parseLong(endTime) * 1000 < times) {
+                        holder.ivTimeout.setVisibility(View.VISIBLE);
+                    }
+                    holder.tvTimelimit.setVisibility(View.VISIBLE);
+                    holder.tvTimelimit.setText("Time：" + formatTime(starTime) + "—" + formatTime(endTime));
                     holder.tvMarketPrice.setVisibility(View.VISIBLE);
                     holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
                     holder.tvMarketPrice.setText("原价：¥" + jsonObject.optString("marketprice"));
@@ -105,10 +116,20 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         ImageView ivCube_xs;
         @BindView(R.id.tv_market_price)
         TextView tvMarketPrice;
+        @BindView(R.id.tv_timeLimit)
+        TextView tvTimelimit;
+        @BindView(R.id.iv_timeout)
+        ImageView ivTimeout;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
     }
 
+    private String formatTime(String time) {
+        long t = Long.parseLong(time) * 1000;
+        SimpleDateFormat formats = new SimpleDateFormat("yyyy.MM.dd");
+        String d = formats.format(new Date(t));
+        return d;
+    }
 }

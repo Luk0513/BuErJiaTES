@@ -50,8 +50,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="450px"
-        android:alpha="0.7"
+        android:layout_marginBottom="430px"
+        android:alpha="0.8"
         android:src="@mipmap/money" />
 
 </RelativeLayout>

@@ -22,6 +22,17 @@
             android:src="@mipmap/file_photo" />
 
         <ImageView
+            android:id="@+id/iv_timeout"
+            android:layout_width="wrap_content"
+            android:layout_height="220dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:alpha="0.9"
+            android:src="@mipmap/timeout"
+            android:visibility="invisible" />
+
+
+        <ImageView
             android:id="@+id/iv_cube"
             android:layout_width="45dp"
             android:layout_height="45dp"
@@ -34,12 +45,21 @@
             android:layout_height="60dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true" />
-
+        <TextView
+            android:id="@+id/tv_timeLimit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_below="@id/iv_goodsIV"
+            android:text="：2017.06.06—2017.06.20"
+            android:textColor="@color/color_4"
+            android:textSize="14sp"
+            android:visibility="invisible" />
         <TextView
             android:id="@+id/tv_goods_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/iv_goodsIV"
+            android:layout_below="@id/tv_timeLimit"
             android:lines="3"
             android:paddingBottom="5dp"
             android:paddingEnd="15dp"
@@ -61,6 +81,7 @@
             android:text="价格：RMB"
             android:textColor="@color/color_7"
             android:textSize="16sp" />
+
         <TextView
             android:id="@+id/tv_market_price"
             android:layout_width="wrap_content"
@@ -70,9 +91,9 @@
             android:layout_marginLeft="18dp"
             android:lines="1"
             android:text="价格：RMB"
-            android:visibility="gone"
             android:textColor="@color/color_text2"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="gone" />
 
     </RelativeLayout>
 

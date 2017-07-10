@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -231,10 +232,12 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     private ImageView ivCountryLogo;
     private TextView tvCountryName;
     private TextView tvGoodsName;
+    private TextView tvTimeLimited;//限时时间
     private TextView tvGoodsBrief;
     private TextView tvGoodsPrice;
     private TextView tvMarketPrice;
     private ImageView ewm;
+    private LinearLayout llTimelimit;
     private ListView listView;
     private View v;
     private ImageView close2;
@@ -245,8 +248,10 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         tvCountryName = (TextView) v.findViewById(R.id.tv_countryName);
         tvGoodsName = (TextView) v.findViewById(R.id.tv_goodsName);
         tvGoodsBrief = (TextView) v.findViewById(R.id.tv_goodsBrief);
+        llTimelimit = (LinearLayout) v.findViewById(R.id.ll_timeLimited);
         tvGoodsPrice = (TextView) v.findViewById(R.id.tv_goodsPrice);
         tvMarketPrice = (TextView) v.findViewById(R.id.tv_marketPrice);
+        tvTimeLimited = (TextView) v.findViewById(R.id.tv_Timelimited);
         close2 = (ImageView) v.findViewById(R.id.iv_close2);
         ewm = (ImageView) v.findViewById(R.id.iv_ewm);
         ivGoodsPic = (ImageView) v.findViewById(R.id.iv_goodsPic);
@@ -280,6 +285,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
+                handler.removeCallbacks(runnable);
                 cacheUtils.removeCache();
                 ivPopuBg.setVisibility(View.GONE);
             }
@@ -306,13 +312,25 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
             public void getPriceSucceed(Object object) {
                 JSONObject jsonObject = (JSONObject) object;
                 String price = "";
+                String endTime = "";
                 String marketPrice = jsonObject.optString("marketprice");
                 if (categoryId.equals("2")) {
                     price = jsonObject.optString("xsg_price");
+                    endTime = jsonObject.optString("timeend");
+                    llTimelimit.setVisibility(View.VISIBLE);
+                    if (Long.parseLong(endTime) * 1000 - System.currentTimeMillis() >= 0) {
+                        resultTime = Long.parseLong(endTime) * 1000 - System.currentTimeMillis();
+                        handler.postDelayed(runnable, 1000);
+                    } else {
+                        handler.removeCallbacks(runnable);
+                        tvTimeLimited.setText("活动结束,下次早点来哦~");
+                    }
+                    Log.e(TAG, "getPriceSucceed: ______<<>>>>>>>>**>>>>" + endTime);
                     tvGoodsPrice.setText("限时优惠：¥" + price);
                     tvMarketPrice.setVisibility(View.VISIBLE);
                     tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG); //中划线
                     tvMarketPrice.setText("原价：¥" + marketPrice);
+
                 } else {
                     tvGoodsPrice.setText("心动价：¥" + marketPrice);
                 }
@@ -353,25 +371,22 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
      * 二维码生成
      */
     private void createQRcode(String goodsId, String d_Id) {
-//        Log.e(TAG, "createQRcode: >>>>>>>>>>>>>>>>" + goods_sn);
-//        if (categoryId.equals("2")) {
-//            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-//                    "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId + "&d_id=" + d_Id;
-//        } else if (categoryId.equals("5")) {
-//            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-//                    "&m=ewei_shopv2&do=mobile&r=groups.goods&erw_gsn=" + goods_sn;
-//            + "&d_id=" + d_Id;
-        //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=groups.goods&id=17
-        //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile
-        //http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=goods.detail&id=1988&mid=3219
-//        }
-
+        Log.e(TAG, "createQRcode: >>>>>>>>>>>>>>>>" + goods_sn);
         String m_id = MyApp.getInstance().getM_id();
-//        Log.e(TAG, "createQRcode: "+m_id );
         int mid = Integer.parseInt(m_id);
-        shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-                "&m=ewei_shopv2&do=mobile&r=goods.detail&id="
-                + goodsId + "&d_id=" + d_Id+"&mid="+mid;
+
+        if (categoryId.equals("2")) {
+            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+                    "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId + "&d_id=" + d_Id + "&mid=" + mid;
+        } else if (categoryId.equals("5")) {
+            shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+                    "&m=ewei_shopv2&do=mobile&r=groups.goods&erw_gsn=" + goods_sn + "&d_id=" + d_Id + "&mid=" + mid;
+            Log.e(TAG, "createQRcode: " + shopUrl);
+
+//        http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=groups.goods&id=17
+//        http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile
+//        http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=goods.detail&id=1988&mid=3219
+        }
 
         try {
             Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 160);
@@ -392,12 +407,40 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         super.onDestroy();
         if (popupWindow != null && popupWindow.isShowing()) {
             popupWindow.dismiss();
+            handler.removeCallbacks(runnable);
             ivPopuBg.setVisibility(View.GONE);
         }
         cacheUtils.cancelAllTasks();
         cacheUtils.removeCache();
         mHandler.removeCallbacksAndMessages(null);
         finish();
+    }
+
+
+    private long resultTime;
+    private Handler handler = new Handler();
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            resultTime--;
+            String formatLongToTimeStr = formatLongToTimeStr(resultTime);
+            tvTimeLimited.setText(formatLongToTimeStr);
+            if (resultTime > 0) {
+                handler.postDelayed(this, 1000);
+            }
+        }
+    };
+
+    public String formatLongToTimeStr(Long l) {
+        //除以1000得到秒，相应的60000得到分，3600000得到小时,86400000 =天
+        long days = (l / (24 * 3600 * 1000));
+        long hour = ((l % (24 * 3600 * 1000)) / (3600 * 1000));
+        long minute = ((l % (24 * 3600 * 1000)) % (3600 * 1000)) / 60000;
+        long second = (((l % (24 * 3600 * 1000)) % (3600 * 1000)) % 60000) / 1000;
+
+        String strtime = days + " 天 " + hour + " 小时 " + minute + " 分钟 " + second + " 秒 ";
+        return strtime;
+
     }
 
 }

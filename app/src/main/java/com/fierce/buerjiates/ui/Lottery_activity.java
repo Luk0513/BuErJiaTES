@@ -7,6 +7,7 @@ import com.fierce.buerjiates.base.BaseActivity;
 import com.fierce.buerjiates.widget.MyWebClient;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * @Author : Lukang
@@ -37,11 +38,19 @@ public class Lottery_activity extends BaseActivity {
         wvDazhuanpan.setWebViewClient(webClient);
         wvDazhuanpan.getSettings().setSupportMultipleWindows(true);//支持多窗口
         wvDazhuanpan.getSettings().setJavaScriptEnabled(true);//支持JS
-//        wb.getSettings().setAllowFileAccess(true);//支持访问文件数据
-//        wb.getSettings().setAllowContentAccess(true);
-//        wb.getSettings().setAllowUniversalAccessFromFileURLs(true);
+        wvDazhuanpan.getSettings().setAllowFileAccess(true);//支持访问文件数据
+        wvDazhuanpan.getSettings().setAllowContentAccess(true);
+        wvDazhuanpan.getSettings().setAllowUniversalAccessFromFileURLs(true);
         wvDazhuanpan.getSettings().setAllowFileAccessFromFileURLs(true);
         wvDazhuanpan.getSettings().setUseWideViewPort(true);//支持HTML的“viewport”标签
         wvDazhuanpan.loadUrl("file:///android_asset/index.html");
+    }
+
+
+    @OnClick(R.id.tv_backHome)
+    public void onViewClicked() {
+        wvDazhuanpan.clearHistory();
+        finish();
+
     }
 }

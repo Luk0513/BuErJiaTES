@@ -51,13 +51,6 @@
             android:text="海外直邮"
             android:textSize="12sp" />
 
-        <!--<ImageView-->
-        <!--android:id="@+id/iv_close"-->
-        <!--android:layout_width="75px"-->
-        <!--android:layout_height="75px"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:src="@drawable/close_selet" />-->
-
         <TextView
             android:id="@+id/tv_goodsName"
             android:layout_width="520px"
@@ -81,11 +74,41 @@
             android:textSize="18sp" />
 
         <LinearLayout
+            android:layout_marginTop="3dp"
+            android:id="@+id/ll_timeLimited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_goodsBrief"
+            android:layout_toEndOf="@id/ll_layout"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="1dp"
+                android:drawableStart="@mipmap/time"
+                android:text="距结束仅剩："
+                android:textColor="@color/color_4"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_Timelimited"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="21小时"
+                android:textSize="18sp"
+                android:textColor="@color/color_4" />
+        </LinearLayout>
+
+
+        <LinearLayout
             android:id="@+id/ll_ewm"
             android:layout_width="160px"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_goodsBrief"
-            android:layout_marginTop="8dp"
+            android:layout_below="@id/ll_timeLimited"
+            android:layout_marginTop="3dp"
             android:layout_toEndOf="@id/ll_layout"
             android:gravity="center"
             android:orientation="vertical"
@@ -111,22 +134,23 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@id/ll_ewm"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="20dp"
             android:layout_toEndOf="@+id/ll_ewm"
             android:text="价格：RMB"
             android:textColor="@color/color_4"
             android:textSize="25sp" />
+
         <TextView
             android:id="@+id/tv_marketPrice"
-            android:text="原价："
-            android:visibility="gone"
-            android:textSize="20sp"
-            android:layout_toEndOf="@id/ll_ewm"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/color_text2"
-            android:layout_below="@id/tv_goodsPrice"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_goodsPrice"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@id/ll_ewm"
+            android:text="原价："
+            android:textColor="@color/color_text2"
+            android:textSize="20sp"
+            android:visibility="gone" />
 
 
         <TextView

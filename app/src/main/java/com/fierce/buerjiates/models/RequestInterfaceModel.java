@@ -167,7 +167,7 @@ public class RequestInterfaceModel implements IRequestInterface {
     @Override
     public void getGoodsPrice(String c, String a, String key, final String goodsSn, final String categoryId, final IBeanCallback callback) {
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
+                .connectTimeout(800, TimeUnit.MILLISECONDS) //设置请求超时
                 .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.PRICE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -192,7 +192,7 @@ public class RequestInterfaceModel implements IRequestInterface {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 callback.onError("价格跑了……");
-                Log.e(TAG, "onFailure: :::::::::::::::::::::::::" + t.toString());
+                Log.e(TAG, "onFailure: getGoodsPrice:::::::::::::::::::::::::" + t.toString());
             }
         });
     }

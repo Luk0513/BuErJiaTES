@@ -1,0 +1,120 @@
+﻿body,ul,ol,li,p,h1,h2,h3,h4,h5,h6,form,fieldset,table,td,img,div{margin:0;padding:0;border:0;}
+body{color:#333; font-size:12px;font-family:"Microsoft YaHei"}
+ul,ol{list-style-type:none;}
+select,input,img,select{vertical-align:middle;}
+input{ font-size:12px;}
+a{ text-decoration:none; color:#000;}
+a:hover{color:#c00; text-decoration:none;}
+.clear{clear:both;}
+
+/* 大转盘样式 */
+.banner{
+            display:block;
+            width:95%;
+            margin-left:auto;
+            margin-right:auto;
+            margin-bottom: 20px;}
+.banner .turnplate{
+        display:block;
+        width:100%;
+        position:relative;}
+.banner .turnplate canvas.item{
+        width:100%;
+        height:auto;
+}
+.banner .turnplate img.pointer{
+                            position:absolute;
+                            width:31.5%;
+                            height:42.5%;
+                            left:34.6%;
+                            top:23.4%;}
+
+.lottery {
+		    width: 100%;
+		    padding-top: 30rem;
+		    background: url(images/bg.png) no-repeat;
+		    background-size: 100%;
+	}
+	/*弹框样式*/
+	.dialogbg {
+	    position: fixed;
+	    top: 0;
+	    right: 0;
+	    bottom: 0;
+	    left: 0;
+	    z-index: 999;
+	
+	    display: none;
+	
+	    opacity: .6;
+	    background: #000;
+	    background: rgba(0,0,0,.6);
+	
+	    filter: alpha(opacity=60);
+	}
+	.prize-diologimg {
+	    position: fixed;
+	    top: 40rem;
+	    left: 10%;
+	    z-index: 10000;
+	    display:none;
+	    width: 80%;
+	    height: 45rem;
+	    margin: 0 auto;
+	    background: url(images/diologbg.png) no-repeat;
+	    background-size: 100% 100%;
+	}
+	.prize-diologimg h2 {
+	    margin-top: 4rem;
+	
+	    font-size: 5rem;
+	    font-weight: bold;
+	
+	    text-align: center;
+	
+	    color: #fff;
+	}
+	.prize-diologimg span {
+	    display: block;
+	    width: 18rem;
+	    height: 18rem;
+	    margin: 0 auto;
+	    margin-top: 4rem;
+	
+	    font-size: 2rem;
+	    font-weight: bold;
+	    line-height: 18rem;
+	
+	    text-align: center;
+	
+	    color: #ae5b11;
+	    border-radius: 100%;
+	    background-color: #fde503 ;
+	}
+	.prize-diologimg p {
+	    margin: 1rem 0;
+	
+	    font-size: 1.5rem;
+	
+	    text-align: center;
+	
+	    color: #fff;
+	}
+	.prize-diologimg p.fxtxt {
+	    margin: .8rem 0 .27rem 0;
+	}
+	.prize-diologimg a.btn {
+	    display: block;
+	    width: 18rem;
+	    height: 4rem;
+	    margin: 0 auto;
+	    font-size: 2.5rem;
+	    line-height: 3.53333rem;
+	    text-align: center;
+	    color: #ae5b11;
+	    border-radius:5px ;
+	    background: url(../images/fxbtn.png) no-repeat ;
+	    background-size: 100% 100%;
+	    background-color: #fde503 ;
+	}
+	
