@@ -1,19 +1,18 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>jQuery+HTML5微信大转盘抽奖代码</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>jQuery+HTML5微信大转盘抽奖代码</title>
+    <link href="file:///android_asset/style.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
 
-<link href="style.css" rel="stylesheet" type="text/css">
-<style type="text/css">
-	
-</style>
-<script type="text/javascript" src="file:///android_asset/js/jquery-1.10.2.js"></script>
-<script type="text/javascript" src="file:///android_asset/js/awardRotate.js"></script>
+    </style>
+    <script type="text/javascript" src="file:///android_asset/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="file:///android_asset/js/awardRotate.js"></script>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 var turnplate={
 		restaraunts:[],				//大转盘奖品名称
 		colors:[],					//大转盘奖品区块对应背景颜色
@@ -150,105 +149,96 @@ function rnd(n, m){
 }
 
 
-//页面所有元素加载完毕后执行drawRouletteWheel()方法对转盘进行渲染
-window.onload=function(){
-	drawRouletteWheel();
-};
-
-function drawRouletteWheel() {    
-  var canvas = document.getElementById("wheelcanvas");         
-  
-}
-  
-</script>
+    </script>
 </head>
 <body style="background:#ff5242;overflow-x:hidden;">
-	<div class="lottery">	
-    <img src="images/1.png" id="shan-img" style="display:none;" />
-    <img src="images/2.png" id="sorry-img" style="display:none;" />
-	<div class="banner">
-		<div class="turnplate" style="background-image:url(images/turnplate-bg.png);background-size:100% 100%;">
-			<img  class="dzp" src="images/cj_dzp.png" id="wheelcanvas" />
-			<img class="pointer" src="images/turnplate-pointer.png" />
-		</div>
-	</div>
-	</div>
-	<!-- 弹框内容开始-->
-	<div class="dialogbg"></div>
-    
-	<div class="prize-diologimg" id="prize-diolog1">
-		<h2>恭喜中奖啦！</h2>
-		<span>获得5元现金券</span>
-		<p>颜值高果然不一样呀~</p>
-		<a class="btn" id="getprizewybtn">去领奖吧^_^</a>
-	</div>
-	<!-- 领奖弹框 -->
-	<div class="prize-diologimg" id="prize-diolog2">
-		<h2>恭喜中奖啦！</h2>
-		<span>获得10元现金券</span>
-		<p>颜值高果然不一样呀~</p>
-		<a class="btn" id="getprizewybtn">去领奖吧^_^</a>
-	</div>
-	<!-- 领奖弹框 -->
-	<div class="prize-diologimg" id="prize-diolog3">
-		<h2>恭喜中奖啦!</h2>
-		<span>获得5元现金券</span>
-		<p>颜值高果然不一样呀~</p>
-		<a class="btn" id="getprizewybtn">去领奖吧^_^</a>
-	</div>
-	<!-- 领奖弹框 -->
-	<div class="prize-diologimg" id="prize-diolog4">
-		<h2>再接再厉</h2>
-		<span>谢谢参与</span>
-		<p>颜值高也有运气差的时候呀~</p>
-		<a class="btn" id="getprizewybtn">下次再战！</a>
-	</div>
-	<!-- 领奖弹框 -->
-	<div class="prize-diologimg" id="prize-diolog5">
-		<h2>恭喜中奖啦</h2>
-		<span>获得5元现金券</span>
-		<p>颜值高果然不一样呀~</p>
-		<a class="btn" id="getprizewybtn">去领奖吧^_^</a>
-	</div>
-	<!-- 领奖弹框 -->
-	<div class="prize-diologimg" id="prize-diolog6">
-		<h2>好运连连</h2>
-		<span>再来一次</span>
-		<p>颜值高就是不一样呀~</p>
-		<a class="btn" id="getprizewybtn">换个姿势再来一次^_^</a>
-	</div>
-	<!-- 领奖弹框 -->
-	<div class="prize-diologimg" id="prize-diolog7">
-		<h2>恭喜中奖啦</h2>
-		<span>获得5元现金券</span>
-		<p>颜值高果然不一样呀~</p>
-		<a class="btn" id="getprizewybtn">去领奖吧^_^</a>
-	</div>
-	
-	<div class="prize-diologimg" id="prize-diolog8">
-		<h2>恭喜中奖啦！</h2>
-		<span>获得10元现金券</span>
-		<p>颜值高果然不一样呀~</p>
-		<a class="btn" id="getprizewybtn">去领奖吧^_^</a>
-	</div>
-	
-	<div class="prize-diologimg" id="prize-diolog9">
-		<h2>恭喜中奖啦！</h2>
-		<span>获得15元现金券</span>
-		<p>颜值高果然不一样呀~</p>
-		<a class="btn" id="getprizewybtn">去领奖吧^_^</a>
-	</div>
-	<!-- 领奖弹框 -->
-	<div class="prize-diologimg" id="prize-diolog10">
-		<h2>再接再厉</h2>
-		<span>谢谢参与</span>
-		<p>颜值高也有运气差的时候呀~</p>
-		<a class="btn" id="getprizewybtn">下次再战！</a>
-	</div>
-	<!-- 领奖弹框 -->
-	
-	
-     <!--弹框结束-->	
+<div class="lottery">
+    <img src="images/1.png" id="shan-img" style="display:none;"/>
+    <img src="images/2.png" id="sorry-img" style="display:none;"/>
+    <div class="banner">
+        <div class="turnplate"
+             style="background-image:url(images/turnplate-bg.png);background-size:100% 100%;">
+            <img class="dzp" src="images/cj_dzp.png" id="wheelcanvas"/>
+            <img class="pointer" src="images/turnplate-pointer.png"/>
+        </div>
+    </div>
+</div>
+<!-- 弹框内容开始-->
+<div class="dialogbg"></div>
+
+<div class="prize-diologimg" id="prize-diolog1">
+    <h2>恭喜中奖啦！</h2>
+    <span>获得5元现金券</span>
+    <p>颜值高果然不一样呀~</p>
+    <a class="btn" id="getprizewybtn">去领奖吧^_^</a>
+</div>
+<!-- 领奖弹框 -->
+<div class="prize-diologimg" id="prize-diolog2">
+    <h2>恭喜中奖啦！</h2>
+    <span>获得10元现金券</span>
+    <p>颜值高果然不一样呀~</p>
+    <a class="btn" id="getprizewybtn">去领奖吧^_^</a>
+</div>
+<!-- 领奖弹框 -->
+<div class="prize-diologimg" id="prize-diolog3">
+    <h2>恭喜中奖啦!</h2>
+    <span>获得5元现金券</span>
+    <p>颜值高果然不一样呀~</p>
+    <a class="btn" id="getprizewybtn">去领奖吧^_^</a>
+</div>
+<!-- 领奖弹框 -->
+<div class="prize-diologimg" id="prize-diolog4">
+    <h2>再接再厉</h2>
+    <span>谢谢参与</span>
+    <p>颜值高也有运气差的时候呀~</p>
+    <a class="btn" id="getprizewybtn">下次再战！</a>
+</div>
+<!-- 领奖弹框 -->
+<div class="prize-diologimg" id="prize-diolog5">
+    <h2>恭喜中奖啦</h2>
+    <span>获得5元现金券</span>
+    <p>颜值高果然不一样呀~</p>
+    <a class="btn" id="getprizewybtn">去领奖吧^_^</a>
+</div>
+<!-- 领奖弹框 -->
+<div class="prize-diologimg" id="prize-diolog6">
+    <h2>好运连连</h2>
+    <span>再来一次</span>
+    <p>颜值高就是不一样呀~</p>
+    <a class="btn" id="getprizewybtn">换个姿势再来一次^_^</a>
+</div>
+<!-- 领奖弹框 -->
+<div class="prize-diologimg" id="prize-diolog7">
+    <h2>恭喜中奖啦</h2>
+    <span>获得5元现金券</span>
+    <p>颜值高果然不一样呀~</p>
+    <a class="btn" id="getprizewybtn">去领奖吧^_^</a>
+</div>
+
+<div class="prize-diologimg" id="prize-diolog8">
+    <h2>恭喜中奖啦！</h2>
+    <span>获得10元现金券</span>
+    <p>颜值高果然不一样呀~</p>
+    <a class="btn" id="getprizewybtn">去领奖吧^_^</a>
+</div>
+
+<div class="prize-diologimg" id="prize-diolog9">
+    <h2>恭喜中奖啦！</h2>
+    <span>获得15元现金券</span>
+    <p>颜值高果然不一样呀~</p>
+    <a class="btn" id="getprizewybtn">去领奖吧^_^</a>
+</div>
+<!-- 领奖弹框 -->
+<div class="prize-diologimg" id="prize-diolog10">
+    <h2>再接再厉</h2>
+    <span>谢谢参与</span>
+    <p>颜值高也有运气差的时候呀~</p>
+    <a class="btn" id="getprizewybtn">下次再战！</a>
+</div>
+<!-- 领奖弹框 -->
+
+
+<!--弹框结束-->
 
 </body>
 </html>

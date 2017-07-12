@@ -40,6 +40,7 @@ public class Lottery_activity extends BaseActivity {
         wvDazhuanpan.getSettings().setJavaScriptEnabled(true);//支持JS
         wvDazhuanpan.getSettings().setAllowFileAccess(true);//支持访问文件数据
         wvDazhuanpan.getSettings().setAllowContentAccess(true);
+        wvDazhuanpan.getSettings().setSupportZoom(false);
         wvDazhuanpan.getSettings().setAllowUniversalAccessFromFileURLs(true);
         wvDazhuanpan.getSettings().setAllowFileAccessFromFileURLs(true);
         wvDazhuanpan.getSettings().setUseWideViewPort(true);//支持HTML的“viewport”标签

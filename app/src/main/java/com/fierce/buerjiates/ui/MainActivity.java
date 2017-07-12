@@ -486,6 +486,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
+                Log.e(TAG, "onResponse: " + response.body());
                 try {
                     JSONObject object = new JSONObject(response.body());
                     JSONArray array = object.getJSONArray("list");
