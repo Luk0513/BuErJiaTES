@@ -15,7 +15,7 @@
             android:layout_height="455px"
             android:layout_weight="1"
             android:scaleType="fitXY"
-            android:src="@mipmap/img1" />
+            android:src="@mipmap/dxbg1" />
 
         <ImageView
             android:id="@+id/iv_image2"
@@ -23,7 +23,7 @@
             android:layout_height="455px"
             android:layout_weight="1"
             android:scaleType="fitXY"
-            android:src="@mipmap/img2" />
+            android:src="@mipmap/dxbg1" />
 
         <ImageView
             android:id="@+id/iv_image3"
@@ -31,7 +31,7 @@
             android:layout_height="455px"
             android:layout_weight="1"
             android:scaleType="fitXY"
-            android:src="@mipmap/img3" />
+            android:src="@mipmap/dxbg1" />
     </LinearLayout>
 
     <LinearLayout
@@ -48,7 +48,7 @@
             android:layout_height="455px"
             android:scaleType="fitXY"
             android:layout_weight="1"
-            android:src="@mipmap/img4" />
+            android:src="@mipmap/dxbg1" />
 
         <ImageView
             android:id="@+id/iv_image5"
@@ -56,7 +56,7 @@
             android:layout_height="455px"
             android:layout_weight="1"
             android:scaleType="fitXY"
-            android:src="@mipmap/img5" />
+            android:src="@mipmap/dxbg1" />
 
         <ImageView
             android:id="@+id/iv_image6"
@@ -64,7 +64,7 @@
             android:layout_height="455px"
             android:layout_weight="1"
             android:scaleType="fitXY"
-            android:src="@mipmap/img6" />
+            android:src="@mipmap/dxbg1" />
     </LinearLayout>
 
     <!--<View-->

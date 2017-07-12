@@ -12,8 +12,10 @@ import com.fierce.buerjiates.R;
 import com.fierce.buerjiates.base.ListItemAdapter;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.presents.IGetGoodsPricePresent;
+import com.fierce.buerjiates.presents.IgetTuanGouPricePresent;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
 import com.fierce.buerjiates.views.IGetGoodsPriceView;
+import com.fierce.buerjiates.views.IgetTuangouView;
 
 import org.json.JSONObject;
 
@@ -59,6 +61,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
          *  调取微信商城的价格
          */
         IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
+
             @Override
             public void getPriceSucceed(Object o) {
                 String price;
@@ -88,17 +91,43 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
                 holder.tvGoodsPrice.setText("价格：有惊喜！");
             }
         });
-        if (bean.getProJsonCode().getGoods_sn() != null) {
-            getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn(), bean.getProductCategoryId());
-        }
-        holder.ivGoodsIV.setTag(imgUrl);
-        cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
-        holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());
+
+        IgetTuanGouPricePresent tgPrice = new IgetTuanGouPricePresent(new IgetTuangouView() {
+            @Override
+            public void getTGPriceSucceed(Object o) {
+                JSONObject tgInfoJson = (JSONObject) o;
+                holder.tvGoodsName.setText(tgInfoJson.optString("title"));
+                String goodsImgUrl = "http://fx.bejmall.com/" + tgInfoJson.optString("thumb");
+                holder.ivGoodsIV.setTag(goodsImgUrl);
+                cacheUtils.loadBitmaps(holder.ivGoodsIV, goodsImgUrl, gridView);
+
+                holder.tvMarketPrice.setVisibility(View.VISIBLE);
+                holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+                holder.tvMarketPrice.setText("原价：¥" + tgInfoJson.optString("price"));
+                holder.tvGoodsPrice.setText("拼团价：¥" + tgInfoJson.optString("groupsprice"));
+            }
+
+            @Override
+            public void getTGPriceFailure(String msg) {
+
+            }
+        });
+
+
         //设置商品列表角标
         if (bean.getProductCategoryId().equals("5")) {
             holder.ivCube.setBackgroundResource(R.mipmap.ping);
+            if (bean.getProJsonCode().getGoods_sn() != null)
+                tgPrice.getTGPrice(bean.getProJsonCode().getGoods_sn(), bean.getProductCategoryId());
         } else {
+            holder.ivGoodsIV.setTag(imgUrl);
+            cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
+            holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());
             holder.ivCube_xs.setBackgroundResource(R.mipmap.xs_48);
+            if (bean.getProJsonCode().getGoods_sn() != null) {
+                getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn(), bean.getProductCategoryId());
+            }
+
         }
         return convertView;
     }

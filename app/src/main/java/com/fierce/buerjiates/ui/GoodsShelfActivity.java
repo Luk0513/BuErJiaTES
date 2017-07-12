@@ -31,10 +31,12 @@ import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.presents.IGetGoodsListPresent;
 import com.fierce.buerjiates.presents.IGetGoodsPricePresent;
+import com.fierce.buerjiates.presents.IgetTuanGouPricePresent;
 import com.fierce.buerjiates.utils.EncodingUtils;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
 import com.fierce.buerjiates.views.IGetGoodsListView;
 import com.fierce.buerjiates.views.IGetGoodsPriceView;
+import com.fierce.buerjiates.views.IgetTuangouView;
 import com.google.gson.Gson;
 import com.google.zxing.WriterException;
 
@@ -233,15 +235,17 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     private TextView tvCountryName;
     private TextView tvGoodsName;
     private TextView tvTimeLimited;//限时时间
+    private LinearLayout llTimelimit;
     private TextView tvGoodsBrief;
     private TextView tvGoodsPrice;
     private TextView tvMarketPrice;
     private ImageView ewm;
-    private LinearLayout llTimelimit;
     private ListView listView;
     private View v;
     private ImageView close2;
     private GoodsList_Bean.ListBean.ProJsonCodeBean proJsonCodeBean;
+    private long resultTime; //限时购时间差
+    private Handler handler = new Handler(); //限时购倒计时处理
 
     private void initDetailsView() {
         v = View.inflate(this, R.layout.goods_details, null);
@@ -295,19 +299,17 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         ivPopuBg.setVisibility(View.VISIBLE);
         proJsonCodeBean = goodsListBean.get(position).getProJsonCode();
         tvCountryName.setText(proJsonCodeBean.getCountry_name());
+
         if (proJsonCodeBean.getCountry_logo().startsWith("http://"))
             ctLogo = proJsonCodeBean.getCountry_logo();
         else
             ctLogo = "http://fx.bejmall.com/data/ecycountrypic/" + proJsonCodeBean.getCountry_logo();
-        Glide.with(this).load(ctLogo).diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivCountryLogo);
-        if (checkNetworkState())
-            Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
-        else {
-            byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
-            Glide.with(this).load(imagebyte).into(ivGoodsPic);
-        }
 
+        Glide.with(this).load(ctLogo).diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivCountryLogo);
+
+        //by lukas  限时购优惠价格 限时倒计时
         IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
+
             @Override
             public void getPriceSucceed(Object object) {
                 JSONObject jsonObject = (JSONObject) object;
@@ -319,13 +321,12 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                     endTime = jsonObject.optString("timeend");
                     llTimelimit.setVisibility(View.VISIBLE);
                     if (Long.parseLong(endTime) * 1000 - System.currentTimeMillis() >= 0) {
-                        resultTime = Long.parseLong(endTime) * 1000 - System.currentTimeMillis();
+                        resultTime = Long.parseLong(endTime) - System.currentTimeMillis() / 1000;
                         handler.postDelayed(runnable, 1000);
                     } else {
                         handler.removeCallbacks(runnable);
                         tvTimeLimited.setText("活动结束,下次早点来哦~");
                     }
-                    Log.e(TAG, "getPriceSucceed: ______<<>>>>>>>>**>>>>" + endTime);
                     tvGoodsPrice.setText("限时优惠：¥" + price);
                     tvMarketPrice.setVisibility(View.VISIBLE);
                     tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG); //中划线
@@ -342,12 +343,53 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                 tvGoodsPrice.setText("价格：有惊喜！");
             }
         });
-        if (proJsonCodeBean.getGoods_sn() != null) {
-            Log.e(TAG, "onItemClick: +" + categoryId);
-            getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn(), categoryId);
+
+        IgetTuanGouPricePresent getTGPriceP = new IgetTuanGouPricePresent(new IgetTuangouView() {
+            @Override
+            public void getTGPriceSucceed(Object o) {
+                JSONObject tgInfoJson = (JSONObject) o;
+                tvGoodsName.setText(tgInfoJson.optString("title"));
+                String goodsImgUrl = "http://fx.bejmall.com/" + tgInfoJson.optString("thumb");
+
+                tvGoodsPrice.setText("拼团价：¥" + tgInfoJson.optString("groupsprice"));
+                tvMarketPrice.setVisibility(View.VISIBLE);
+                tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG); //中划线
+                tvMarketPrice.setText("原价：¥" + tgInfoJson.optString("price"));
+                //商品图片
+                ivGoodsPic.setScaleType(ImageView.ScaleType.FIT_XY);
+                if (checkNetworkState()) {
+                    Glide.with(GoodsShelfActivity.this).load(goodsImgUrl).into(ivGoodsPic);
+                }else {
+                    byte[] imagebyte = cacheUtils.getBitmapByte(goodsImgUrl);
+                    Glide.with(GoodsShelfActivity.this).load(imagebyte).into(ivGoodsPic);
+                }
+            }
+
+            @Override
+            public void getTGPriceFailure(String msg) {
+
+            }
+        });
+        if (categoryId.equals("2")) {
+            tvGoodsName.setText(proJsonCodeBean.getGoods_name());
+            if (proJsonCodeBean.getGoods_sn() != null) {
+                getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn(), categoryId);
+            }
+            //商品图片
+            if (checkNetworkState())
+                Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
+            else {
+                byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
+                Glide.with(this).load(imagebyte).into(ivGoodsPic);
+            }
+        } else {
+            if (proJsonCodeBean.getGoods_sn() != null) {
+                getTGPriceP.getTGPrice(proJsonCodeBean.getGoods_sn(), categoryId);
+            }
         }
-        tvGoodsName.setText(proJsonCodeBean.getGoods_name());
+
         tvGoodsBrief.setText(proJsonCodeBean.getGoods_brief());
+
         String html = proJsonCodeBean.getGoods_desc();
         /**
          *网页爬虫 抓取页面数据
@@ -416,31 +458,27 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         finish();
     }
 
-
-    private long resultTime;
-    private Handler handler = new Handler();
+    //倒计时
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
             resultTime--;
             String formatLongToTimeStr = formatLongToTimeStr(resultTime);
             tvTimeLimited.setText(formatLongToTimeStr);
+            Log.e(TAG, "run: +++++++" + resultTime);
             if (resultTime > 0) {
-                handler.postDelayed(this, 1000);
+                handler.postDelayed(runnable, 1000);
             }
         }
     };
 
     public String formatLongToTimeStr(Long l) {
-        //除以1000得到秒，相应的60000得到分，3600000得到小时,86400000 =天
-        long days = (l / (24 * 3600 * 1000));
-        long hour = ((l % (24 * 3600 * 1000)) / (3600 * 1000));
-        long minute = ((l % (24 * 3600 * 1000)) % (3600 * 1000)) / 60000;
-        long second = (((l % (24 * 3600 * 1000)) % (3600 * 1000)) % 60000) / 1000;
-
+        long days = l / 60 / 60 / 24;
+        long hour = l / 60 / 60 % 24;
+        long minute = l / 60 % 60;
+        long second = l % 60;
         String strtime = days + " 天 " + hour + " 小时 " + minute + " 分钟 " + second + " 秒 ";
         return strtime;
-
     }
 
 }

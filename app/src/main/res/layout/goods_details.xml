@@ -9,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/rl"
         android:layout_width="match_parent"
-        android:layout_height="775px"
+        android:layout_height="375px"
         android:background="@color/color_1"
         android:padding="3dp">
 
@@ -74,15 +74,15 @@
             android:textSize="18sp" />
 
         <LinearLayout
-            android:layout_marginTop="3dp"
             android:id="@+id/ll_timeLimited"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_goodsBrief"
+            android:layout_marginTop="3dp"
             android:layout_toEndOf="@id/ll_layout"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:visibility="visible">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -97,9 +97,8 @@
                 android:id="@+id/tv_Timelimited"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="21小时"
-                android:textSize="18sp"
-                android:textColor="@color/color_4" />
+                android:textColor="@color/color_4"
+                android:textSize="18sp" />
         </LinearLayout>
 
 

@@ -165,7 +165,7 @@ public class RequestInterfaceModel implements IRequestInterface {
     }
 
     @Override
-    public void getGoodsPrice(String c, String a, String key, final String goodsSn, final String categoryId, final IBeanCallback callback) {
+    public void getGoodsPrice(String c, String a, String key, final String goodsSn, String categoryId, final IBeanCallback callback) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(800, TimeUnit.MILLISECONDS) //设置请求超时
                 .build();
@@ -193,6 +193,37 @@ public class RequestInterfaceModel implements IRequestInterface {
             public void onFailure(Call<String> call, Throwable t) {
                 callback.onError("价格跑了……");
                 Log.e(TAG, "onFailure: getGoodsPrice:::::::::::::::::::::::::" + t.toString());
+            }
+        });
+    }
+
+    @Override
+    public void getTuanGouPrice(final String c, String a, String ukey, String goodsSn, String categoryId, final IBeanCallback callback) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(800, TimeUnit.MILLISECONDS) //设置请求超时
+                .build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.PRICE_URL)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .client(client)
+                .build();
+        Call<String> call = retrofit.create(HttpManage.class).getTGprice(c, a, ukey, goodsSn);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+                    if (response.body() != null) {
+                        JSONObject jsonObject = new JSONObject(response.body());
+                        callback.onSuccesd(jsonObject);
+                    } else
+                        callback.onError("获取数据失败");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                callback.onError("网络错误");
             }
         });
     }

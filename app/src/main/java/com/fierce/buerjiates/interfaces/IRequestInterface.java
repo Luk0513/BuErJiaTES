@@ -14,15 +14,17 @@ import com.fierce.buerjiates.bean.GoodsSort_Bean;
 
 public interface IRequestInterface {
 
-     void activeDevice(@NonNull String device_Id, @NonNull String device_Key, IBeanCallback callback);
+    void activeDevice(@NonNull String device_Id, @NonNull String device_Key, IBeanCallback callback);
 
-     void getBanner(IBeanCallback<Banners_Bean> callback);
+    void getBanner(IBeanCallback<Banners_Bean> callback);
 
-     void getGoodsSort(IBeanCallback<GoodsSort_Bean> callback);
+    void getGoodsSort(IBeanCallback<GoodsSort_Bean> callback);
 
-     void getGoodsList(@NonNull String categoryId, IBeanCallback<GoodsList_Bean> callback);
+    void getGoodsList(@NonNull String categoryId, IBeanCallback<GoodsList_Bean> callback);
 
-     void getGoodsInfo(@NonNull String goodsId, IBeanCallback<GoodsBean> callback);
+    void getGoodsInfo(@NonNull String goodsId, IBeanCallback<GoodsBean> callback);
 
-     void getGoodsPrice(String c, String a, String key, String goodsSn,String categoryId, IBeanCallback callback);
+    void getGoodsPrice(String c, String a, String key, String goodsSn, String categoryId, IBeanCallback callback);
+
+    void getTuanGouPrice(String c, String a, String ukey, String goodsSn, String categoryId, IBeanCallback callback);
 }

@@ -60,6 +60,15 @@ public interface HttpManage {
                                @Field("key") String key,
                                @Field("good_sn") String good_sn);
 
+    @POST(HttpServerInterface.GoodsPrice)
+    @FormUrlEncoded
+    Call<String> getTGprice(@Field("c") String user,
+                            @Field("a") String login,
+                            @Field("ukey") String key,
+                            @Field("good_sn") String good_sn);
+
     @GET(HttpServerInterface.UPDATEAPP)
     Call<String> updateApp();
+
+
 }
