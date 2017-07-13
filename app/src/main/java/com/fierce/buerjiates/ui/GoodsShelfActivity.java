@@ -356,7 +356,6 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                 tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG); //中划线
                 tvMarketPrice.setText("原价：¥" + tgInfoJson.optString("price"));
                 //商品图片
-                ivGoodsPic.setScaleType(ImageView.ScaleType.FIT_XY);
                 if (checkNetworkState()) {
                     Glide.with(GoodsShelfActivity.this).load(goodsImgUrl).into(ivGoodsPic);
                 }else {

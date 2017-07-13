@@ -474,10 +474,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             }
         }
         //下载apk
-        getApkfromeNet();
-    }
-
-    private void getApkfromeNet() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://120.76.159.2:8090/admin/")
                 .addConverterFactory(ScalarsConverterFactory.create())
