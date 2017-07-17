@@ -2,16 +2,35 @@ package com.fierce.buerjiates.config;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Environment;
+import android.util.Log;
 
+import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.https.HttpServerInterface;
+import com.fierce.buerjiates.services.DownAPKService;
 import com.fierce.buerjiates.utils.SPHelper;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import cn.jpush.android.api.JPushInterface;
 import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+import static android.content.ContentValues.TAG;
 
 
 /**
@@ -43,6 +62,8 @@ public class MyApp extends Application {
         context = getApplicationContext();
         SPHelper spHelper = new SPHelper(getContext(), "ServerState");
         spHelper.clear();
+        JPushInterface.setDebugMode(true);    // 设置开启日志,发布时请关闭日志
+        JPushInterface.init(this);            // 初始化 JPush
     }
 
     public Context getContext() {
@@ -202,5 +223,76 @@ public class MyApp extends Application {
         return spHelper.getBoolean("state");
     }
 
+    public void updateAPP() {
+        //先检查本地文件夹是否存在
+        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
+        if (!downloadFile.mkdirs()) {
+            try {
+                downloadFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //下载apk
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://120.76.159.2:8090/admin/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        Call<String> call = retrofit.create(HttpManage.class).updateApp();
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.e(TAG, "onResponse: " + response.body());
+                try {
+                    JSONObject object = new JSONObject(response.body());
+                    JSONArray array = object.getJSONArray("list");
+                    JSONObject object2 = array.getJSONObject(0);
+                    String versionTexe = object2.optString("versionText");
+                    //服务器Apk 版本号
+                    double versionCode = Double.valueOf(versionTexe).doubleValue();
+                    //本地应用版本号
+                    double appCode = getAppVersion();
+                    if (versionCode > appCode) {
+                        //后台下载Apk
+                        String apkUrl = object2.optString("filePath");
+                        Intent intent = new Intent(getBaseContext(), DownAPKService.class);
+                        intent.putExtra("url", apkUrl);
+                        startService(intent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("TAG", "onFailure: ::::::::::::::" + t.toString());
+            }
+        });
+    }
+
+    /**
+     * 获取单个App版本号
+     **/
+    public double getAppVersion() {
+        PackageManager pManager = this.getPackageManager();
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = pManager.getPackageInfo(this.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        int appVersion = packageInfo.versionCode;
+        double version = Double.valueOf(appVersion).doubleValue();
+        Log.e("TAG", "getAppVersion: " + appVersion + "   " + version);
+        return version;
+    }
+
+    public void sendJpushBrocads() {
+        Intent intent = new Intent("Jpush");
+        intent.putExtra("Jp", "jp");
+        getApplicationContext().sendBroadcast(intent);
+        Log.e(TAG, "sendJpushBrocads: ()()()()()()(");
+    }
 
 }

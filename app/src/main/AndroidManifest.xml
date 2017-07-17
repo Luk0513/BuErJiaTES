@@ -17,6 +17,12 @@
     <uses-permission android:name="Android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
 
+    <uses-permission android:name="com.fierce.buerjiates.permission.JPUSH_MESSAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:name=".config.MyApp"
         android:allowBackup="true"
@@ -41,7 +47,7 @@
         <activity
             android:name=".ui.GoodsShelfActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".ui.Lottery_activity"/>
+        <activity android:name=".ui.Lottery_activity" />
 
         <!--注册广播接收器-->
         <receiver android:name=".widget.CustomBroadcastReciver">
@@ -53,6 +59,28 @@
 
         <service android:name=".services.LoadDataSevice" />
         <service android:name=".services.DownAPKService" />
+
+        <!--结束极光推送的 广播接收器-->
+        <receiver
+            android:name=".receiver.JpushMessage_Receiver"
+            android:enabled="true">
+            <intent-filter>
+                <!--收到了自定义消息 Push -->
+                <action android:name="cn.jpush.android.intent.MESSAGE_RECEIVED" />
+                <category android:name="com.fierce.buerjiates" />
+
+                <!--SDK（客户端） 向 JPush Server 注册所得到的注册 ID -->
+                <!--<action android:name="cn.jpush.android.intent.REGISTRATION" />-->
+                <!--收到了通知 Push。-->
+                <!--<action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED" />-->
+                <!--用户点击了通知。 一般情况下，用户不需要配置此 receiver action。-->
+                <!--<action android:name="cn.jpush.android.intent.NOTIFICATION_OPENED" />-->
+                <!--用户点击了通知栏中自定义的按钮。(SDK 3.0.0 以上版本支持)-->
+                <!--<action android:name="cn.jpush.android.intent.NOTIFICATION_CLICK_ACTION" />-->
+                <!--JPush 服务的连接状态发生变化。（注：不是指 Android 系统的网络连接状态。）-->
+                <!--<action android:name="cn.jpush.android.intent.CONNECTION" />-->
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
