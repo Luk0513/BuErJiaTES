@@ -58,7 +58,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         final String categoryId = bean.getProductCategoryId();
 
         /**
-         *  调取微信商城的价格
+         *  调取微信商城的限时购价格
          */
         IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
 
@@ -80,9 +80,6 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
                     holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
                     holder.tvMarketPrice.setText("原价：¥" + jsonObject.optString("marketprice"));
                     holder.tvGoodsPrice.setText("限时优惠：¥" + price);
-                } else {
-                    price = jsonObject.optString("marketprice");
-                    holder.tvGoodsPrice.setText("活动价格：¥" + price);
                 }
             }
 
@@ -92,6 +89,9 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             }
         });
 
+        /**
+         * 团购信息
+         */
         IgetTuanGouPricePresent tgPrice = new IgetTuanGouPricePresent(new IgetTuangouView() {
             @Override
             public void getTGPriceSucceed(Object o) {
@@ -116,10 +116,12 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
 
         //设置商品列表角标
         if (bean.getProductCategoryId().equals("5")) {
+            //团购
             holder.ivCube.setBackgroundResource(R.mipmap.ping);
             if (bean.getProJsonCode().getGoods_sn() != null)
                 tgPrice.getTGPrice(bean.getProJsonCode().getGoods_sn(), bean.getProductCategoryId());
-        } else {
+        } else if (bean.getProductCategoryId().equals("2")) {
+            //限时购
             holder.ivGoodsIV.setTag(imgUrl);
             cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
             holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());
@@ -127,8 +129,17 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             if (bean.getProJsonCode().getGoods_sn() != null) {
                 getGoodsPricePresent.getGoodsPrice(bean.getProJsonCode().getGoods_sn(), bean.getProductCategoryId());
             }
-
+        } else {
+            //其他正常销售商品
+            holder.ivCube_xs.setVisibility(View.GONE);
+            holder.ivCube.setVisibility(View.GONE);
+            holder.tvGoodsPrice.setText("价格：¥" + bean.getProJsonCode().getShop_price());
+            holder.ivGoodsIV.setTag(imgUrl);
+            cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
+            holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());
         }
+
+
         return convertView;
     }
 

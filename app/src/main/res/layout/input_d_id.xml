@@ -30,7 +30,8 @@
                 android:maxWidth="170dp"
                 android:padding="3dp"
                 android:singleLine="true"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:inputType="text" />
         </TableRow>
 
         <TableRow android:layout_marginTop="10dp">
@@ -52,7 +53,8 @@
                 android:maxWidth="170dp"
                 android:padding="3dp"
                 android:singleLine="true"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:inputType="text" />
         </TableRow>
 
         <TableRow

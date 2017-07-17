@@ -52,6 +52,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="430px"
         android:alpha="0.8"
-        android:src="@mipmap/money" />
+        android:src="@mipmap/money"
+        android:contentDescription="" />
 
 </RelativeLayout>

@@ -281,6 +281,12 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         return flag;
     }
 
+    /**
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     */
     @Override
     public void onItemClick(final AdapterView<?> parent, View view, int position, long id) {
         Log.e(TAG, "onItemClick: " + position + " // " + id);
@@ -331,11 +337,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                     tvMarketPrice.setVisibility(View.VISIBLE);
                     tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG); //中划线
                     tvMarketPrice.setText("原价：¥" + marketPrice);
-
-                } else {
-                    tvGoodsPrice.setText("心动价：¥" + marketPrice);
                 }
-//                Log.e(TAG, "getPriceSucceed: " + price);
             }
 
             @Override
@@ -343,6 +345,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                 tvGoodsPrice.setText("价格：有惊喜！");
             }
         });
+
 
         IgetTuanGouPricePresent getTGPriceP = new IgetTuanGouPricePresent(new IgetTuangouView() {
             @Override
@@ -358,7 +361,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                 //商品图片
                 if (checkNetworkState()) {
                     Glide.with(GoodsShelfActivity.this).load(goodsImgUrl).into(ivGoodsPic);
-                }else {
+                } else {
                     byte[] imagebyte = cacheUtils.getBitmapByte(goodsImgUrl);
                     Glide.with(GoodsShelfActivity.this).load(imagebyte).into(ivGoodsPic);
                 }
@@ -369,7 +372,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
 
             }
         });
-        if (categoryId.equals("2")) {
+        if (categoryId.equals("2")) {  //限时购
             tvGoodsName.setText(proJsonCodeBean.getGoods_name());
             if (proJsonCodeBean.getGoods_sn() != null) {
                 getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn(), categoryId);
@@ -381,10 +384,20 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                 byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
                 Glide.with(this).load(imagebyte).into(ivGoodsPic);
             }
-        } else {
+        } else if (categoryId.equals("5")) {  //团购
             if (proJsonCodeBean.getGoods_sn() != null) {
                 getTGPriceP.getTGPrice(proJsonCodeBean.getGoods_sn(), categoryId);
             }
+        } else { //其他正常购
+            tvGoodsName.setText(proJsonCodeBean.getGoods_name());
+            //商品图片
+            if (checkNetworkState())
+                Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
+            else {
+                byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
+                Glide.with(this).load(imagebyte).into(ivGoodsPic);
+            }
+            tvGoodsPrice.setText("价格：¥" + proJsonCodeBean.getShop_price());
         }
 
         tvGoodsBrief.setText(proJsonCodeBean.getGoods_brief());
@@ -416,13 +429,14 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         String m_id = MyApp.getInstance().getM_id();
         int mid = Integer.parseInt(m_id);
 
-        if (categoryId.equals("2")) {
+        if (categoryId.equals("5")) {
             shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-                    "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId + "&d_id=" + d_Id + "&mid=" + mid;
-        } else if (categoryId.equals("5")) {
+                    "&m=ewei_shopv2&do=mobile&r=groups.goods&erw_gsn="
+                    + goods_sn + "&d_id=" + d_Id + "&mid=" + mid;
+        } else {
             shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-                    "&m=ewei_shopv2&do=mobile&r=groups.goods&erw_gsn=" + goods_sn + "&d_id=" + d_Id + "&mid=" + mid;
-            Log.e(TAG, "createQRcode: " + shopUrl);
+                    "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId
+                    + "&d_id=" + d_Id + "&mid=" + mid;
 
 //        http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=groups.goods&id=17
 //        http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile
