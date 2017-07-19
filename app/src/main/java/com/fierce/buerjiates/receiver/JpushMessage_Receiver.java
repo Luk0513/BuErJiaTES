@@ -3,6 +3,8 @@ package com.fierce.buerjiates.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.fierce.buerjiates.config.MyApp;
 
@@ -25,6 +27,10 @@ public class JpushMessage_Receiver extends BroadcastReceiver {
         if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
             MyApp.getInstance().updateAPP();//更新APP
             MyApp.getInstance().sendJpushBrocads();
+        }else if(JPushInterface.ACTION_CONNECTION_CHANGE.equals(intent.getAction())) {
+            boolean connected = intent.getBooleanExtra(JPushInterface.EXTRA_CONNECTION_CHANGE, false);
+            Toast.makeText(MyApp.getInstance().getContext(),connected+"",Toast.LENGTH_LONG);
+            Log.e(TAG, "[MyReceiver]" + intent.getAction() +" connected:"+connected);
         }
     }
 

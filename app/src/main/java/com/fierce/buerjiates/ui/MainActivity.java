@@ -59,6 +59,12 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private NetWorkUtils netWorkUtils;
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    @Override
     protected int getLayoutRes() {
         return R.layout.activity_main;
     }

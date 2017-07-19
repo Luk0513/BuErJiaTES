@@ -63,7 +63,9 @@
         <!--结束极光推送的 广播接收器-->
         <receiver
             android:name=".receiver.JpushMessage_Receiver"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="true">
+
             <intent-filter>
                 <!--收到了自定义消息 Push -->
                 <action android:name="cn.jpush.android.intent.MESSAGE_RECEIVED" />
@@ -78,7 +80,7 @@
                 <!--用户点击了通知栏中自定义的按钮。(SDK 3.0.0 以上版本支持)-->
                 <!--<action android:name="cn.jpush.android.intent.NOTIFICATION_CLICK_ACTION" />-->
                 <!--JPush 服务的连接状态发生变化。（注：不是指 Android 系统的网络连接状态。）-->
-                <!--<action android:name="cn.jpush.android.intent.CONNECTION" />-->
+                <action android:name="cn.jpush.android.intent.CONNECTION" />
             </intent-filter>
         </receiver>
     </application>
