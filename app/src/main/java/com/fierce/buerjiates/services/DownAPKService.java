@@ -79,8 +79,4 @@ public class DownAPKService extends IntentService {
         });
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 }

@@ -416,6 +416,11 @@ public class ImageCacheUtils {
             try {
                 final URL url = new URL(urlString);
                 urlConnection = (HttpURLConnection) url.openConnection();
+                // 设置连接主机超时时间
+                urlConnection.setConnectTimeout(5 * 1000);
+                //设置从主机读取数据超时
+                urlConnection.setReadTimeout(5 * 1000);
+                urlConnection.connect();
                 in = new BufferedInputStream(urlConnection.getInputStream(), 8 * 1024);
                 out = new BufferedOutputStream(outputStream, 8 * 1024);
                 int b;

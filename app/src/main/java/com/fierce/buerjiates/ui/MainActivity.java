@@ -82,7 +82,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             startService(new Intent(this, LoadDataSevice.class));
             inputDid();
         }
-        MyApp.getInstance().updateAPP();
+//        MyApp.getInstance().updateAPP();
         vHideView.setOnTouchListener(this);
 //        if (!videoIsExsit()) {
 //            Log.e("TAG", "onCreate: --开始下载视频--");
@@ -358,12 +358,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             devicePresent = new IActdevicePresent(this);
             devicePresent.acvDevice();
         }
-//        updateAPP();
+        MyApp.getInstance().updateAPP();
     }
 
 
     @Override
     protected void onStop() {
+        Log.e(TAG, "onStop: ");
         super.onStop();
         mHandler.removeCallbacksAndMessages(null);
         guideDialog.dismiss();

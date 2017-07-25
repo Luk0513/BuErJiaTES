@@ -30,8 +30,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-import static android.content.ContentValues.TAG;
-
 
 /**
  * 保存设备的 ID
@@ -41,6 +39,7 @@ import static android.content.ContentValues.TAG;
 
 public class MyApp extends Application {
 
+    private final String TAG = "MyApp";
     private static volatile MyApp instance;
     private static Context context;
 
@@ -225,7 +224,7 @@ public class MyApp extends Application {
 
     public void updateAPP() {
         //先检查本地文件夹是否存在
-        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
+        final File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
         if (!downloadFile.mkdirs()) {
             try {
                 downloadFile.createNewFile();
@@ -242,22 +241,45 @@ public class MyApp extends Application {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.e(TAG, "onResponse: " + response.body());
+                Log.e("MyApp", "onResponse: " + response.body());
                 try {
                     JSONObject object = new JSONObject(response.body());
                     JSONArray array = object.getJSONArray("list");
                     JSONObject object2 = array.getJSONObject(0);
                     String versionTexe = object2.optString("versionText");
                     //服务器Apk 版本号
-                    double versionCode = Double.valueOf(versionTexe).doubleValue();
+                    double versionCode = Double.parseDouble(versionTexe);
                     //本地应用版本号
                     double appCode = getAppVersion();
                     if (versionCode > appCode) {
-                        //后台下载Apk
-                        String apkUrl = object2.optString("filePath");
-                        Intent intent = new Intent(getBaseContext(), DownAPKService.class);
-                        intent.putExtra("url", apkUrl);
-                        startService(intent);
+                        //如果服务器上的版本号大于本地应用版本号 开始更新
+                        if (!MyApp.getInstance().getisRunning()) {
+                            //在下载apk文件前 先检查本地apk文件的版本号是否等于服务器上的版本号
+                            //相等则直接安装 否则开始下载
+                            File[] allFiles = new File(downloadFile.getAbsolutePath()).listFiles();
+                            int apkCode = 0;
+                            File apkfile = null;
+                            if (allFiles.length > 0) {
+                                apkfile = allFiles[0];
+                                PackageInfo packageInfo = getPackageManager()
+                                        .getPackageArchiveInfo(apkfile.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+                                apkCode = packageInfo.versionCode;//apk 版本号；
+                            }
+                            if (apkCode == versionCode && apkfile != null) {
+                                Intent in = new Intent("PupoState");
+                                in.putExtra("isDone", true);
+                                in.putExtra("apk", apkfile.getAbsolutePath());
+                                sendBroadcast(in);
+                            } else {
+                                //后台下载Apk
+                                String apkUrl = object2.optString("filePath");
+                                Intent intent = new Intent(getBaseContext(), DownAPKService.class);
+                                intent.putExtra("url", apkUrl);
+                                startService(intent);
+                            }
+                        } else {
+                            Log.e(TAG, "onResponse: KKKKKKKKKKKKKKKKKKKK 已经启动服务");
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
