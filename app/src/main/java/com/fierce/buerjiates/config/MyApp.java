@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
-import android.util.Log;
 
 import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.https.HttpServerInterface;
@@ -241,7 +240,7 @@ public class MyApp extends Application {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.e("MyApp", "onResponse: " + response.body());
+//                Log.e("MyApp", "onResponse: " + response.body());
                 try {
                     JSONObject object = new JSONObject(response.body());
                     JSONArray array = object.getJSONArray("list");
@@ -278,7 +277,7 @@ public class MyApp extends Application {
                                 startService(intent);
                             }
                         } else {
-                            Log.e(TAG, "onResponse: KKKKKKKKKKKKKKKKKKKK 已经启动服务");
+//                            Log.e(TAG, "onResponse: KKKKKKKKKKKKKKKKKKKK 已经启动服务");
                         }
                     }
                 } catch (JSONException e) {
@@ -288,7 +287,7 @@ public class MyApp extends Application {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.e("TAG", "onFailure: ::::::::::::::" + t.toString());
+//                Log.e("TAG", "onFailure: ::::::::::::::" + t.toString());
             }
         });
     }
@@ -306,7 +305,7 @@ public class MyApp extends Application {
         }
         int appVersion = packageInfo.versionCode;
         double version = Double.valueOf(appVersion).doubleValue();
-        Log.e("TAG", "getAppVersion: " + appVersion + "   " + version);
+//        Log.e("TAG", "getAppVersion: " + appVersion + "   " + version);
         return version;
     }
 
@@ -314,7 +313,7 @@ public class MyApp extends Application {
         Intent intent = new Intent("Jpush");
         intent.putExtra("Jp", "jp");
         getApplicationContext().sendBroadcast(intent);
-        Log.e(TAG, "sendJpushBrocads: ()()()()()()(");
+//        Log.e(TAG, "sendJpushBrocads: ()()()()()()(");
     }
 
 }

@@ -54,4 +54,10 @@ public class Lottery_activity extends BaseActivity {
         finish();
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 }

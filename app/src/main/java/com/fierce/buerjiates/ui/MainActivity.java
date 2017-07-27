@@ -354,7 +354,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         index = 1;
         if (MyApp.getInstance().getDevice_id() != null) {
             deviceId = MyApp.getInstance().getDevice_id();
-            deviceKey = "123456";
+            deviceKey = "fierce321";
             devicePresent = new IActdevicePresent(this);
             devicePresent.acvDevice();
         }
@@ -364,7 +364,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void onStop() {
-        Log.e(TAG, "onStop: ");
+//        Log.e(TAG, "onStop: ");
         super.onStop();
         mHandler.removeCallbacksAndMessages(null);
         guideDialog.dismiss();
@@ -374,7 +374,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e(TAG, "onDestroy: :::::::::");
+//        Log.e(TAG, "onDestroy: :::::::::");
         mHandler.removeCallbacksAndMessages(null);
         if (guideDialog != null && guideDialog.isShowing()) {
             guideDialog.dismiss();
@@ -392,7 +392,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             isPopuShowe = intent.getBooleanExtra("isPopuShowe", false);
             boolean isDone = intent.getBooleanExtra("isDone", false);
             final String apkPath = intent.getStringExtra("apk");
-            Log.e(TAG, "onReceive: >>>>>>>>>>>>>" + apkPath);
+//            Log.e(TAG, "onReceive: >>>>>>>>>>>>>" + apkPath);
             if (isPopuShowe) {
                 vHideView.setOnClickListener(new View.OnClickListener() {
                     @Override

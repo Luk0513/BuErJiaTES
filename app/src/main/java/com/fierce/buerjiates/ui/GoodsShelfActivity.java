@@ -69,19 +69,13 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     ImageView ivPopuBg;
 
     private String categoryId;
-    private String banner2Image;
     private PopupWindow popupWindow;
-    private IGetGoodsListPresent present;
     private List<GoodsList_Bean.ListBean> goodsListBean;
-    private String goodsId;
     private String goods_sn;
     private String d_Id;
-    private String shopUrl;
     private ImageCacheUtils cacheUtils;
     private MyGridviewAdapter adapter;
-    private GoodsSrcListAdapter srcListAdapter;
     private Handler mHandler;
-    private Typeface typeface;
 
     @Override
     protected int getLayoutRes() {
@@ -92,16 +86,16 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     protected void initView() {
         //自定义字体
         goodsListBean = new ArrayList<>();
-        typeface = Typeface.createFromAsset(getAssets(), "fonnts/mnkt.TTF");
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonnts/mnkt.TTF");
         tvBackHome.setTypeface(typeface);
         mHandler = new MyHandler(this);
         mHandler.sendEmptyMessageDelayed(1, 20 * 1000);
         currentTime = System.currentTimeMillis();
         categoryId = getIntent().getStringExtra("categoryId");
-        banner2Image = getIntent().getStringExtra("bannerImage");
+        String banner2Image = getIntent().getStringExtra("bannerImage");
 
         cacheUtils = new ImageCacheUtils(this);
-        present = new IGetGoodsListPresent(this);
+        IGetGoodsListPresent present = new IGetGoodsListPresent(this);
         Glide.with(this).load(cacheUtils.getBitmapByte(banner2Image))
                 .diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivAdpictuer);
         present.getGoodsList();
@@ -241,14 +235,12 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
     private TextView tvMarketPrice;
     private ImageView ewm;
     private ListView listView;
-    private View v;
     private ImageView close2;
-    private GoodsList_Bean.ListBean.ProJsonCodeBean proJsonCodeBean;
     private long resultTime; //限时购时间差
     private Handler handler = new Handler(); //限时购倒计时处理
 
     private void initDetailsView() {
-        v = View.inflate(this, R.layout.goods_details, null);
+        View v = View.inflate(this, R.layout.goods_details, null);
         tvCountryName = (TextView) v.findViewById(R.id.tv_countryName);
         tvGoodsName = (TextView) v.findViewById(R.id.tv_goodsName);
         tvGoodsBrief = (TextView) v.findViewById(R.id.tv_goodsBrief);
@@ -268,12 +260,10 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         popupWindow.setAnimationStyle(R.style.popwin_anim_style);
     }
 
-    private ConnectivityManager manager;
-
     public boolean checkNetworkState() {
         boolean flag = false;
         //得到网络连接信息
-        manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager manager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         //去进行判断网络是否连接
         if (manager.getActiveNetworkInfo() != null) {
             flag = manager.getActiveNetworkInfo().isAvailable();
@@ -303,7 +293,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         if (!popupWindow.isShowing())
             popupWindow.showAtLocation(ivAdpictuer, Gravity.CENTER, 0, -120);
         ivPopuBg.setVisibility(View.VISIBLE);
-        proJsonCodeBean = goodsListBean.get(position).getProJsonCode();
+        GoodsList_Bean.ListBean.ProJsonCodeBean proJsonCodeBean = goodsListBean.get(position).getProJsonCode();
         tvCountryName.setText(proJsonCodeBean.getCountry_name());
 
         if (proJsonCodeBean.getCountry_logo().startsWith("http://"))
@@ -372,33 +362,65 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
 
             }
         });
-        if (categoryId.equals("2")) {  //限时购
-            tvGoodsName.setText(proJsonCodeBean.getGoods_name());
-            if (proJsonCodeBean.getGoods_sn() != null) {
-                getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn(), categoryId);
-            }
-            //商品图片
-            if (checkNetworkState())
-                Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
-            else {
-                byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
-                Glide.with(this).load(imagebyte).into(ivGoodsPic);
-            }
-        } else if (categoryId.equals("5")) {  //团购
-            if (proJsonCodeBean.getGoods_sn() != null) {
-                getTGPriceP.getTGPrice(proJsonCodeBean.getGoods_sn(), categoryId);
-            }
-        } else { //其他正常购
-            tvGoodsName.setText(proJsonCodeBean.getGoods_name());
-            //商品图片
-            if (checkNetworkState())
-                Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
-            else {
-                byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
-                Glide.with(this).load(imagebyte).into(ivGoodsPic);
-            }
-            tvGoodsPrice.setText("价格：¥" + proJsonCodeBean.getShop_price());
+        switch (categoryId) {
+            case "2":
+                tvGoodsName.setText(proJsonCodeBean.getGoods_name());
+                if (proJsonCodeBean.getGoods_sn() != null) {
+                    getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn(), categoryId);
+                }
+                //商品图片
+                if (checkNetworkState())
+                    Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
+                else {
+                    byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
+                    Glide.with(this).load(imagebyte).into(ivGoodsPic);
+                }
+                break;
+            case "5":
+                if (proJsonCodeBean.getGoods_sn() != null) {
+                    getTGPriceP.getTGPrice(proJsonCodeBean.getGoods_sn(), categoryId);
+                }
+                break;
+            default:
+                tvGoodsName.setText(proJsonCodeBean.getGoods_name());
+                //商品图片
+                if (checkNetworkState())
+                    Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
+                else {
+                    byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
+                    Glide.with(this).load(imagebyte).into(ivGoodsPic);
+                }
+                tvGoodsPrice.setText("价格：¥" + proJsonCodeBean.getShop_price());
+                break;
+
         }
+//        if (categoryId.equals("2")) {  //限时购
+//            tvGoodsName.setText(proJsonCodeBean.getGoods_name());
+//            if (proJsonCodeBean.getGoods_sn() != null) {
+//                getGoodsPricePresent.getGoodsPrice(proJsonCodeBean.getGoods_sn(), categoryId);
+//            }
+//            //商品图片
+//            if (checkNetworkState())
+//                Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
+//            else {
+//                byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
+//                Glide.with(this).load(imagebyte).into(ivGoodsPic);
+//            }
+//        } else if (categoryId.equals("5")) {  //团购
+//            if (proJsonCodeBean.getGoods_sn() != null) {
+//                getTGPriceP.getTGPrice(proJsonCodeBean.getGoods_sn(), categoryId);
+//            }
+//        } else { //其他正常购
+//            tvGoodsName.setText(proJsonCodeBean.getGoods_name());
+//            //商品图片
+//            if (checkNetworkState())
+//                Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
+//            else {
+//                byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
+//                Glide.with(this).load(imagebyte).into(ivGoodsPic);
+//            }
+//            tvGoodsPrice.setText("价格：¥" + proJsonCodeBean.getShop_price());
+//        }
 
         tvGoodsBrief.setText(proJsonCodeBean.getGoods_brief());
 
@@ -414,9 +436,9 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                 imgUrlList.add(src.attr("src"));
             }
         }
-        srcListAdapter = new GoodsSrcListAdapter(this, imgUrlList, cacheUtils, listView);
+        GoodsSrcListAdapter srcListAdapter = new GoodsSrcListAdapter(this, imgUrlList, cacheUtils, listView);
         listView.setAdapter(srcListAdapter);
-        goodsId = proJsonCodeBean.getGoods_id();
+        String goodsId = proJsonCodeBean.getGoods_id();
         goods_sn = proJsonCodeBean.getGoods_sn();
         createQRcode(goodsId, d_Id);//二维码
     }
@@ -428,7 +450,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         Log.e(TAG, "createQRcode: >>>>>>>>>>>>>>>>" + goods_sn);
         String m_id = MyApp.getInstance().getM_id();
         int mid = Integer.parseInt(m_id);
-
+        String shopUrl;
         if (categoryId.equals("5")) {
             shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
                     "&m=ewei_shopv2&do=mobile&r=groups.goods&erw_gsn="
@@ -437,12 +459,10 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
             shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
                     "&m=ewei_shopv2&do=mobile&r=goods.detail&id=" + goodsId
                     + "&d_id=" + d_Id + "&mid=" + mid;
-
 //        http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=groups.goods&id=17
 //        http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile
 //        http://m.bejmall.com/app/index.php?i=4&c=entry&m=ewei_shopv2&do=mobile&r=goods.detail&id=1988&mid=3219
         }
-
         try {
             Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 160);
             ewm.setImageBitmap(bitmap);
@@ -478,7 +498,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
             resultTime--;
             String formatLongToTimeStr = formatLongToTimeStr(resultTime);
             tvTimeLimited.setText(formatLongToTimeStr);
-            Log.e(TAG, "run: +++++++" + resultTime);
+//            Log.e(TAG, "run: +++++++" + resultTime);
             if (resultTime > 0) {
                 handler.postDelayed(runnable, 1000);
             }
@@ -490,8 +510,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         long hour = l / 60 / 60 % 24;
         long minute = l / 60 % 60;
         long second = l % 60;
-        String strtime = days + " 天 " + hour + " 小时 " + minute + " 分钟 " + second + " 秒 ";
-        return strtime;
+        return days + " 天 " + hour + " 小时 " + minute + " 分钟 " + second + " 秒 ";
     }
 
 }
