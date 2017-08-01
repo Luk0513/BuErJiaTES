@@ -12,6 +12,8 @@ import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.https.HttpServerInterface;
 import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
+import com.fierce.buerjiates.utils.LogUtils;
+import com.fierce.buerjiates.utils.SPHelper;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -44,7 +46,7 @@ public class RequestInterfaceModel implements IRequestInterface {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.e("TAG", "onResponse:  返回结果+++_______::::::::::::::++++" + response.body());
+//                Log.e("TAG", "onResponse:  返回结果+++_______::::::::::::::++++" + response.body());
                 try {
                     JSONObject jsonObject = new JSONObject(response.body());
 //                    Log.e(TAG, "onResponse: :::::::::::::" + jsonObject.optString("objMessage"));
@@ -128,9 +130,12 @@ public class RequestInterfaceModel implements IRequestInterface {
         call.enqueue(new Callback<GoodsList_Bean>() {
             @Override
             public void onResponse(Call<GoodsList_Bean> call, Response<GoodsList_Bean> response) {
-                // Log.e(TAG, "onResponse:getGoodsList " + response.body().toString());
+                 Log.e(TAG, "onResponse:getGoodsList " + response.body().toString());
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
+                LogUtils.json(LogUtils.E,json);
+                SPHelper helper = new SPHelper(MyApp.getInstance().getApplicationContext(), "GoodsListJson");
+                helper.clear();
                 MyApp.getInstance().saveGoodsListJson(categoryId, json);
                 callback.onSuccesd(response.body());
             }
@@ -149,7 +154,7 @@ public class RequestInterfaceModel implements IRequestInterface {
         call.enqueue(new Callback<GoodsBean>() {
             @Override
             public void onResponse(Call<GoodsBean> call, Response<GoodsBean> response) {
-                Log.e(TAG, "onResponse: getGoodsInfo   " + response.body().toString());
+//                Log.e(TAG, "onResponse: getGoodsInfo   " + response.body().toString());
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
                 MyApp.getInstance().saveGoodsInfoJson(goodsId, json);

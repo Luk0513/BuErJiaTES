@@ -190,11 +190,7 @@ public class MyApp extends Application {
 
     public String getGoodsListJson(String key) {
         SPHelper helper = new SPHelper(getApplicationContext(), "GoodsListJson");
-        if (helper != null) {
-            String json = helper.getString(key);
-            return json;
-        }
-        return null;
+        return helper.getString(key);
     }
 
     public void saveGoodsInfoJson(String key, String json) {
@@ -204,11 +200,9 @@ public class MyApp extends Application {
 
     public String getGoodsInfoJson(String key) {
         SPHelper spHelper = new SPHelper(getApplicationContext(), "GoodsInfoJson");
-        if (spHelper != null) {
-            String json = spHelper.getString(key);
-            return json;
-        }
-        return null;
+        return spHelper.getString(key);
+
+
     }
 
     public void saveisRunning(boolean isRunning) {

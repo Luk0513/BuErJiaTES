@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         hideNavigationBar();
         setContentView(getLayoutRes());
         ButterKnife.bind(this);
+        Log.e("TAG", "onCreate: _____" );
         initView();
     }
 

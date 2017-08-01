@@ -364,7 +364,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void onStop() {
-//        Log.e(TAG, "onStop: ");
+        Log.e(TAG, "onStop: >>>>>>");
         super.onStop();
         mHandler.removeCallbacksAndMessages(null);
         guideDialog.dismiss();
@@ -374,7 +374,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        Log.e(TAG, "onDestroy: :::::::::");
+        Log.e(TAG, "onDestroy: :::::::::");
         mHandler.removeCallbacksAndMessages(null);
         if (guideDialog != null && guideDialog.isShowing()) {
             guideDialog.dismiss();

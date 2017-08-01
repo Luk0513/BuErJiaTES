@@ -52,11 +52,12 @@ public class Lottery_activity extends BaseActivity {
     public void onViewClicked() {
         wvDazhuanpan.clearHistory();
         finish();
-
     }
 
     @Override
     protected void onDestroy() {
+        wvDazhuanpan.destroy();
+        wvDazhuanpan = null;
         super.onDestroy();
 
     }

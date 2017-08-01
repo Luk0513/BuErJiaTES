@@ -136,6 +136,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             holder.tvGoodsPrice.setText("价格：¥" + bean.getProJsonCode().getShop_price());
             holder.ivGoodsIV.setTag(imgUrl);
             cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
+//            Glide.with(getContext()).load(imgUrl).into(holder.ivGoodsIV);
             holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());
         }
 
