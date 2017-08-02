@@ -7,8 +7,10 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -29,12 +31,10 @@ import com.fierce.buerjiates.adapters.MyGridviewAdapter;
 import com.fierce.buerjiates.base.BaseActivity;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.config.MyApp;
-import com.fierce.buerjiates.presents.IGetGoodsListPresent;
 import com.fierce.buerjiates.presents.IGetGoodsPricePresent;
 import com.fierce.buerjiates.presents.IgetTuanGouPricePresent;
 import com.fierce.buerjiates.utils.EncodingUtils;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
-import com.fierce.buerjiates.views.IGetGoodsListView;
 import com.fierce.buerjiates.views.IGetGoodsPriceView;
 import com.fierce.buerjiates.views.IgetTuangouView;
 import com.google.gson.Gson;
@@ -57,7 +57,7 @@ import butterknife.OnClick;
  * Created by win7 on 2017/3/13.
  */
 
-public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListView, AdapterView.OnItemClickListener, View.OnTouchListener {
+public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnTouchListener {
     private final String TAG = "GoodsShelfActivity";
     @BindView(R.id.tv_backHome)
     TextView tvBackHome;
@@ -82,43 +82,33 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         return R.layout.goods_shelf;
     }
 
+    long time;
+
     @Override
     protected void initView() {
         //自定义字体
-        goodsListBean = new ArrayList<>();
         Typeface typeface = Typeface.createFromAsset(getAssets(), "fonnts/mnkt.TTF");
+        categoryId = getIntent().getStringExtra("categoryId");
+        goodsListBean = new ArrayList<>();
+//        IGetGoodsListPresent present = new IGetGoodsListPresent(this);
+        time = System.currentTimeMillis();
+        Log.e(TAG, "initView: <<<<<<<<<<<<<<<<<<<<_+" + time);
         tvBackHome.setTypeface(typeface);
         mHandler = new MyHandler(this);
         mHandler.sendEmptyMessageDelayed(1, 20 * 1000);
         currentTime = System.currentTimeMillis();
-        categoryId = getIntent().getStringExtra("categoryId");
         String banner2Image = getIntent().getStringExtra("bannerImage");
-
         cacheUtils = new ImageCacheUtils(this);
-        IGetGoodsListPresent present = new IGetGoodsListPresent(this);
         Glide.with(this).load(cacheUtils.getBitmapByte(banner2Image))
                 .diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivAdpictuer);
-        present.getGoodsList();
         d_Id = MyApp.getInstance().getDevice_id();
         Log.e(TAG, "initView: >>>" + d_Id);
-        initDetailsView();
         gvGoodslist.setOnTouchListener(this);
+        getGoodsListBean(categoryId);
     }
 
-    @Override
-    public void showToas_getGoodList(String msg) {
-    }
 
-    @Override
-    public void getListSucceed() {
-    }
-
-    /**
-     * @param msg 没有网络时 获取本地JSon数据
-     */
-    @Override
-    public void getListFailure(String msg) {
-        Log.e(TAG, "getListFailure: >>>>>>>>>");
+    private void getGoodsListBean(String categoryId) {
         String goodsListJson = MyApp.getInstance().getGoodsListJson(categoryId);
         Gson gson = new Gson();
         if (goodsListJson != null) {
@@ -129,26 +119,11 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
                 }
             }
             adapter = new MyGridviewAdapter(getApplicationContext(), goodsListBean, gvGoodslist, cacheUtils);
+            Log.e(TAG, "getListFailure: >>>>>>>>>>>>>>>>>> gvGoodslist.setAdapter(adapter);");
             gvGoodslist.setAdapter(adapter);
             gvGoodslist.setOnItemClickListener(this);
+            initDetailsView();
         }
-    }
-
-    @Override
-    public String getGoodsCategoryId() {
-        return categoryId;
-    }
-
-    @Override
-    public void setGoodsListView(List<GoodsList_Bean.ListBean> goodsListBean) {
-        for (GoodsList_Bean.ListBean bean : goodsListBean) {
-            if (bean.getAdmcNum().equals(MyApp.getInstance().getDevice_id())) {
-                this.goodsListBean.add(bean);
-            }
-        }
-        adapter = new MyGridviewAdapter(getApplicationContext(), this.goodsListBean, gvGoodslist, cacheUtils);
-        gvGoodslist.setAdapter(adapter);
-        gvGoodslist.setOnItemClickListener(this);
     }
 
     private long currentTime;
@@ -412,7 +387,7 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
             if (src.tagName().equals("img")) {
                 String url = src.attr("src");
                 //后台数据有问题需要处理
-                if (url.lastIndexOf("http:") != 0) {
+                if (url.lastIndexOf("http:") != 0 && url.lastIndexOf("http:") != -1) {
                     String replaceText = url.substring(0, url.lastIndexOf("http:"));
                     url = url.replace(replaceText, "");
                 }
@@ -449,6 +424,18 @@ public class GoodsShelfActivity extends BaseActivity implements IGetGoodsListVie
         } catch (WriterException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.e(TAG, "onCreate: ");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e(TAG, "onResume: ");
     }
 
     @Override

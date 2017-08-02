@@ -12,8 +12,6 @@ import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.https.HttpServerInterface;
 import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
-import com.fierce.buerjiates.utils.LogUtils;
-import com.fierce.buerjiates.utils.SPHelper;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -127,16 +125,17 @@ public class RequestInterfaceModel implements IRequestInterface {
     public void getGoodsList(@NonNull final String categoryId, final IBeanCallback<GoodsList_Bean> callback) {
         Retrofit retrofit = MyApp.getInstance().getGsonRetrofit();
         Call<GoodsList_Bean> call = retrofit.create(HttpManage.class).getGoodsList(categoryId);
+        final long t = System.currentTimeMillis();
+        Log.e(TAG, "getGoodsList: ..........." + t);
+
         call.enqueue(new Callback<GoodsList_Bean>() {
             @Override
             public void onResponse(Call<GoodsList_Bean> call, Response<GoodsList_Bean> response) {
-                 Log.e(TAG, "onResponse:getGoodsList " + response.body().toString());
+//                 Log.e(TAG, "onResponse:getGoodsList " + response.body().toString());
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
-                LogUtils.json(LogUtils.E,json);
-                SPHelper helper = new SPHelper(MyApp.getInstance().getApplicationContext(), "GoodsListJson");
-                helper.clear();
                 MyApp.getInstance().saveGoodsListJson(categoryId, json);
+                Log.e(TAG, "onResponse: ,.........>>>>>>" + (System.currentTimeMillis() - t));
                 callback.onSuccesd(response.body());
             }
 
@@ -191,12 +190,12 @@ public class RequestInterfaceModel implements IRequestInterface {
                         e.printStackTrace();
                     }
                 } else
-                    callback.onError("价格跑了……");
+                    callback.onError("价格数据丢失……");
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                callback.onError("价格跑了……");
+                callback.onError("价格数据丢失……");
                 Log.e(TAG, "onFailure: getGoodsPrice:::::::::::::::::::::::::" + t.toString());
             }
         });

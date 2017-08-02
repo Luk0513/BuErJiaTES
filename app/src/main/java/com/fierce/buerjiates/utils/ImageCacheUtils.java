@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 import android.util.LruCache;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -106,7 +107,10 @@ public class ImageCacheUtils {
      * 加载Bitmap对象。此方法会在LruCache中检查所有屏幕中可见的ImageView的Bitmap对象，
      * 如果发现任何一个ImageView的Bitmap对象不在缓存中，就会开启异步线程去下载图片。
      */
+    int i = 0;
+
     public void loadBitmaps(ImageView imageView, String imageUrl, ViewGroup view) {
+        Log.e(TAG, "loadBitmaps: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + i++);
         Bitmap bitmap;
         String key = hashKeyForDisk(imageUrl);
         bitmap = getBitmapFromMemoryCache(key);

@@ -12,11 +12,7 @@ import java.util.List;
 public interface IGetGoodsListView {
     void showToas_getGoodList(String msg);
 
-    void getListSucceed();
+    void getListSucceed(List<GoodsList_Bean.ListBean> goodsListBean);
 
     void getListFailure(String msg);
-
-    String getGoodsCategoryId();
-
-    void setGoodsListView(List<GoodsList_Bean.ListBean> goodsListBean);
 }

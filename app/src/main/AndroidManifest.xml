@@ -46,6 +46,7 @@
 
         <activity
             android:name=".ui.GoodsShelfActivity"
+            android:hardwareAccelerated="true"
             android:screenOrientation="portrait" />
         <activity android:name=".ui.Lottery_activity" />
 

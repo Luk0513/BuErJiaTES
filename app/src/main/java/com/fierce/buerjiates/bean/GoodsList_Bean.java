@@ -1,12 +1,13 @@
 package com.fierce.buerjiates.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Administrator on 2017/3/13.
  */
 
-public class GoodsList_Bean {
+public class GoodsList_Bean implements Serializable {
 
 
     private List<ListBean> list;
@@ -19,7 +20,7 @@ public class GoodsList_Bean {
         this.list = list;
     }
 
-    public static class ListBean {
+    public static class ListBean implements Serializable{
         /**
          * applyPrice : 198
          * goodName : 德国 喜宝 益生元系列 2段 600g

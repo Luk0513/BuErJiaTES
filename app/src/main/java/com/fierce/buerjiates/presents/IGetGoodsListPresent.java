@@ -20,12 +20,11 @@ public class IGetGoodsListPresent {
         iRequestInterface = new RequestInterfaceModel();
     }
 
-    public void getGoodsList() {
-        iRequestInterface.getGoodsList(goodsListView.getGoodsCategoryId(), new IBeanCallback<GoodsList_Bean>() {
+    public void getGoodsList(String categoryId) {
+        iRequestInterface.getGoodsList(categoryId, new IBeanCallback<GoodsList_Bean>() {
             @Override
             public void onSuccesd(GoodsList_Bean listBean) {
-                goodsListView.getListSucceed();
-                goodsListView.setGoodsListView(listBean.getList());
+                goodsListView.getListSucceed(listBean.getList());
             }
 
             @Override

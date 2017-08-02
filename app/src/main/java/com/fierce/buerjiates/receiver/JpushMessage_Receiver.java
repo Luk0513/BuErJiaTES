@@ -31,6 +31,4 @@ public class JpushMessage_Receiver extends BroadcastReceiver {
 //            Log.e(TAG, "[MyReceiver]" + intent.getAction() +" connected:"+connected);
         }
     }
-
-
 }
