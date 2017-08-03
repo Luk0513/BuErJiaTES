@@ -119,7 +119,7 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                 }
             }
             adapter = new MyGridviewAdapter(getApplicationContext(), goodsListBean, gvGoodslist, cacheUtils);
-            Log.e(TAG, "getListFailure: >>>>>>>>>>>>>>>>>> gvGoodslist.setAdapter(adapter);");
+            Log.e(TAG, "getGoodsListBean: >>>>>>>>>>>>>>>>>> gvGoodslist.setAdapter(adapter);"+(System.currentTimeMillis()-time));
             gvGoodslist.setAdapter(adapter);
             gvGoodslist.setOnItemClickListener(this);
             initDetailsView();

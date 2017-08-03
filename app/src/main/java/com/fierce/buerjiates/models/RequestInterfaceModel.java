@@ -122,9 +122,9 @@ public class RequestInterfaceModel implements IRequestInterface {
     }
 
     @Override
-    public void getGoodsList(@NonNull final String categoryId, final IBeanCallback<GoodsList_Bean> callback) {
+    public void getGoodsList(@NonNull final String categoryId, @NonNull String admcNum, final IBeanCallback<GoodsList_Bean> callback) {
         Retrofit retrofit = MyApp.getInstance().getGsonRetrofit();
-        Call<GoodsList_Bean> call = retrofit.create(HttpManage.class).getGoodsList(categoryId);
+        Call<GoodsList_Bean> call = retrofit.create(HttpManage.class).getGoodsList(categoryId, admcNum);
         final long t = System.currentTimeMillis();
         Log.e(TAG, "getGoodsList: ..........." + t);
 

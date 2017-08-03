@@ -20,7 +20,7 @@ public interface IRequestInterface {
 
     void getGoodsSort(IBeanCallback<GoodsSort_Bean> callback);
 
-    void getGoodsList(@NonNull String categoryId, IBeanCallback<GoodsList_Bean> callback);
+    void getGoodsList(@NonNull String categoryId, @NonNull String admcNum, IBeanCallback<GoodsList_Bean> callback);
 
     void getGoodsInfo(@NonNull String goodsId, IBeanCallback<GoodsBean> callback);
 

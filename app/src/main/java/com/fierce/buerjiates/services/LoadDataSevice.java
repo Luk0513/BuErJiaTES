@@ -97,7 +97,7 @@ public class LoadDataSevice extends IntentService {
                 for (GoodsSort_Bean.ListBean listBean : goodsSort_bean.getList()) {
 
                     if (listBean.getState() == 1) {
-                        getGoodsList("" + i);
+                        getGoodsList("" + i, MyApp.getInstance().getDevice_id());
                         i++;
                     } else {
                         String goodsUrl = listBean.getPic();
@@ -119,9 +119,9 @@ public class LoadDataSevice extends IntentService {
      * @param id 分类 id
      *           有不同的分类 所有要与不同的key    这里的id 即为key
      */
-    private void getGoodsList(final String id) {
+    private void getGoodsList(final String id, String admcNum) {
         Retrofit retrofit = MyApp.getInstance().getStringRetrofit();
-        Call<String> call = retrofit.create(HttpManage.class).getGoodsLists(id);
+        Call<String> call = retrofit.create(HttpManage.class).getGoodsLists(id, admcNum);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -168,7 +168,7 @@ public class LoadDataSevice extends IntentService {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String goodsInfo = response.body().toString();
-                MyApp.getInstance().saveGoodsInfoJson(goodId,goodsInfo);
+                MyApp.getInstance().saveGoodsInfoJson(goodId, goodsInfo);
                 Gson gson = new Gson();
                 GoodsBean bean = gson.fromJson(goodsInfo, GoodsBean.class);
                 for (GoodsBean.ListBean listBean : bean.getList()) {

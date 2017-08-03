@@ -34,11 +34,13 @@ public interface HttpManage {
 //
 
     @GET(HttpServerInterface.GOODS_List)
-    Call<GoodsList_Bean> getGoodsList(@Query("categoryId") String id);
+    Call<GoodsList_Bean> getGoodsList(@Query("categoryId") String id,
+                                      @Query("admcNum") String admcNum);
 
     //
     @GET(HttpServerInterface.GOODS_List)
-    Call<String> getGoodsLists(@Query("categoryId") String id);
+    Call<String> getGoodsLists(@Query("categoryId") String id,
+                               @Query("admcNum") String admcNum);
 
     //
     @GET(HttpServerInterface.GOODS_SORT)

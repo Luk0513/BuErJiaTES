@@ -1,11 +1,10 @@
 package com.fierce.buerjiates.presents;
 
 import com.fierce.buerjiates.bean.GoodsList_Bean;
-import com.fierce.buerjiates.models.RequestInterfaceModel;
-import com.fierce.buerjiates.views.IGetGoodsListView;
-
 import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
+import com.fierce.buerjiates.models.RequestInterfaceModel;
+import com.fierce.buerjiates.views.IGetGoodsListView;
 
 /**
  * Created by win7 on 2017/3/15.
@@ -20,8 +19,8 @@ public class IGetGoodsListPresent {
         iRequestInterface = new RequestInterfaceModel();
     }
 
-    public void getGoodsList(String categoryId) {
-        iRequestInterface.getGoodsList(categoryId, new IBeanCallback<GoodsList_Bean>() {
+    public void getGoodsList(String categoryId, String admcNum) {
+        iRequestInterface.getGoodsList(categoryId, admcNum ,new IBeanCallback<GoodsList_Bean>() {
             @Override
             public void onSuccesd(GoodsList_Bean listBean) {
                 goodsListView.getListSucceed(listBean.getList());
