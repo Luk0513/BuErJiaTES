@@ -125,9 +125,6 @@ public class RequestInterfaceModel implements IRequestInterface {
     public void getGoodsList(@NonNull final String categoryId, @NonNull String admcNum, final IBeanCallback<GoodsList_Bean> callback) {
         Retrofit retrofit = MyApp.getInstance().getGsonRetrofit();
         Call<GoodsList_Bean> call = retrofit.create(HttpManage.class).getGoodsList(categoryId, admcNum);
-        final long t = System.currentTimeMillis();
-        Log.e(TAG, "getGoodsList: ..........." + t);
-
         call.enqueue(new Callback<GoodsList_Bean>() {
             @Override
             public void onResponse(Call<GoodsList_Bean> call, Response<GoodsList_Bean> response) {
@@ -135,7 +132,6 @@ public class RequestInterfaceModel implements IRequestInterface {
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
                 MyApp.getInstance().saveGoodsListJson(categoryId, json);
-                Log.e(TAG, "onResponse: ,.........>>>>>>" + (System.currentTimeMillis() - t));
                 callback.onSuccesd(response.body());
             }
 

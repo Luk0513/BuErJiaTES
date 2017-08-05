@@ -82,8 +82,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         return R.layout.goods_shelf;
     }
 
-    long time;
-
     @Override
     protected void initView() {
         //自定义字体
@@ -91,8 +89,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         categoryId = getIntent().getStringExtra("categoryId");
         goodsListBean = new ArrayList<>();
 //        IGetGoodsListPresent present = new IGetGoodsListPresent(this);
-        time = System.currentTimeMillis();
-        Log.e(TAG, "initView: <<<<<<<<<<<<<<<<<<<<_+" + time);
         tvBackHome.setTypeface(typeface);
         mHandler = new MyHandler(this);
         mHandler.sendEmptyMessageDelayed(1, 20 * 1000);
@@ -102,7 +98,7 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         Glide.with(this).load(cacheUtils.getBitmapByte(banner2Image))
                 .diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivAdpictuer);
         d_Id = MyApp.getInstance().getDevice_id();
-        Log.e(TAG, "initView: >>>" + d_Id);
+//        Log.e(TAG, "initView: >>>" + d_Id);
         gvGoodslist.setOnTouchListener(this);
         getGoodsListBean(categoryId);
     }
@@ -119,7 +115,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                 }
             }
             adapter = new MyGridviewAdapter(getApplicationContext(), goodsListBean, gvGoodslist, cacheUtils);
-            Log.e(TAG, "getGoodsListBean: >>>>>>>>>>>>>>>>>> gvGoodslist.setAdapter(adapter);"+(System.currentTimeMillis()-time));
             gvGoodslist.setAdapter(adapter);
             gvGoodslist.setOnItemClickListener(this);
             initDetailsView();

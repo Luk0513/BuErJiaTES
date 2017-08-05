@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Log;
 import android.util.LruCache;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -110,7 +109,6 @@ public class ImageCacheUtils {
     int i = 0;
 
     public void loadBitmaps(ImageView imageView, String imageUrl, ViewGroup view) {
-        Log.e(TAG, "loadBitmaps: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + i++);
         Bitmap bitmap;
         String key = hashKeyForDisk(imageUrl);
         bitmap = getBitmapFromMemoryCache(key);

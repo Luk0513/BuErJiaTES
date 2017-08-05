@@ -79,7 +79,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         if (!MyApp.getInstance().isActivateDevice()) {
             netWorkUtils.checkNetworkState();
             devicePresent = new IActdevicePresent(this);
-            startService(new Intent(this, LoadDataSevice.class));
+
             inputDid();
         }
 //        MyApp.getInstance().updateAPP();
@@ -150,12 +150,15 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     public void onSucceed() {
+        startService(new Intent(this, LoadDataSevice.class));
         if (actDialog.isShowing()) {
             actDialog.dismiss();
         }
-        showGuideDialog();
-
+        for (int i = 1; i <= 6; i++) {
+            MyApp.getInstance().getGoodsListBean(i + "", MyApp.getInstance().getDevice_id());
+        }
     }
+
 
     @Override
     public void onOFF() {

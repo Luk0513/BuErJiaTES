@@ -2,6 +2,7 @@ package com.fierce.buerjiates.adapters;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -30,27 +31,22 @@ import butterknife.ButterKnife;
  * Created by win7 on 2017/3/13.
  */
 
-public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> implements IGetGoodsPriceView, IgetTuangouView {
+public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> {
 
     private ImageCacheUtils cacheUtils;
     private GridView gridView;
-    IGetGoodsPricePresent getGoodsPricePresent;
-    IgetTuanGouPricePresent tgPrice;
 
     public MyGridviewAdapter(Context context, List<GoodsList_Bean.ListBean> list,
                              GridView gridView, ImageCacheUtils cacheUtils) {
         super(context, list);
         this.cacheUtils = cacheUtils;
         this.gridView = gridView;
-        tgPrice = new IgetTuanGouPricePresent(this);
-        getGoodsPricePresent = new IGetGoodsPricePresent(this);
     }
 
-    private ViewHolder holder;
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
+        final ViewHolder holder;
         if (convertView == null) {
             convertView = View.inflate(getContext(), R.layout.goodslist_layout, null);
             holder = new ViewHolder(convertView);
@@ -62,61 +58,65 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
         final String imgUrl = bean.getProJsonCode().getGoods_img();
         final String categoryId = bean.getProductCategoryId();
 
-//        /**
-//         *  调取微信商城的限时购价格
-//         */
-//        IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
-//
-//            @Override
-//            public void getPriceSucceed(Object o) {
-//                String price;
-//                JSONObject jsonObject = (JSONObject) o;
-//                if (categoryId.equals("2")) {
-//                    price = jsonObject.optString("xsg_price");
-//                    String starTime = jsonObject.optString("timestart");
-//                    String endTime = jsonObject.optString("timeend");
-//                    long times = System.currentTimeMillis();
-//                    if (Long.parseLong(endTime) * 1000 < times) {
-//                        holder.ivTimeout.setVisibility(View.VISIBLE);
-//                    }
-//                    holder.tvTimelimit.setVisibility(View.VISIBLE);
-//                    holder.tvTimelimit.setText("Time：" + formatTime(starTime) + "—" + formatTime(endTime));
-//                    holder.tvMarketPrice.setVisibility(View.VISIBLE);
-//                    holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
-//                    holder.tvMarketPrice.setText("原价：¥" + jsonObject.optString("marketprice"));
-//                    holder.tvGoodsPrice.setText("限时优惠：¥" + price);
-//                }
-//            }
-//
-//            @Override
-//            public void getPriceFailure(String msg) {
-//                holder.tvGoodsPrice.setText("价格：有惊喜！");
-//            }
-//        });
-//
-//        /**
-//         * 团购信息
-//         */
-//        IgetTuanGouPricePresent tgPrice = new IgetTuanGouPricePresent(new IgetTuangouView() {
-//            @Override
-//            public void getTGPriceSucceed(Object o) {
-//                JSONObject tgInfoJson = (JSONObject) o;
-//                holder.tvGoodsName.setText(tgInfoJson.optString("title"));
-//                String goodsImgUrl = "http://fx.bejmall.com/" + tgInfoJson.optString("thumb");
-//                holder.ivGoodsIV.setTag(goodsImgUrl);
-//                cacheUtils.loadBitmaps(holder.ivGoodsIV, goodsImgUrl, gridView);
-//
-//                holder.tvMarketPrice.setVisibility(View.VISIBLE);
-//                holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
-//                holder.tvMarketPrice.setText("原价：¥" + tgInfoJson.optString("price"));
-//                holder.tvGoodsPrice.setText("拼团价：¥" + tgInfoJson.optString("groupsprice"));
-//            }
-//
-//            @Override
-//            public void getTGPriceFailure(String msg) {
-//
-//            }
-//        });
+        /**
+         *  调取微信商城的限时购价格
+         */
+        IGetGoodsPricePresent getGoodsPricePresent = new IGetGoodsPricePresent(new IGetGoodsPriceView() {
+
+            @Override
+            public void getPriceSucceed(Object o) {
+                String price;
+                JSONObject jsonObject = (JSONObject) o;
+                if (categoryId.equals("2")) {
+                    price = jsonObject.optString("xsg_price");
+                    String starTime = jsonObject.optString("timestart");
+                    String endTime = jsonObject.optString("timeend");
+                    long times = System.currentTimeMillis();
+                    if (Long.parseLong(endTime) * 1000 < times) {
+                        holder.ivTimeout.setVisibility(View.VISIBLE);
+                    }
+                    holder.tvTimelimit.setVisibility(View.VISIBLE);
+                    holder.tvTimelimit.setText("Time：" + formatTime(starTime) + "—" + formatTime(endTime));
+                    holder.tvMarketPrice.setVisibility(View.VISIBLE);
+                    holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+                    holder.tvMarketPrice.setText("原价：¥" + jsonObject.optString("marketprice"));
+                    holder.tvGoodsPrice.setText("限时优惠：¥" + price);
+                    Log.e("MyGridviewAdapter", "getPriceSucceed: >>>>>>>>>> " + price);
+
+
+                }
+            }
+
+            @Override
+            public void getPriceFailure(String msg) {
+                Log.e("TAG", "getPriceFailure: >>>>>>>>>>>" + msg);
+                holder.tvGoodsPrice.setText("价格：有惊喜！");
+            }
+        });
+
+        /**
+         * 团购信息
+         */
+        IgetTuanGouPricePresent tgPrice = new IgetTuanGouPricePresent(new IgetTuangouView() {
+            @Override
+            public void getTGPriceSucceed(Object o) {
+                JSONObject tgInfoJson = (JSONObject) o;
+                holder.tvGoodsName.setText(tgInfoJson.optString("title"));
+                String goodsImgUrl = "http://fx.bejmall.com/" + tgInfoJson.optString("thumb");
+                holder.ivGoodsIV.setTag(goodsImgUrl);
+                cacheUtils.loadBitmaps(holder.ivGoodsIV, goodsImgUrl, gridView);
+
+                holder.tvMarketPrice.setVisibility(View.VISIBLE);
+                holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+                holder.tvMarketPrice.setText("原价：¥" + tgInfoJson.optString("price"));
+                holder.tvGoodsPrice.setText("拼团价：¥" + tgInfoJson.optString("groupsprice"));
+            }
+
+            @Override
+            public void getTGPriceFailure(String msg) {
+
+            }
+        });
 
         //设置商品列表角标
         if (bean.getProductCategoryId().equals("5")) {
@@ -124,6 +124,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             holder.ivCube.setBackgroundResource(R.mipmap.ping);
             if (bean.getProJsonCode().getGoods_sn() != null)
                 tgPrice.getTGPrice(bean.getProJsonCode().getGoods_sn(), bean.getProductCategoryId());
+
         } else if (bean.getProductCategoryId().equals("2")) {
             //限时购
             holder.ivGoodsIV.setTag(imgUrl);
@@ -143,52 +144,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
 //            Glide.with(getContext()).load(imgUrl).into(holder.ivGoodsIV);
         }
-
-
         return convertView;
-    }
-
-    @Override
-    public void getPriceSucceed(Object o) {
-        JSONObject jsonObject = (JSONObject) o;
-        String price = jsonObject.optString("xsg_price");
-        String starTime = jsonObject.optString("timestart");
-        String endTime = jsonObject.optString("timeend");
-        long times = System.currentTimeMillis();
-        if (Long.parseLong(endTime) * 1000 < times) {
-            holder.ivTimeout.setVisibility(View.VISIBLE);
-        }
-        holder.tvTimelimit.setVisibility(View.VISIBLE);
-        holder.tvTimelimit.setText("Time：" + formatTime(starTime) + "—" + formatTime(endTime));
-        holder.tvMarketPrice.setVisibility(View.VISIBLE);
-        holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
-        holder.tvMarketPrice.setText("原价：¥" + jsonObject.optString("marketprice"));
-        holder.tvGoodsPrice.setText("限时优惠：¥" + price);
-
-    }
-
-    @Override
-    public void getPriceFailure(String msg) {
-        holder.tvGoodsPrice.setText("价格：有惊喜！");
-    }
-
-    @Override
-    public void getTGPriceSucceed(Object o) {
-        JSONObject tgInfoJson = (JSONObject) o;
-        holder.tvGoodsName.setText(tgInfoJson.optString("title"));
-        String goodsImgUrl = "http://fx.bejmall.com/" + tgInfoJson.optString("thumb");
-        holder.ivGoodsIV.setTag(goodsImgUrl);
-        cacheUtils.loadBitmaps(holder.ivGoodsIV, goodsImgUrl, gridView);
-
-        holder.tvMarketPrice.setVisibility(View.VISIBLE);
-        holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
-        holder.tvMarketPrice.setText("原价：¥" + tgInfoJson.optString("price"));
-        holder.tvGoodsPrice.setText("拼团价：¥" + tgInfoJson.optString("groupsprice"));
-    }
-
-    @Override
-    public void getTGPriceFailure(String msg) {
-
     }
 
     static class ViewHolder {
