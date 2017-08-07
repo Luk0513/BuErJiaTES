@@ -177,7 +177,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         finish();
     }
 
-    //todo Handler////////////////////////////////////////////////////////////////////////////////
     private static class MyHandler extends Handler {
         private WeakReference<GoodsShelfActivity> mWeakReference;
 
