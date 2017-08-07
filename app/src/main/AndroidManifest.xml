@@ -33,7 +33,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.MainActivity"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"> <!--锁定竖屏-->>>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,6 +47,7 @@
         <activity
             android:name=".ui.GoodsShelfActivity"
             android:hardwareAccelerated="true"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity android:name=".ui.Lottery_activity" />
 

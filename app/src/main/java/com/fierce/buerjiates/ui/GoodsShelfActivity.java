@@ -7,10 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -98,7 +96,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         Glide.with(this).load(cacheUtils.getBitmapByte(banner2Image))
                 .diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivAdpictuer);
         d_Id = MyApp.getInstance().getDevice_id();
-//        Log.e(TAG, "initView: >>>" + d_Id);
         gvGoodslist.setOnTouchListener(this);
         getGoodsListBean(categoryId);
     }
@@ -153,18 +150,23 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
             case R.id.tv_backHome:
                 if (popupWindow == null) {
                     startActivity(new Intent(this, MainActivity.class));
-                    finish();
                 } else {
                     if (!popupWindow.isShowing()) {
                         startActivity(new Intent(this, MainActivity.class));
-                        finish();
                     }
                 }
+                finish();
                 break;
             case R.id.iv_popuBg:
                 if (!popupWindow.isShowing()) {
                     ivPopuBg.setVisibility(View.GONE);
                     cacheUtils.removeCache();
+                    mHandler.removeCallbacks(runnable);
+                    Log.e(TAG, "onClick: ,,,,,,,,,,,,,,,,  !popupWindow.isShowing()" );
+                } else {
+
+                    Log.e(TAG, "onClick: >>>>>>>>>>>>>popupWindow.isShowing()" );
+                    mHandler.removeCallbacks(runnable);
                 }
                 break;
         }
@@ -419,18 +421,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         } catch (WriterException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.e(TAG, "onCreate: ");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.e(TAG, "onResume: ");
     }
 
     @Override

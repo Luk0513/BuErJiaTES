@@ -7,8 +7,8 @@ android {
         applicationId "com.fierce.buerjiates"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 11
-        versionName "2.4"
+        versionCode 12
+        versionName "2.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库。

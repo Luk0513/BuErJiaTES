@@ -77,12 +77,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         netWorkUtils = new NetWorkUtils(this);
         //检查网络状态
         if (!MyApp.getInstance().isActivateDevice()) {
-            netWorkUtils.checkNetworkState();
             devicePresent = new IActdevicePresent(this);
-
             inputDid();
+            netWorkUtils.checkNetworkState();
         }
-//        MyApp.getInstance().updateAPP();
         vHideView.setOnTouchListener(this);
 //        if (!videoIsExsit()) {
 //            Log.e("TAG", "onCreate: --开始下载视频--");
@@ -205,7 +203,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         });
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
     private AnimationDrawable anim;
 
     /**
@@ -265,7 +262,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                                 showToast("密码错误");
                             }
                         }
-
                     }
                 })
                 .build();
@@ -287,14 +283,12 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //结束计时
-//                Log.e(TAG, "onTouch: :::::::::::::D");
                 currentTime = System.currentTimeMillis() - currentTime;
                 if (currentTime < 1000 * 10) {
                     if (mHandler.hasMessages(1))
                         mHandler.removeMessages(1);
                 }
             case MotionEvent.ACTION_UP:
-//                Log.e(TAG, "onTouch: :::::::::::::U");
                 //开始计时
                 currentTime = System.currentTimeMillis();
                 mHandler.sendEmptyMessageDelayed(1, 1000 * 15);

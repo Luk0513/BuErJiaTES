@@ -81,9 +81,6 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
                     holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
                     holder.tvMarketPrice.setText("原价：¥" + jsonObject.optString("marketprice"));
                     holder.tvGoodsPrice.setText("限时优惠：¥" + price);
-                    Log.e("MyGridviewAdapter", "getPriceSucceed: >>>>>>>>>> " + price);
-
-
                 }
             }
 

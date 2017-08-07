@@ -1,7 +1,5 @@
 package com.fierce.buerjiates.presents;
 
-import android.util.Log;
-
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
@@ -22,7 +20,6 @@ public class IGetGoodsListPresent {
     }
 
     public void getGoodsList(String categoryId, String admcNum) {
-        Log.e("IGetGoodsListPresent", "getGoodsList: ......." + categoryId + "  " + admcNum);
         iRequestInterface.getGoodsList(categoryId, admcNum, new IBeanCallback<GoodsList_Bean>() {
             @Override
             public void onSuccesd(GoodsList_Bean listBean) {
