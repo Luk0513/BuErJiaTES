@@ -12,6 +12,7 @@ import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.https.HttpServerInterface;
 import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
+import com.fierce.buerjiates.utils.mlog;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -44,16 +45,13 @@ public class RequestInterfaceModel implements IRequestInterface {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-//                Log.e("TAG", "onResponse:  返回结果+++_______::::::::::::::++++" + response.body());
                 try {
                     JSONObject jsonObject = new JSONObject(response.body());
-//                    Log.e(TAG, "onResponse: :::::::::::::" + jsonObject.optString("objMessage"));
                     if (jsonObject.optString("resCode").equals("0")) {
                         JSONArray array = jsonObject.getJSONArray("listMassage");
                         JSONObject object2 = array.getJSONObject(0);
                         //分销商ID
                         String mid = object2.optString("mId");
-//                    Log.e(TAG, "onResponse: >>>>>>>" + mid);
                         MyApp.getInstance().saveDevice_id(device_Id, mid);
                         callback.onSuccesd("设备激活成功");
                     } else {
@@ -106,7 +104,6 @@ public class RequestInterfaceModel implements IRequestInterface {
         call.enqueue(new Callback<GoodsSort_Bean>() {
             @Override
             public void onResponse(Call<GoodsSort_Bean> call, Response<GoodsSort_Bean> response) {
-//                Log.e(TAG, "onResponse:getGoodsSort  " + response.body().toString());
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
                 MyApp.getInstance().saveGoodSortJson(json);
@@ -128,7 +125,6 @@ public class RequestInterfaceModel implements IRequestInterface {
         call.enqueue(new Callback<GoodsList_Bean>() {
             @Override
             public void onResponse(Call<GoodsList_Bean> call, Response<GoodsList_Bean> response) {
-//                 Log.e(TAG, "onResponse:getGoodsList " + response.body().toString());
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
                 MyApp.getInstance().saveGoodsListJson(categoryId, json);
@@ -149,7 +145,6 @@ public class RequestInterfaceModel implements IRequestInterface {
         call.enqueue(new Callback<GoodsBean>() {
             @Override
             public void onResponse(Call<GoodsBean> call, Response<GoodsBean> response) {
-//                Log.e(TAG, "onResponse: getGoodsInfo   " + response.body().toString());
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
                 MyApp.getInstance().saveGoodsInfoJson(goodsId, json);
@@ -158,7 +153,7 @@ public class RequestInterfaceModel implements IRequestInterface {
 
             @Override
             public void onFailure(Call<GoodsBean> call, Throwable t) {
-                Log.e(TAG, "onFailure:getGoodsInfo  " + t.toString());
+                mlog.e(TAG, "onFailure:getGoodsInfo  " + t.toString());
                 callback.onError("服务器连接失败");
             }
         });
@@ -192,7 +187,7 @@ public class RequestInterfaceModel implements IRequestInterface {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 callback.onError("价格数据丢失……");
-                Log.e(TAG, "onFailure: getGoodsPrice:::::::::::::::::::::::::" + t.toString());
+                mlog.e(TAG, "onFailure: getGoodsPrice:::::::::::::::::::::::::" + t.toString());
             }
         });
     }

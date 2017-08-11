@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,6 +32,7 @@ import com.fierce.buerjiates.presents.IGetGoodsPricePresent;
 import com.fierce.buerjiates.presents.IgetTuanGouPricePresent;
 import com.fierce.buerjiates.utils.EncodingUtils;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
+import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.views.IGetGoodsPriceView;
 import com.fierce.buerjiates.views.IgetTuangouView;
 import com.google.gson.Gson;
@@ -98,8 +98,14 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         d_Id = MyApp.getInstance().getDevice_id();
         gvGoodslist.setOnTouchListener(this);
         getGoodsListBean(categoryId);
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mlog.e(TAG, "initView: >>>>>>>>>>>>>>>>>>>");
+    }
 
     private void getGoodsListBean(String categoryId) {
         String goodsListJson = MyApp.getInstance().getGoodsListJson(categoryId);
@@ -162,10 +168,10 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                     ivPopuBg.setVisibility(View.GONE);
                     cacheUtils.removeCache();
                     mHandler.removeCallbacks(runnable);
-                    Log.e(TAG, "onClick: ,,,,,,,,,,,,,,,,  !popupWindow.isShowing()" );
+                    mlog.e(TAG, "onClick: ,,,,,,,,,,,,,,,,  !popupWindow.isShowing()");
                 } else {
 
-                    Log.e(TAG, "onClick: >>>>>>>>>>>>>popupWindow.isShowing()" );
+                    mlog.e(TAG, "onClick: >>>>>>>>>>>>>popupWindow.isShowing()");
                     mHandler.removeCallbacks(runnable);
                 }
                 break;
@@ -438,7 +444,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         cacheUtils.cancelAllTasks();
         cacheUtils.removeCache();
         mHandler.removeCallbacksAndMessages(null);
-        finish();
     }
 
     //倒计时

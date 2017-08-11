@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.LruCache;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -28,10 +30,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by win7 on 2017/3/20.
+ * @Author : Lukang
+ * >>Live and learn<<
+ * @PackegeName : com.fierce.buerjiates.utils
+ * @ProjectName : BuErJiaTES
+ * @Date :  2017-08-04
+ * <p>
+ * 需要依赖 compile 'com.jakewharton:disklrucache:2.0.2'
  */
 
+
 public class ImageCacheUtils {
+
     private final String TAG = "ImageCacheUtils";
     /**
      * 记录所有正在下载或等待下载的任务。
@@ -39,7 +49,8 @@ public class ImageCacheUtils {
     private Set<BitmapWorkerTask> taskCollection;
 
     /**
-     * 图片缓存技术的核心类，用于缓存所有下载好的图片，在程序内存达到设定值时会将最少最近使用的图片移除掉。
+     * 图片内存缓存技术的核心类，用于缓存所有下载好的图片，在程序内存达到设定值时会将最少最近使用的图片移除掉。
+     * 《官方推荐LruCache》
      */
     private LruCache<String, Bitmap> mMemoryCache;
 
@@ -97,18 +108,23 @@ public class ImageCacheUtils {
         return mMemoryCache.get(key);
     }
 
+
+    /**
+     * 清空内存
+     */
     public void removeCache() {
-        mMemoryCache.evictionCount();
         mMemoryCache.evictAll();
     }
 
     /**
      * 加载Bitmap对象。此方法会在LruCache中检查所有屏幕中可见的ImageView的Bitmap对象，
      * 如果发现任何一个ImageView的Bitmap对象不在缓存中，就会开启异步线程去下载图片。
+     *
+     * @param imageView 对应显示的控件 imageView
+     * @param imageUrl  图片地址
+     * @param view      可以为空，如果是ListView GridVIew等 imageView需要设置Tag  img.setTag(imageUrl);
      */
-    int i = 0;
-
-    public void loadBitmaps(ImageView imageView, String imageUrl, ViewGroup view) {
+    public void loadBitmaps(@NonNull ImageView imageView, @NonNull String imageUrl, ViewGroup view) {
         Bitmap bitmap;
         String key = hashKeyForDisk(imageUrl);
         bitmap = getBitmapFromMemoryCache(key);
@@ -155,6 +171,27 @@ public class ImageCacheUtils {
     }
 
     /**
+     * @param imageUrl url
+     *                 可以用于后台预先缓存 不需ui显示
+     */
+    public void loadBitmaps(String imageUrl) {
+        String key = hashKeyForDisk(imageUrl);
+        DiskLruCache.Snapshot snapshot;
+        try {
+            snapshot = mDiskLruCache.get(key);
+            if (snapshot == null) {
+                BitmapWorkerTask task;
+                task = new BitmapWorkerTask();
+                taskCollection.add(task);
+                task.execute(imageUrl);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
      * bitmap转byteArr
      *
      * @param bitmap bitmap对象
@@ -167,6 +204,10 @@ public class ImageCacheUtils {
         return baos.toByteArray();
     }
 
+    /**
+     * @param imgUrl
+     * @return 从缓存中获取Bitmap 转 Byte[]()
+     */
     public byte[] getBitmapByte(String imgUrl) {
         Bitmap bitmap;
         byte[] bimapbyt;
@@ -193,26 +234,6 @@ public class ImageCacheUtils {
             }
         }
         return null;
-    }
-
-
-    /**
-     * @param imageUrl url
-     */
-    public void loadBitmaps(String imageUrl) {
-        String key = hashKeyForDisk(imageUrl);
-        DiskLruCache.Snapshot snapshot;
-        try {
-            snapshot = mDiskLruCache.get(key);
-            if (snapshot == null) {
-                BitmapWorkerTask task;
-                task = new BitmapWorkerTask();
-                taskCollection.add(task);
-                task.execute(imageUrl);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -269,6 +290,18 @@ public class ImageCacheUtils {
         return cacheKey;
     }
 
+    private String bytesToHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(0xFF & bytes[i]);
+            if (hex.length() == 1) {
+                sb.append('0');
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
+    }
+
     /**
      * 将缓存记录同步到journal文件中。
      */
@@ -280,18 +313,6 @@ public class ImageCacheUtils {
                 e.printStackTrace();
             }
         }
-    }
-
-    private String bytesToHexString(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(0xFF & bytes[i]);
-            if (hex.length() == 1) {
-                sb.append('0');
-            }
-            sb.append(hex);
-        }
-        return sb.toString();
     }
 
 
@@ -403,6 +424,7 @@ public class ImageCacheUtils {
                     addBitmapToMemoryCache(hashKeyForDisk(imageUrl), bitmap);
                 }
             }
+            //下载完成 移除任务
             taskCollection.remove(this);
         }
 
@@ -422,7 +444,6 @@ public class ImageCacheUtils {
                 urlConnection.setConnectTimeout(5 * 1000);
                 //设置从主机读取数据超时
                 urlConnection.setReadTimeout(5 * 1000);
-                urlConnection.connect();
                 in = new BufferedInputStream(urlConnection.getInputStream(), 8 * 1024);
                 out = new BufferedOutputStream(outputStream, 8 * 1024);
                 int b;

@@ -5,20 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.fierce.buerjiates.R;
 import com.fierce.buerjiates.base.BaseActivity;
@@ -27,26 +21,22 @@ import com.fierce.buerjiates.presents.IActdevicePresent;
 import com.fierce.buerjiates.services.LoadDataSevice;
 import com.fierce.buerjiates.utils.DownloadUtil;
 import com.fierce.buerjiates.utils.NetWorkUtils;
+import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.views.IActiveDeviceView;
 import com.fierce.buerjiates.widget.CustomDialog;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class MainActivity extends BaseActivity implements SurfaceHolder.Callback, IActiveDeviceView, View.OnTouchListener {
-    private final String TAG = "MainActivity";
+public class MainActivity extends BaseActivity implements SurfaceHolder.Callback, IActiveDeviceView {
     @BindView(R.id.suv_advideo)
     SurfaceView suvAdvideo;
     @BindView(R.id.v_hideView)
     View vHideView;
-//    @BindView(R.id.imge_money)
-//    ImageView imageMoney;
 
     private CustomDialog actDialog;
-    private CustomDialog guideDialog;
     private int lastPosition;
     private MediaPlayer mediaPlayer;
     private String deviceId;
@@ -54,7 +44,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private IActdevicePresent devicePresent;
     private String videoUrl = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
     private String vedioPath = "/storage/emulated/0/adVideo/big_buck_bunny.mp4";
-    private MyHandler mHandler;
     private MyBroadcastReceiver broadReceiver;
     private NetWorkUtils netWorkUtils;
 
@@ -71,9 +60,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void initView() {
-        mHandler = new MyHandler(this);
         suvAdvideo.getHolder().addCallback(this);
-        initGuideDialog();
         netWorkUtils = new NetWorkUtils(this);
         //检查网络状态
         if (!MyApp.getInstance().isActivateDevice()) {
@@ -81,18 +68,16 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             inputDid();
             netWorkUtils.checkNetworkState();
         }
-        vHideView.setOnTouchListener(this);
 //        if (!videoIsExsit()) {
-//            Log.e("TAG", "onCreate: --开始下载视频--");
 //            vidoDownlod();
 //        }
 
+        mlog.e(MyApp.getInstance().getDevice_id());
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 //        mediaPlayer = new MediaPlayer();
-        //Log.e("TAG", "surfaceCreated____777777_____ " + lastPosition);
         try {
             mediaPlayer = MediaPlayer.create(this, R.raw.buerjia_video);
 //            mediaPlayer.setDataSource(vedioPath);
@@ -123,7 +108,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 mediaPlayer.stop();
                 lastPosition = mediaPlayer.getCurrentPosition();
                 MyApp.getInstance().saveVideoPosition(lastPosition);
-                // Log.e(TAG, "surfaceDestroyed6666: " + lastPosition);
             }
             mediaPlayer.stop();
             mediaPlayer.release();
@@ -203,41 +187,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         });
     }
 
-    private AnimationDrawable anim;
-
-    /**
-     * 显示引导页
-     */
-    private void initGuideDialog() {
-        View layout = View.inflate(this, R.layout.dialog_layout, null);
-        ImageView iv = (ImageView) layout.findViewById(R.id.iv_image);
-        iv.setBackgroundResource(R.drawable.daxiang_gif);
-        anim = (AnimationDrawable) iv.getBackground();
-        anim.start();
-        guideDialog = new CustomDialog.Builder(this)
-                .setIsFloating(true)
-                .setIsFullscreen(true)
-                .setView(layout)
-                .setViewOnClike(R.id.iv_image, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dismissGuideDialog();
-                    }
-                })
-                .build();
-    }
-
-    private void showGuideDialog() {
-        guideDialog.show();
-        anim.start();
-    }
-
-    private void dismissGuideDialog() {
-        if (guideDialog.isShowing()) {
-            guideDialog.dismiss();
-            anim.stop();
-        }
-    }
 
     // 激活设备 inputDid()
     private void inputDid() {
@@ -275,53 +224,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         deviceKey = ed_Key.getText().toString();
     }
 
-    private long currentTime;
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        currentTime = System.currentTimeMillis();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                //结束计时
-                currentTime = System.currentTimeMillis() - currentTime;
-                if (currentTime < 1000 * 10) {
-                    if (mHandler.hasMessages(1))
-                        mHandler.removeMessages(1);
-                }
-            case MotionEvent.ACTION_UP:
-                //开始计时
-                currentTime = System.currentTimeMillis();
-                mHandler.sendEmptyMessageDelayed(1, 1000 * 15);
-                break;
-        }
-        return false;
-    }
-
-
     @OnClick(R.id.imge_money)
     public void onViewClicked() {
         startActivity(new Intent(this, Lottery_activity.class));
-    }
-
-    private static class MyHandler extends Handler {
-        private WeakReference<MainActivity> mWeakReference;
-
-        private MyHandler(MainActivity activity) {
-            mWeakReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            if (mWeakReference.get() == null)
-                return;
-            switch (msg.what) {
-                case 1:
-                    if (!mWeakReference.get().guideDialog.isShowing()) {
-                        mWeakReference.get().showGuideDialog();
-                    }
-                    break;
-            }
-        }
     }
 
     @Override
@@ -331,12 +236,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             hideNavigationBar();
         }
         hideNavigationBar();
-        if (hasFocus && guideDialog != null && !guideDialog.isShowing()) {
-            mHandler.sendEmptyMessageDelayed(1, 15 * 1000);
-        }
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onBackPressed() {
     }
@@ -347,7 +248,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     protected void onResume() {
         super.onResume();
         registrBodcast();
-        Log.e(TAG, "onResume: ");
         index = 1;
         if (MyApp.getInstance().getDevice_id() != null) {
             deviceId = MyApp.getInstance().getDevice_id();
@@ -361,21 +261,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void onStop() {
-        Log.e(TAG, "onStop: >>>>>>");
         super.onStop();
-        mHandler.removeCallbacksAndMessages(null);
-        guideDialog.dismiss();
         unregisterReceiver(broadReceiver);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e(TAG, "onDestroy: :::::::::");
-        mHandler.removeCallbacksAndMessages(null);
-        if (guideDialog != null && guideDialog.isShowing()) {
-            guideDialog.dismiss();
-        }
     }
 
     /**
@@ -389,7 +281,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             isPopuShowe = intent.getBooleanExtra("isPopuShowe", false);
             boolean isDone = intent.getBooleanExtra("isDone", false);
             final String apkPath = intent.getStringExtra("apk");
-//            Log.e(TAG, "onReceive: >>>>>>>>>>>>>" + apkPath);
             if (isPopuShowe) {
                 vHideView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -398,18 +289,11 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                     }
                 });
                 vHideView.setBackgroundResource(R.color.color_2);
-                if (mHandler.hasMessages(1)) {
-                    mHandler.removeMessages(1);
-                }
             } else {
                 vHideView.setBackgroundResource(R.color.color_9);
                 sendBroadcast(new Intent("dismmisPopu"));
                 vHideView.setClickable(false);
-                mHandler.sendEmptyMessageDelayed(1, 15 * 1000);
             }
-            Boolean isShowDialog = intent.getBooleanExtra("isshowDialog", false);
-            if (isShowDialog)
-                showGuideDialog();
 
             if (isDone) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);

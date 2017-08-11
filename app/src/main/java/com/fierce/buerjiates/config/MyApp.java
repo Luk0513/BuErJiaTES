@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
-import android.util.Log;
 
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.https.HttpManage;
@@ -14,6 +13,7 @@ import com.fierce.buerjiates.https.HttpServerInterface;
 import com.fierce.buerjiates.presents.IGetGoodsListPresent;
 import com.fierce.buerjiates.services.DownAPKService;
 import com.fierce.buerjiates.utils.SPHelper;
+import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.views.IGetGoodsListView;
 
 import org.json.JSONArray;
@@ -239,7 +239,7 @@ public class MyApp extends Application {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.e("MyApp", "onResponse: " + response.body());
+                mlog.json(response.body());
                 try {
                     JSONObject object = new JSONObject(response.body());
                     JSONArray array = object.getJSONArray("list");

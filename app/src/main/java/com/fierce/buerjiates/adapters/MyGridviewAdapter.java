@@ -2,7 +2,6 @@ package com.fierce.buerjiates.adapters;
 
 import android.content.Context;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -15,6 +14,7 @@ import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.presents.IGetGoodsPricePresent;
 import com.fierce.buerjiates.presents.IgetTuanGouPricePresent;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
+import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.views.IGetGoodsPriceView;
 import com.fierce.buerjiates.views.IgetTuangouView;
 
@@ -86,7 +86,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
 
             @Override
             public void getPriceFailure(String msg) {
-                Log.e("TAG", "getPriceFailure: >>>>>>>>>>>" + msg);
+                mlog.e("TAG", "getPriceFailure: >>>>>>>>>>>" + msg);
                 holder.tvGoodsPrice.setText("价格：有惊喜！");
             }
         });
