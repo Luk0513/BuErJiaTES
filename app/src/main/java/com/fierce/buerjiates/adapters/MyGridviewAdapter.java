@@ -8,6 +8,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fierce.buerjiates.R;
 import com.fierce.buerjiates.base.ListItemAdapter;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
@@ -33,13 +35,13 @@ import butterknife.ButterKnife;
 
 public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> {
 
-    private ImageCacheUtils cacheUtils;
+    //    private ImageCacheUtils cacheUtils;
     private GridView gridView;
 
     public MyGridviewAdapter(Context context, List<GoodsList_Bean.ListBean> list,
                              GridView gridView, ImageCacheUtils cacheUtils) {
         super(context, list);
-        this.cacheUtils = cacheUtils;
+//        this.cacheUtils = cacheUtils;
         this.gridView = gridView;
     }
 
@@ -87,7 +89,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             @Override
             public void getPriceFailure(String msg) {
                 mlog.e("TAG", "getPriceFailure: >>>>>>>>>>>" + msg);
-                holder.tvGoodsPrice.setText("价格：有惊喜！");
+                holder.tvGoodsPrice.setText("获取价格数据失败，请检查网络");
             }
         });
 
@@ -98,11 +100,12 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             @Override
             public void getTGPriceSucceed(Object o) {
                 JSONObject tgInfoJson = (JSONObject) o;
+                mlog.json("tag",tgInfoJson.toString());
                 holder.tvGoodsName.setText(tgInfoJson.optString("title"));
                 String goodsImgUrl = "http://fx.bejmall.com/" + tgInfoJson.optString("thumb");
-                holder.ivGoodsIV.setTag(goodsImgUrl);
-                cacheUtils.loadBitmaps(holder.ivGoodsIV, goodsImgUrl, gridView);
-
+                holder.ivGoodsIV.setScaleType(ImageView.ScaleType.FIT_XY);
+                Glide.with(getContext()).load(goodsImgUrl).diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .into(holder.ivGoodsIV);
                 holder.tvMarketPrice.setVisibility(View.VISIBLE);
                 holder.tvMarketPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
                 holder.tvMarketPrice.setText("原价：¥" + tgInfoJson.optString("price"));
@@ -111,7 +114,7 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
 
             @Override
             public void getTGPriceFailure(String msg) {
-
+                holder.tvGoodsPrice.setText("获取价格数据失败，请检查网络");
             }
         });
 
@@ -124,8 +127,8 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
 
         } else if (bean.getProductCategoryId().equals("2")) {
             //限时购
-            holder.ivGoodsIV.setTag(imgUrl);
-            cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
+            Glide.with(getContext()).load(imgUrl).diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .into(holder.ivGoodsIV);
             holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());
             holder.ivCube_xs.setBackgroundResource(R.mipmap.xs_48);
             if (bean.getProJsonCode().getGoods_sn() != null) {
@@ -137,9 +140,8 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             holder.tvGoodsName.setText(bean.getProJsonCode().getGoods_name());
             holder.ivCube_xs.setVisibility(View.GONE);
             holder.ivCube.setVisibility(View.GONE);
-            holder.ivGoodsIV.setTag(imgUrl);
-            cacheUtils.loadBitmaps(holder.ivGoodsIV, imgUrl, gridView);
-//            Glide.with(getContext()).load(imgUrl).into(holder.ivGoodsIV);
+            Glide.with(getContext()).load(imgUrl).diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .into(holder.ivGoodsIV);
         }
         return convertView;
     }

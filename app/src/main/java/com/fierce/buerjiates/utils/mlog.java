@@ -17,7 +17,7 @@ import java.util.Formatter;
  * blog : http://blog.csdn.net/fight_0513
  * @Date :  2017-08-04
  */
-public final class mlog {
+public  class mlog {
 
     private mlog() {
         throw new UnsupportedOperationException("u can't instantiate me...");

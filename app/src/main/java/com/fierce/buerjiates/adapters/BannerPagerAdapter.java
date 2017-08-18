@@ -12,8 +12,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fierce.buerjiates.R;
+import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
+import com.fierce.buerjiates.utils.mlog;
 
 import java.util.List;
 
@@ -26,7 +30,7 @@ public class BannerPagerAdapter extends PagerAdapter {
     private Context context;
     private List<View> mList;
     private List<String> imgUrl;
-    private ImageCacheUtils cacheUtils;
+//    private ImageCacheUtils cacheUtils;
     private View v;
     private ImageView imageView;
 
@@ -34,7 +38,7 @@ public class BannerPagerAdapter extends PagerAdapter {
         this.context = context;
         this.mList = mList;
         this.imgUrl = imgUrl;
-        this.cacheUtils = cacheUtils;
+//        this.cacheUtils = cacheUtils;
         v = View.inflate(context, R.layout.banner_itemlayout, null);
         imageView = (ImageView) v.findViewById(R.id.iv_imag);
         ivClose = (ImageView) v.findViewById(R.id.iv_close3);
@@ -82,7 +86,9 @@ public class BannerPagerAdapter extends PagerAdapter {
                 if (!popupWindow.isShowing()) {
                     popupWindow.showAtLocation(v, Gravity.CENTER, 0, -100);
                 }
-                cacheUtils.loadBitmaps(imageView, imgUrl.get(position), null);
+//                cacheUtils.loadBitmaps(imageView, imgUrl.get(position), null);
+                Glide.with(MyApp.getInstance().getApplicationContext()).load(imgUrl.get(position))
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT).into(imageView);
                 timer = new ICountDownTimer(15000, 1000);
                 sendBrocat2MianAct(true);
                 sendBrocat2Banner(true);
@@ -93,6 +99,7 @@ public class BannerPagerAdapter extends PagerAdapter {
         return mList.get(position);
     }
 
+    //倒计时
     private class ICountDownTimer extends CountDownTimer {
         private ICountDownTimer(long millisInFuture, long countDownInterval) {
             super(millisInFuture, countDownInterval);
@@ -111,6 +118,7 @@ public class BannerPagerAdapter extends PagerAdapter {
             }
             sendBrocat2MianAct(false);
             sendBrocat2Banner(false);
+            mlog.e("banner");
         }
     }
 

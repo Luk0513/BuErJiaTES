@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.LruCache;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,7 +15,6 @@ import com.jakewharton.disklrucache.DiskLruCache;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -127,43 +125,30 @@ public class ImageCacheUtils {
     public void loadBitmaps(@NonNull ImageView imageView, @NonNull String imageUrl, ViewGroup view) {
         Bitmap bitmap;
         String key = hashKeyForDisk(imageUrl);
+        //从内存中查找
         bitmap = getBitmapFromMemoryCache(key);
         if (bitmap == null) {
-            DiskLruCache.Snapshot snapshot;
-            FileDescriptor fileDescriptor = null;
-            FileInputStream fileInputStream = null;
-            try {
-                snapshot = mDiskLruCache.get(key);
-                if (snapshot == null) {
-                    BitmapWorkerTask task;
-                    if (view != null)
-                        task = new BitmapWorkerTask(view);
-                    else
-                        task = new BitmapWorkerTask(imageView);
-                    taskCollection.add(task);
-                    task.execute(imageUrl);
-                } else {
-                    fileInputStream = (FileInputStream) snapshot.getInputStream(0);
-                    fileDescriptor = fileInputStream.getFD();
-                    try {
-                        bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-                    } catch (OutOfMemoryError e) {
-                        removeCache();
-                    }
-                    imageView.setImageBitmap(bitmap);
-                    addBitmapToMemoryCache(key, bitmap);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (fileDescriptor == null && fileInputStream != null) {
-                    try {
-                        fileInputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            //内存中没有 开启异步任务后台下载（或者硬盘中查找）
+            BitmapWorkerTask task = new BitmapWorkerTask(view);
+            taskCollection.add(task);
+            mlog.e("z后台加载》》》list");
+            task.execute(imageUrl);
+        } else {
+            mlog.e("内存中加载");
+            if (imageView != null)
+                imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    public void loadBitmaps(@NonNull ImageView imageView, @NonNull String imageUrl) {
+        Bitmap bitmap;
+        String key = hashKeyForDisk(imageUrl);
+        //从内存中查找
+        bitmap = getBitmapFromMemoryCache(key);
+        if (bitmap == null) {
+            BitmapWorkerTask task = new BitmapWorkerTask(imageView);
+            taskCollection.add(task);
+            task.execute(imageUrl);
         } else {
             if (imageView != null)
                 imageView.setImageBitmap(bitmap);
@@ -175,44 +160,20 @@ public class ImageCacheUtils {
      *                 可以用于后台预先缓存 不需ui显示
      */
     public void loadBitmaps(String imageUrl) {
-        String key = hashKeyForDisk(imageUrl);
+        BitmapWorkerTask task = new BitmapWorkerTask();
+        taskCollection.add(task);
+        task.execute(imageUrl);
+    }
+
+    /**
+     * 离线时 直接到磁盘查找
+     * @param url 图片地址
+     * @return
+     */
+    public Bitmap getBitmap(String url) {
+        String key = hashKeyForDisk(url);
         DiskLruCache.Snapshot snapshot;
-        try {
-            snapshot = mDiskLruCache.get(key);
-            if (snapshot == null) {
-                BitmapWorkerTask task;
-                task = new BitmapWorkerTask();
-                taskCollection.add(task);
-                task.execute(imageUrl);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * bitmap转byteArr
-     *
-     * @param bitmap bitmap对象
-     * @return 字节数组
-     */
-    private static byte[] bitmap2Bytes(Bitmap bitmap) {
-        if (bitmap == null) return null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        return baos.toByteArray();
-    }
-
-    /**
-     * @param imgUrl
-     * @return 从缓存中获取Bitmap 转 Byte[]()
-     */
-    public byte[] getBitmapByte(String imgUrl) {
         Bitmap bitmap;
-        byte[] bimapbyt;
-        String key = hashKeyForDisk(imgUrl);
-        DiskLruCache.Snapshot snapshot;
         FileDescriptor fileDescriptor = null;
         FileInputStream fileInputStream = null;
         try {
@@ -220,9 +181,8 @@ public class ImageCacheUtils {
             fileInputStream = (FileInputStream) snapshot.getInputStream(0);
             fileDescriptor = fileInputStream.getFD();
             bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-            bimapbyt = bitmap2Bytes(bitmap);
-            return bimapbyt;
-        } catch (Exception e) {
+            return bitmap;
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (fileDescriptor == null && fileInputStream != null) {
@@ -283,7 +243,6 @@ public class ImageCacheUtils {
             final MessageDigest mDigest = MessageDigest.getInstance("MD5");
             mDigest.update(key.getBytes());
             cacheKey = bytesToHexString(mDigest.digest());
-            // Log.e(TAG, "hashKeyForDisk: ***********************MD5  " + key + " ?? " + cacheKey);
         } catch (NoSuchAlgorithmException e) {
             cacheKey = String.valueOf(key.hashCode());
         }
@@ -314,24 +273,6 @@ public class ImageCacheUtils {
             }
         }
     }
-
-
-//    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-//        // Raw height and width of image
-//        // 源图片的高度和宽度
-//        final int height = options.outHeight;
-//        final int width = options.outWidth;
-//        int inSampleSize = 1;
-//        if (height > reqHeight || width > reqWidth) {
-//            // 计算出实际宽高和目标宽高的比率
-//            final int heightRatio = Math.round((float) height / (float) reqHeight);
-//            final int widthRatio = Math.round((float) width / (float) reqWidth);
-//            // 选择宽和高中最小的比率作为inSampleSize的值，这样可以保证最终图片的宽和高
-//            // 一定都会大于等于目标的宽和高。
-//            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
-//        }
-//        return inSampleSize;
-//    }
 
     /**
      * 异步下载图片的任务。
@@ -370,19 +311,25 @@ public class ImageCacheUtils {
             FileInputStream fileInputStream = null;
             DiskLruCache.Snapshot snapShot;
             try {
+                // 生成图片URL对应的key
                 final String key = hashKeyForDisk(imageUrl);
-                DiskLruCache.Editor editor = mDiskLruCache.edit(key);
-                // 存入磁盘
-                if (editor != null) {
-                    OutputStream outputStream = editor.newOutputStream(0);
-                    if (downloadUrlToStream(imageUrl, outputStream)) {
-                        editor.commit();
-                    } else {
-                        editor.abort();
-                    }
-                }
-                // 缓存被写入后，再次查找key对应的缓存
+                // 查找key对应的缓存
                 snapShot = mDiskLruCache.get(key);
+                if (snapShot == null) {
+                    mlog.e("网络加载");
+                    // 如果没有找到对应的缓存，则准备从网络上请求数据，并写入缓存
+                    DiskLruCache.Editor editor = mDiskLruCache.edit(key);
+                    if (editor != null) {
+                        OutputStream outputStream = editor.newOutputStream(0);
+                        if (downloadUrlToStream(imageUrl, outputStream)) {
+                            editor.commit();
+                        } else {
+                            editor.abort();
+                        }
+                    }
+                    // 缓存被写入后，再次查找key对应的缓存
+                    snapShot = mDiskLruCache.get(key);
+                }
                 if (snapShot != null) {
                     fileInputStream = (FileInputStream) snapShot.getInputStream(0);
                     fileDescriptor = fileInputStream.getFD();
@@ -393,6 +340,10 @@ public class ImageCacheUtils {
                     if (fileDescriptor != null) {
                         bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
                     }
+                }
+                if (bitmap != null) {
+                    // 将Bitmap对象添加到内存缓存当中
+                    addBitmapToMemoryCache(params[0], bitmap);
                 }
                 return bitmap;
             } catch (IOException e) {

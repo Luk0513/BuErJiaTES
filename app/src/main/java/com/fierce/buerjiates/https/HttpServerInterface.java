@@ -47,7 +47,10 @@ public class HttpServerInterface {
      * 商品价格
      */
     public static final String UPDATEAPP = "product/queryVersionAll.shtml";
-
+    /**
+     * 获取抽奖活动奖项资料
+     */
+    static final String GetGift = "activity/queryActivityProductList.shtml";
 
 
 }

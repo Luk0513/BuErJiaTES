@@ -25,8 +25,7 @@ public class IGetGoodsSortPresent {
         requestInterface.getGoodsSort(new IBeanCallback<GoodsSort_Bean>() {
             @Override
             public void onSuccesd(GoodsSort_Bean goodsSort_bean) {
-                goodsSorView.getSortSucceed();
-                goodsSorView.setGoodsSortImage(goodsSort_bean.getList());
+                goodsSorView.getSortSucceed(goodsSort_bean.getList());
             }
 
             @Override

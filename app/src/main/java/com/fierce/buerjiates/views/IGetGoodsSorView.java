@@ -12,9 +12,8 @@ import java.util.List;
 public interface IGetGoodsSorView {
      void showToas_Sort(String msg);
 
-     void getSortSucceed();
+     void getSortSucceed(List<GoodsSort_Bean.ListBean> goodsSortListBean);
 
      void getSortFailure(String msg);
 
-     void setGoodsSortImage(List<GoodsSort_Bean.ListBean> goodsSortListBean);
 }

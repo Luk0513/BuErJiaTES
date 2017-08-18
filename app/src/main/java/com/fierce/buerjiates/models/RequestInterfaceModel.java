@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.fierce.buerjiates.bean.Banners_Bean;
+import com.fierce.buerjiates.bean.Gift_Bean;
 import com.fierce.buerjiates.bean.GoodsBean;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.bean.GoodsSort_Bean;
@@ -26,6 +27,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
@@ -172,7 +174,6 @@ public class RequestInterfaceModel implements IRequestInterface {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-//                Log.e(TAG, "onResponse:   ,.,.,.,.,.,.,.,.,,,," + response.body());
                 if (response.body() != null) {
                     try {
                         JSONObject jsonObject = new JSONObject(response.body());
@@ -219,6 +220,31 @@ public class RequestInterfaceModel implements IRequestInterface {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 callback.onError("网络错误");
+            }
+        });
+    }
+
+    @Override
+    public void getGifts(final IBeanCallback<Gift_Bean> callback) {
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://192.168.1.111:8080/admin/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        Call<Gift_Bean> call = retrofit.create(HttpManage.class).getGift();
+        call.enqueue(new Callback<Gift_Bean>() {
+            @Override
+            public void onResponse(Call<Gift_Bean> call, Response<Gift_Bean> response) {
+                Gson gson = new Gson();
+                String json = gson.toJson(response.body());
+                MyApp.getInstance().saveLotteryGift(json);
+                callback.onSuccesd(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Gift_Bean> call, Throwable t) {
+
+                mlog.e(t);
+                callback.onError(t.toString());
             }
         });
     }

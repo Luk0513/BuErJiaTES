@@ -159,7 +159,6 @@ public class MyApp extends Application {
     }
 
 
-    /////////////////////////////////////////////
     public void saveBannerJson(String json) {
         SPHelper helper = new SPHelper(getApplicationContext(), "BannerJson");
         helper.save(new SPHelper.ContentValue("BannerJson", json));
@@ -218,6 +217,16 @@ public class MyApp extends Application {
     public boolean getisRunning() {
         SPHelper spHelper = new SPHelper(getContext(), "ServerState");
         return spHelper.getBoolean("state");
+    }
+
+    public void saveLotteryGift(String giftJson) {
+        SPHelper spHelper = new SPHelper(getContext(), "Gifts");
+        spHelper.save(new SPHelper.ContentValue("gift", giftJson));
+    }
+
+    public String getGiftJson() {
+        SPHelper spHelper = new SPHelper(getContext(), "Gifts");
+        return spHelper.getString("gift");
     }
 
     public void updateAPP() {
@@ -280,7 +289,7 @@ public class MyApp extends Application {
                                 startService(intent);
                             }
                         } else {
-//                            Log.e(TAG, "onResponse: KKKKKKKKKKKKKKKKKKKK 已经启动服务");
+                            mlog.e("onResponse: KKKKKKKKKKKKKKKKKKKK 已经启动服务");
                         }
                     }
                 } catch (JSONException e) {
@@ -308,7 +317,6 @@ public class MyApp extends Application {
         }
         int appVersion = packageInfo.versionCode;
         double version = Double.valueOf(appVersion).doubleValue();
-//        Log.e("TAG", "getAppVersion: " + appVersion + "   " + version);
         return version;
     }
 
@@ -316,7 +324,6 @@ public class MyApp extends Application {
         Intent intent = new Intent("Jpush");
         intent.putExtra("Jp", "jp");
         getApplicationContext().sendBroadcast(intent);
-//        Log.e(TAG, "sendJpushBrocads: ()()()()()()(");
     }
 
 

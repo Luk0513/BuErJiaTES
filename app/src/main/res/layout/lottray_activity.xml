@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/luck"
+    tools:context=".ui.Lottery_activity">
+
+
+    <com.fierce.buerjiates.widget.LotteryView
+        android:id="@+id/lottery_view"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_centerInParent="true"
+        android:layout_margin="20dp"
+        android:background="@drawable/bg_gif"
+        android:paddingBottom="50dp"
+        android:paddingLeft="43dp"
+        android:paddingRight="50dp"
+        android:paddingTop="45dp"
+        app:column_space="10dp"
+        app:line_space="10dp">
+
+        <ImageView
+            android:id="@+id/img_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/probj"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <ImageView
+            android:id="@+id/img_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/probj"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <ImageView
+            android:id="@+id/img_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/probj"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <ImageView
+            android:id="@+id/img_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/probj"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <ImageView
+            android:id="@+id/img_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/probj"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <ImageView
+            android:id="@+id/img_6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/probj"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <ImageView
+            android:id="@+id/img_7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/probj"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <ImageView
+            android:id="@+id/img_8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/probj"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
+
+        <ImageView
+            android:id="@+id/img_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/lottery_start"
+            android:scaleType="fitCenter" />
+    </com.fierce.buerjiates.widget.LotteryView>
+
+    <TextView
+        android:id="@+id/tv_backHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lottery_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/custombg"
+        android:gravity="center"
+        android:paddingBottom="5dp"
+        android:paddingEnd="30dp"
+        android:paddingStart="30dp"
+        android:paddingTop="5dp"
+        android:text="返回首页"
+        android:textColor="@color/color_1"
+        android:textSize="30sp" />
+</RelativeLayout>

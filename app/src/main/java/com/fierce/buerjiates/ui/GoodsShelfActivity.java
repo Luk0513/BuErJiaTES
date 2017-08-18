@@ -56,7 +56,6 @@ import butterknife.OnClick;
  */
 
 public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnTouchListener {
-    private final String TAG = "GoodsShelfActivity";
     @BindView(R.id.tv_backHome)
     TextView tvBackHome;
     @BindView(R.id.gv_goodslist)
@@ -75,6 +74,8 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
     private MyGridviewAdapter adapter;
     private Handler mHandler;
 
+    private String banner2Image;
+
     @Override
     protected int getLayoutRes() {
         return R.layout.goods_shelf;
@@ -84,28 +85,27 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
     protected void initView() {
         //自定义字体
         Typeface typeface = Typeface.createFromAsset(getAssets(), "fonnts/mnkt.TTF");
+        tvBackHome.setTypeface(typeface);
         categoryId = getIntent().getStringExtra("categoryId");
         goodsListBean = new ArrayList<>();
-//        IGetGoodsListPresent present = new IGetGoodsListPresent(this);
-        tvBackHome.setTypeface(typeface);
         mHandler = new MyHandler(this);
         mHandler.sendEmptyMessageDelayed(1, 20 * 1000);
         currentTime = System.currentTimeMillis();
-        String banner2Image = getIntent().getStringExtra("bannerImage");
+        banner2Image = getIntent().getStringExtra("bannerImage");
         cacheUtils = new ImageCacheUtils(this);
-        Glide.with(this).load(cacheUtils.getBitmapByte(banner2Image))
-                .diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivAdpictuer);
         d_Id = MyApp.getInstance().getDevice_id();
         gvGoodslist.setOnTouchListener(this);
-        getGoodsListBean(categoryId);
-
+        mThread.start();
+        Glide.with(getApplicationContext()).load(banner2Image)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivAdpictuer);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mlog.e(TAG, "initView: >>>>>>>>>>>>>>>>>>>");
-    }
+    Thread mThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            getGoodsListBean(categoryId);
+        }
+    });
 
     private void getGoodsListBean(String categoryId) {
         String goodsListJson = MyApp.getInstance().getGoodsListJson(categoryId);
@@ -118,7 +118,12 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                 }
             }
             adapter = new MyGridviewAdapter(getApplicationContext(), goodsListBean, gvGoodslist, cacheUtils);
-            gvGoodslist.setAdapter(adapter);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    gvGoodslist.setAdapter(adapter);
+                }
+            });
             gvGoodslist.setOnItemClickListener(this);
             initDetailsView();
         }
@@ -168,10 +173,10 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                     ivPopuBg.setVisibility(View.GONE);
                     cacheUtils.removeCache();
                     mHandler.removeCallbacks(runnable);
-                    mlog.e(TAG, "onClick: ,,,,,,,,,,,,,,,,  !popupWindow.isShowing()");
+                    mlog.e("onClick: ,,,,,,,,,,,,,,,,  !popupWindow.isShowing()");
                 } else {
 
-                    mlog.e(TAG, "onClick: >>>>>>>>>>>>>popupWindow.isShowing()");
+                    mlog.e("onClick: >>>>>>>>>>>>>popupWindow.isShowing()");
                     mHandler.removeCallbacks(runnable);
                 }
                 break;
@@ -334,8 +339,9 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                 if (checkNetworkState()) {
                     Glide.with(GoodsShelfActivity.this).load(goodsImgUrl).into(ivGoodsPic);
                 } else {
-                    byte[] imagebyte = cacheUtils.getBitmapByte(goodsImgUrl);
-                    Glide.with(GoodsShelfActivity.this).load(imagebyte).into(ivGoodsPic);
+                    mlog.e("没有网络");
+                    if (cacheUtils.getBitmap(goodsImgUrl) != null)
+                        ivGoodsPic.setImageBitmap(cacheUtils.getBitmap(goodsImgUrl));
                 }
             }
 
@@ -354,8 +360,8 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                 if (checkNetworkState())
                     Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
                 else {
-                    byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
-                    Glide.with(this).load(imagebyte).into(ivGoodsPic);
+                    if (cacheUtils.getBitmap(proJsonCodeBean.getGoods_img()) != null)
+                        ivGoodsPic.setImageBitmap(cacheUtils.getBitmap(proJsonCodeBean.getGoods_img()));
                 }
                 break;
             case "5":
@@ -369,8 +375,9 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                 if (checkNetworkState())
                     Glide.with(this).load(proJsonCodeBean.getGoods_img()).into(ivGoodsPic);
                 else {
-                    byte[] imagebyte = cacheUtils.getBitmapByte(proJsonCodeBean.getGoods_img());
-                    Glide.with(this).load(imagebyte).into(ivGoodsPic);
+                    if (cacheUtils.getBitmap(proJsonCodeBean.getGoods_img()) != null)
+                        ivGoodsPic.setImageBitmap(cacheUtils.getBitmap(proJsonCodeBean.getGoods_img()));
+                    mlog.e("lixiang");
                 }
                 tvGoodsPrice.setText("价格：¥" + proJsonCodeBean.getShop_price());
                 break;
@@ -441,7 +448,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
             popupWindow.dismiss();
             ivPopuBg.setVisibility(View.GONE);
         }
-        cacheUtils.cancelAllTasks();
         cacheUtils.removeCache();
         mHandler.removeCallbacksAndMessages(null);
     }

@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.fierce.buerjiates.bean.GoodsBean;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
@@ -12,6 +11,7 @@ import com.fierce.buerjiates.bean.GoodsSort_Bean;
 import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
+import com.fierce.buerjiates.utils.mlog;
 import com.google.gson.Gson;
 
 import org.jsoup.Jsoup;
@@ -48,7 +48,7 @@ public class LoadDataSevice extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Log.e("TAG", "onHandleIntent: ::::::::::::::::::::::后台服务");
+        mlog.e("TAG", "onHandleIntent: ::::::::::::::::::::::后台服务");
         getBanner();
         getGoodsort();
     }
@@ -131,9 +131,9 @@ public class LoadDataSevice extends IntentService {
                 Gson son = new Gson();
                 GoodsList_Bean bean = son.fromJson(goodsLisJson, GoodsList_Bean.class);
                 for (GoodsList_Bean.ListBean listBean : bean.getList()) {
-                    String goods_img = listBean.getProJsonCode().getGoods_img();
+//                    String goods_img = listBean.getProJsonCode().getGoods_img();
                     String goods_desc = listBean.getProJsonCode().getGoods_desc();
-                    cacheUtils.loadBitmaps(goods_img);
+//                    cacheUtils.loadBitmaps(goods_img);
                     /**
                      *网页爬虫 抓取页面数据
                      */
@@ -177,7 +177,6 @@ public class LoadDataSevice extends IntentService {
                      *网页爬虫 抓取页面数据
                      */
                     Document doc = Jsoup.parse(html);
-//                    Log.e(TAG, "getGoodsInfo  " + doc.body().toString());
                     Elements media = doc.select("[src]");
                     imgUrlList1 = new ArrayList<>();
                     for (Element src : media) {

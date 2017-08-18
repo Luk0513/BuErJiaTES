@@ -262,16 +262,17 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(broadReceiver);
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(broadReceiver);
     }
 
     /**
-     * 接受Fragment发来的广播
+     * 接受Fragment发来的广播 根据发来广播获取 popuWindo的状态 设置VhideView
      */
     public class MyBroadcastReceiver extends BroadcastReceiver {
         private Boolean isPopuShowe;
@@ -279,13 +280,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         @Override
         public void onReceive(Context context, Intent intent) {
             isPopuShowe = intent.getBooleanExtra("isPopuShowe", false);
-            boolean isDone = intent.getBooleanExtra("isDone", false);
+            boolean isDone = intent.getBooleanExtra("isDone", false);//下载完成
             final String apkPath = intent.getStringExtra("apk");
             if (isPopuShowe) {
                 vHideView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendBroadcast(new Intent("dismmisPopu"));
+                        sendBroadcast(new Intent("dismmisPopu"));//发送广播关闭popuwindow
                     }
                 });
                 vHideView.setBackgroundResource(R.color.color_2);

@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowFullscreen">true</item>
     </style>
+
     <style name="Dialog_NoTitle">
         <item name="android:windowNoTitle">true</item>
     </style>
@@ -20,6 +21,7 @@
         <!--<item name="android:backgroundDimEnabled">true</item>-->
         <item name="android:windowIsFloating">false</item>
     </style>
+
     <style name="Dialog_FullScreen_NoTitle2" parent="Dialog_NoTitle">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -79,5 +81,14 @@
     <style name="popwin_anim_style">
         <item name="android:windowEnterAnimation">@anim/popuwin_into_anim</item>
         <item name="android:windowExitAnimation">@anim/popuwin_exit_anim</item>
+    </style>
+
+
+    <style name="TextViewLuckDraw">
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_height">match_parent</item>
+
     </style>
 </resources>

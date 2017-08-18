@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LotteryView">
+        <attr name="line_space" format="dimension" />
+        <attr name="column_space" format="dimension" />
+    </declare-styleable>
+</resources>

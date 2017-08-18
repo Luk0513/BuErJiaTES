@@ -54,6 +54,7 @@ public class GoodsSrcListAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+
         holder.ivGoodsrclIstitem.setTag(imgUrlList.get(position));
         holder.ivGoodsrclIstitem.setScaleType(ImageView.ScaleType.FIT_XY);
         cacheUtils.loadBitmaps(holder.ivGoodsrclIstitem, imgUrlList.get(position), imgLisView);
