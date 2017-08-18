@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -69,6 +68,9 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
     private List<Double> probability;
     private Gift_Bean giftBean;
     private int stopPosition;
+    private Dialog lotterayDialog;
+    private LotteryHolder holder;
+
 
     @Override
     protected int getLayoutRes() {
@@ -80,21 +82,23 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
         present = new IGteGifPresent(this);
         present.getGifts();
         probability = new ArrayList<>();
+        setLottreyLayout();
+        lotterayRun();
+        setDialog();
+    }
 
+    private void setLottreyLayout() {
         int width = getWindowManager().getDefaultDisplay().getWidth();
         int hiegt = getWindowManager().getDefaultDisplay().getHeight();
         width = width - 200;
         int maginTop = (hiegt - width) / 2;
-        Log.e("TAG", "onCreate: " + width);
         lotteryView = (LotteryView) findViewById(R.id.lottery_view);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, width);
-        params.setMargins(100, maginTop, 100, 0);
+        params.setMargins(90, maginTop, 90, 0);
         lotteryView.setLayoutParams(params);
 
         AnimationDrawable anim = (AnimationDrawable) lotteryView.getBackground();
         anim.start();
-        lotterayRun();
-        setDialog();
     }
 
     private void lotterayRun() {
@@ -132,9 +136,6 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
         Glide.with(this).load(giftList.get(7).getImageUrl()).into(img8);
     }
 
-    private Dialog lotterayDialog;
-    private LotteryHolder holder;
-
     private void setDialog() {
         View v = View.inflate(this, R.layout.lotteray_dialog_layout, null);
         holder = new LotteryHolder(v);
@@ -160,6 +161,8 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
                 holder.tvSao1sao.setText("不要灰心~");
                 holder.tvDialogTitle.setText("真遗憾呐~");
             } else {
+                holder.tvSao1sao.setText("打开微信扫一扫，大奖领回家~");
+                holder.tvDialogTitle.setText("恭喜你中奖啦！");
                 Bitmap bitmap = EncodingUtils.createQRCode("cehsjsehfjhfj", null, 220);
                 holder.imgQcode.setImageBitmap(bitmap);
             }
