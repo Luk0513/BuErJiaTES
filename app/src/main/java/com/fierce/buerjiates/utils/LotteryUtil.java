@@ -18,16 +18,13 @@ public class LotteryUtil {
     /**
      * 抽奖
      *
-     * @param orignalRates
-     *            原始的概率列表，保证顺序和实际物品对应
-     * @return
-     *         物品的索引
+     * @param orignalRates 原始的概率列表，保证顺序和实际物品对应
+     * @return 物品的索引
      */
     public static int lottery(List<Double> orignalRates) {
         if (orignalRates == null || orignalRates.isEmpty()) {
             return -1;
         }
-mlog.e("l  ");
         int size = orignalRates.size();
 
         // 计算总概率，这样可以保证不一定总概率是1

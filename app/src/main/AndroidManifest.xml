@@ -50,7 +50,6 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity android:name=".ui.Lottery_activity" />
-        <activity android:name=".ui.Lottery_Gridview_activity" />
         <!--注册广播接收器-->
         <receiver android:name=".widget.CustomBroadcastReciver">
             <intent-filter>

@@ -5,10 +5,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="800px"
+        android:layout_height="650px"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="120dp"
         android:background="@mipmap/diologbg">
 
         <TextView
@@ -16,10 +16,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="26dp"
+            android:layout_marginTop="60dp"
             android:text="恭喜你中奖啦！"
             android:textColor="#FDE503"
-            android:textSize="28sp"
+            android:textSize="38sp"
             android:textStyle="bold" />
 
         <TextView
@@ -28,10 +28,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_dialog_title"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="40dp"
             android:text="打开微信扫一扫，大奖领回家"
             android:textColor="@color/color_1"
-            android:textSize="16sp" />
+            android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/img_qcode"
@@ -52,7 +52,7 @@
             android:layout_marginTop="10dp"
             android:text="获得****"
             android:textColor="#FDE503"
-            android:textSize="18sp" />
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/tv_backButton"
@@ -60,21 +60,21 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_giftname"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="40dp"
             android:background="@drawable/lottery_button"
             android:text="返回"
             android:textColor="@color/color_text2"
-            android:textSize="18sp" />
+            android:textSize="20sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_backButton"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="40dp"
-            android:text="不二家跨境商城对此保留最终解释权"
-            android:textColor="@color/color_1"
-            android:textSize="14sp" />
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@id/tv_backButton"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginTop="40dp"-->
+        <!--android:text="不二家跨境商城对此保留最终解释权"-->
+        <!--android:textColor="@color/color_1"-->
+        <!--android:textSize="16sp" />-->
     </RelativeLayout>
 
 

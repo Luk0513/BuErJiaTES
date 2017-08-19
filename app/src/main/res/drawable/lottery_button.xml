@@ -13,10 +13,10 @@
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
             <solid android:color="#b6a60f"/>
-            <padding android:bottom="3dp"
-                android:left="30dp"
-                android:right="30dp"
-                android:top="3dp"/>
+            <padding android:bottom="5dp"
+                android:left="50dp"
+                android:right="50dp"
+                android:top="5dp"/>
             <corners android:radius="5dp" />
         </shape>
     </item>

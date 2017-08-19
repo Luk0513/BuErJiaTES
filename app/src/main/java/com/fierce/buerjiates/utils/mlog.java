@@ -187,6 +187,7 @@ public  class mlog {
             StringBuilder sb = new StringBuilder();
             String[] lines = msg.split(LINE_SEPARATOR);
             for (String line : lines) {
+
                 sb.append(LEFT_BORDER).append(line).append(LINE_SEPARATOR);
             }
             msg = sb.toString();

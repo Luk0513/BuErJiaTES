@@ -71,6 +71,10 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
     private Dialog lotterayDialog;
     private LotteryHolder holder;
 
+    String d_Id;
+    int mid;
+    int y_id;
+
 
     @Override
     protected int getLayoutRes() {
@@ -85,6 +89,10 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
         setLottreyLayout();
         lotterayRun();
         setDialog();
+        d_Id = MyApp.getInstance().getDevice_id();
+        String m_id = MyApp.getInstance().getM_id();
+        mid = Integer.parseInt(m_id);
+
     }
 
     private void setLottreyLayout() {
@@ -117,7 +125,12 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        showDialog();
+                        try {
+                            Thread.sleep(1200);
+                            showDialog();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         tvBackHome.setClickable(true);
                     }
                 });
@@ -146,6 +159,10 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
                 .build();
     }
 
+
+    /**
+     * 抽奖结果弹窗
+     */
     private void showDialog() {
         holder.tvBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,14 +173,26 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
         });
 
         try {
-            if (giftList.get(stopPosition).getGoodName().equals("谢谢参与")) {
+            if (giftList.get(stopPosition).getGoodName().startsWith("谢谢")) {
                 holder.imgQcode.setImageResource(R.mipmap.timg);
                 holder.tvSao1sao.setText("不要灰心~");
                 holder.tvDialogTitle.setText("真遗憾呐~");
+            } else if (giftList.get(stopPosition).getGoodName().startsWith("再")) {
+                holder.imgQcode.setImageResource(R.mipmap.again);
+                holder.tvSao1sao.setText("换个姿势，说不定几率会增加哦~");
+                holder.tvDialogTitle.setText("获得一次抽奖机会！");
             } else {
                 holder.tvSao1sao.setText("打开微信扫一扫，大奖领回家~");
                 holder.tvDialogTitle.setText("恭喜你中奖啦！");
-                Bitmap bitmap = EncodingUtils.createQRCode("cehsjsehfjhfj", null, 220);
+
+                //优惠券Id
+                String Yid = giftList.get(stopPosition).getRemark();
+                y_id = Integer.parseInt(Yid);
+                mlog.e(y_id);
+                String shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+                        "&m=ewei_shopv2&do=mobile&r=goods.youhui&d_id=" + d_Id + "&mid=" + mid + "&y_id=" + y_id;
+
+                Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 220);
                 holder.imgQcode.setImageBitmap(bitmap);
             }
             holder.tvGiftname.setText(giftList.get(stopPosition).getGoodName());
@@ -205,7 +234,6 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
             giftList = giftBean.getList();
             setGiftImage(giftList);
         }
-
     }
 
     @OnClick(R.id.tv_backHome)
@@ -230,5 +258,13 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
         LotteryHolder(View view) {
             ButterKnife.bind(this, view);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if (lotterayDialog.isShowing())
+            lotterayDialog.dismiss();
     }
 }

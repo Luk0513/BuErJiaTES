@@ -148,6 +148,9 @@ public class LotteryView extends ViewGroup {
         }
     }
 
+    /**
+     * @param onStartListener 点击开始抽奖的监听
+     */
     public void setOnStartListener(OnStartListener onStartListener) {
         mOnStartListener = onStartListener;
         View startBtn = getChildAt(getChildCount() - 1);
