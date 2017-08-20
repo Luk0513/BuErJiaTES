@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.fierce.buerjiates.R;
+import com.fierce.buerjiates.utils.mlog;
 
 /**
  * 九宫格抽奖控件
@@ -145,24 +146,33 @@ public class LotteryView extends ViewGroup {
             }
             mOnStartListener.onStop();
             initSetting();
+            try {
+                Thread.sleep(1300);
+                startBtn.setClickable(true);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
-
+   private View startBtn;
     /**
      * @param onStartListener 点击开始抽奖的监听
      */
     public void setOnStartListener(OnStartListener onStartListener) {
         mOnStartListener = onStartListener;
-        View startBtn = getChildAt(getChildCount() - 1);
+         startBtn = getChildAt(getChildCount() - 1);
         startBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                mlog.e(" startBtn>>>>>>>");
+
                 if (!mIsStarted) {
                     mIsStarted = true;
                     start();
                     if (mOnStartListener != null) {
                         mOnStartListener.onStart();
                     }
+                    startBtn.setClickable(false);
                 }
             }
         });

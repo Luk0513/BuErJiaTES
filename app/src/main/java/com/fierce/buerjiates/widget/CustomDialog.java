@@ -218,7 +218,6 @@ public class CustomDialog extends Dialog {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
     }
 
     @Override

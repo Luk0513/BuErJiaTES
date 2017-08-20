@@ -39,7 +39,7 @@ import butterknife.OnClick;
  * @Date :  2017-07-06
  */
 
-public class Lottery_activity extends BaseActivity implements IGetGiftView {
+public class Lottery_activity extends BaseActivity implements IGetGiftView, View.OnClickListener {
     @BindView(R.id.img_1)
     ImageView img1;
     @BindView(R.id.img_2)
@@ -56,6 +56,11 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
     ImageView img7;
     @BindView(R.id.img_8)
     ImageView img8;
+    @BindView(R.id.image_hover)
+    ImageView imgHover;
+//    @BindView(R.id.img_button)
+//    ImageView imgButton;
+
     @BindView(R.id.tv_backHome)
     TextView tvBackHome;
 
@@ -89,6 +94,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
         setLottreyLayout();
         lotterayRun();
         setDialog();
+        imgHover.setOnClickListener(this);
         d_Id = MyApp.getInstance().getDevice_id();
         String m_id = MyApp.getInstance().getM_id();
         mid = Integer.parseInt(m_id);
@@ -169,6 +175,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
             public void onClick(View v) {
                 if (lotterayDialog.isShowing())
                     lotterayDialog.dismiss();
+//                imgButton.setClickable(true);
             }
         });
 
@@ -242,6 +249,11 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
         finish();
     }
 
+    @Override
+    public void onClick(View v) {
+        imgHover.setVisibility(View.GONE);
+    }
+
     static class LotteryHolder {
 
         @BindView(R.id.tv_dialog_title)
@@ -263,7 +275,6 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
         if (lotterayDialog.isShowing())
             lotterayDialog.dismiss();
     }
