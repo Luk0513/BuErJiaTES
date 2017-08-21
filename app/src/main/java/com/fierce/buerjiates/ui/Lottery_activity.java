@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,7 +23,6 @@ import com.fierce.buerjiates.views.IGetGiftView;
 import com.fierce.buerjiates.widget.CustomDialog;
 import com.fierce.buerjiates.widget.LotteryView;
 import com.google.gson.Gson;
-import com.google.zxing.WriterException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,9 +76,9 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     private Dialog lotterayDialog;
     private LotteryHolder holder;
 
-    String d_Id;
-    int mid;
-    int y_id;
+    private String d_Id;
+    private int mid;
+    private int y_id;
 
 
     @Override
@@ -104,11 +104,11 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     private void setLottreyLayout() {
         int width = getWindowManager().getDefaultDisplay().getWidth();
         int hiegt = getWindowManager().getDefaultDisplay().getHeight();
-        width = width - 200;
+        width = width - 160;
         int maginTop = (hiegt - width) / 2;
         lotteryView = (LotteryView) findViewById(R.id.lottery_view);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, width);
-        params.setMargins(90, maginTop, 90, 0);
+        params.setMargins(80, maginTop, 80, 0);
         lotteryView.setLayoutParams(params);
 
         AnimationDrawable anim = (AnimationDrawable) lotteryView.getBackground();
@@ -137,13 +137,15 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        tvBackHome.setClickable(true);
                     }
                 });
             }
         });
     }
 
+    /**
+     * @param giftList 设置奖项图片
+     */
     private void setGiftImage(List<Gift_Bean.ListBean> giftList) {
         Glide.with(this).load(giftList.get(0).getImageUrl()).into(img1);
         Glide.with(this).load(giftList.get(1).getImageUrl()).into(img2);
@@ -175,7 +177,10 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
             public void onClick(View v) {
                 if (lotterayDialog.isShowing())
                     lotterayDialog.dismiss();
-//                imgButton.setClickable(true);
+                tvBackHome.setClickable(true);
+                if (!giftList.get(stopPosition).getGoodName().startsWith("再")) {
+                    imgHover.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -204,9 +209,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
             }
             holder.tvGiftname.setText(giftList.get(stopPosition).getGoodName());
             lotterayDialog.show();
-
-        } catch (
-                WriterException e)
+        } catch (Exception e)
 
         {
             e.printStackTrace();
@@ -237,6 +240,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         if (MyApp.getInstance().getGiftJson() != null) {
             Gson gson = new Gson();
             String json = MyApp.getInstance().getGiftJson();
+            mlog.json(json);
             giftBean = gson.fromJson(json, Gift_Bean.class);
             giftList = giftBean.getList();
             setGiftImage(giftList);
@@ -252,6 +256,26 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     @Override
     public void onClick(View v) {
         imgHover.setVisibility(View.GONE);
+        showeYzDialog();
+    }
+
+    private Dialog yzDailog;
+
+    private void showeYzDialog() {
+        View view = View.inflate(this, R.layout.lottery_verify_dialog_layout, null);
+
+        yzDailog = new CustomDialog.Builder(this)
+                .setIsFloating(false)
+                .setIsFullscreen(false)
+                .setView(view)
+                .setViewOnClike(R.id.image_close, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        yzDailog.dismiss();
+                    }
+                })
+                .build();
+        yzDailog.show();
     }
 
     static class LotteryHolder {
@@ -273,9 +297,28 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    protected void onDestroy() {
         if (lotterayDialog.isShowing())
             lotterayDialog.dismiss();
+        super.onDestroy();
+    }
+
+    static class YZ_ViewHolder {
+        @BindView(R.id.image_close)
+        ImageView imageClose;
+        @BindView(R.id.tv_tip)
+        TextView tvTip;
+        @BindView(R.id.tv_tipMessage)
+        TextView tvTipMessage;
+        @BindView(R.id.tv_yanzhengma)
+        TextView tvYanzhengma;
+        @BindView(R.id.tv_yangzheng)
+        TextView tvYangzheng;
+        @BindView(R.id.et_verify)
+        EditText etVerify;
+
+        YZ_ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }

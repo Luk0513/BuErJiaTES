@@ -8,7 +8,8 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_marginStart="120dp"
+        android:layout_marginStart="150dp"
+        android:paddingBottom="100dp"
         android:background="@mipmap/diologbg">
 
         <TextView
@@ -40,7 +41,7 @@
             android:layout_below="@id/tv_sao1sao"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
-            android:src="@mipmap/qcode" />
+             />
 
 
         <TextView
@@ -49,10 +50,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/img_qcode"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:text="获得****"
             android:textColor="#FDE503"
-            android:textSize="22sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/tv_backButton"
@@ -64,7 +65,7 @@
             android:background="@drawable/lottery_button"
             android:text="返回"
             android:textColor="@color/color_text2"
-            android:textSize="20sp" />
+            android:textSize="22sp" />
 
         <!--<TextView-->
         <!--android:layout_width="wrap_content"-->

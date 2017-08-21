@@ -75,7 +75,7 @@
                 <!--SDK（客户端） 向 JPush Server 注册所得到的注册 ID -->
                 <!--<action android:name="cn.jpush.android.intent.REGISTRATION" />-->
                 <!--收到了通知 Push。-->
-                <!--<action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED" />-->
+                <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED" />
                 <!--用户点击了通知。 一般情况下，用户不需要配置此 receiver action。-->
                 <!--<action android:name="cn.jpush.android.intent.NOTIFICATION_OPENED" />-->
                 <!--用户点击了通知栏中自定义的按钮。(SDK 3.0.0 以上版本支持)-->

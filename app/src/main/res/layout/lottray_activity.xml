@@ -11,13 +11,10 @@
     <com.fierce.buerjiates.widget.LotteryView
         android:id="@+id/lottery_view"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="400dp"
         android:layout_centerInParent="true"
         android:background="@drawable/bg_gif"
-        android:paddingBottom="70dp"
-        android:paddingLeft="66dp"
-        android:paddingRight="70dp"
-        android:paddingTop="70dp"
+        android:padding="105dp"
         app:column_space="10dp"
         app:line_space="10dp">
 
@@ -26,64 +23,56 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/probj"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/img_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/probj"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/img_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/probj"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/img_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/probj"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/img_5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/probj"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/img_6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/probj"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/img_7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/probj"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/img_8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/probj"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/img_button"
@@ -95,24 +84,25 @@
 
     <ImageView
         android:id="@+id/image_hover"
-        android:layout_width="wrap_content"
-        android:src="@mipmap/close"
-        android:layout_centerInParent="true"
-        android:layout_height="wrap_content" />
+        android:layout_width="300px"
+        android:layout_height="300px"
+        android:background="@color/color_1"
+        android:layout_centerInParent="true" />
+
     <TextView
         android:id="@+id/tv_backHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/lottery_view"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:background="@drawable/custombg"
         android:gravity="center"
-        android:paddingBottom="5dp"
-        android:paddingEnd="30dp"
-        android:paddingStart="30dp"
-        android:paddingTop="5dp"
+        android:paddingBottom="10dp"
+        android:paddingEnd="50dp"
+        android:paddingStart="50dp"
+        android:paddingTop="10dp"
         android:text="返回首页"
         android:textColor="@color/color_1"
-        android:textSize="30sp" />
+        android:textSize="36sp" />
 </RelativeLayout>

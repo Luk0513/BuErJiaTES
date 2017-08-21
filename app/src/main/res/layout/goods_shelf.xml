@@ -9,7 +9,7 @@
         android:layout_height="430px"
         android:layout_alignParentTop="true"
         android:scaleType="fitXY"
-        android:src="@mipmap/malllogo" />
+         />
 
     <TextView
         android:id="@+id/tv_backHome"

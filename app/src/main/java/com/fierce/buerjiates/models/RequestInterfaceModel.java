@@ -226,16 +226,20 @@ public class RequestInterfaceModel implements IRequestInterface {
 
     @Override
     public void getGifts(final IBeanCallback<Gift_Bean> callback) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
+                .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl("http://192.168.1.111:8080/admin/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
-
         Call<Gift_Bean> call = retrofit.create(HttpManage.class).getGift();
         call.enqueue(new Callback<Gift_Bean>() {
             @Override
             public void onResponse(Call<Gift_Bean> call, Response<Gift_Bean> response) {
                 Gson gson = new Gson();
                 String json = gson.toJson(response.body());
+                mlog.json(json);
                 MyApp.getInstance().saveLotteryGift(json);
                 callback.onSuccesd(response.body());
             }

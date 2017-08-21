@@ -147,7 +147,7 @@ public class LotteryView extends ViewGroup {
             mOnStartListener.onStop();
             initSetting();
             try {
-                Thread.sleep(1300);
+                Thread.sleep(2000);
                 startBtn.setClickable(true);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -165,7 +165,6 @@ public class LotteryView extends ViewGroup {
             @Override
             public void onClick(View v) {
                 mlog.e(" startBtn>>>>>>>");
-
                 if (!mIsStarted) {
                     mIsStarted = true;
                     start();
