@@ -11,7 +11,6 @@ public class Banners_Bean implements Serializable {
 
 
     private List<ListBean> list;
-
     public List<ListBean> getList() {
         return list;
     }

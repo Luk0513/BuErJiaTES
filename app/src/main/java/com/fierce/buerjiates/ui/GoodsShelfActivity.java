@@ -262,7 +262,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
      */
     @Override
     public void onItemClick(final AdapterView<?> parent, View view, int position, long id) {
-//        Log.e(TAG, "onItemClick: " + position + " // " + id);
         String ctLogo;
         close2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -273,10 +272,13 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
                 ivPopuBg.setVisibility(View.GONE);
             }
         });
+
         if (!popupWindow.isShowing())
             popupWindow.showAtLocation(ivAdpictuer, Gravity.CENTER, 0, -120);
+
         ivPopuBg.setVisibility(View.VISIBLE);
         GoodsList_Bean.ListBean.ProJsonCodeBean proJsonCodeBean = goodsListBean.get(position).getProJsonCode();
+
         if (proJsonCodeBean.getCountry_logo() != null) {
             tvCountryName.setText(proJsonCodeBean.getCountry_name());
             if (proJsonCodeBean.getCountry_logo().startsWith("http://"))
@@ -325,6 +327,7 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
 
 
         IgetTuanGouPricePresent getTGPriceP = new IgetTuanGouPricePresent(new IgetTuangouView() {
+
             @Override
             public void getTGPriceSucceed(Object o) {
                 JSONObject tgInfoJson = (JSONObject) o;
@@ -350,6 +353,7 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
 
             }
         });
+
         switch (categoryId) {
             case "2":
                 tvGoodsName.setText(proJsonCodeBean.getGoods_name());

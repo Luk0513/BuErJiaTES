@@ -1,18 +1,16 @@
 package com.fierce.buerjiates.views;
 
-import com.fierce.buerjiates.bean.GiftsBean;
-
 /**
  * @Author : Lukang
  * >>Live and learn<<
  * blog : http://blog.csdn.net/fight_0513
  * @PackegeName : com.fierce.buerjiates.views
  * @ProjectName : BuErJiaTES
- * @Date :  2017-08-18
+ * @Date :  2017-08-22
  */
 
-public interface IGetGiftView {
-    void getGiftSucceed(GiftsBean listBean);
+public interface IVerifyView {
+    void verifySucceed(String message);
 
-    void getGiftFault(String msg);
+    void verifyFailure(String msg);
 }

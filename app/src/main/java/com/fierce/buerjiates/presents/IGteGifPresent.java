@@ -1,6 +1,6 @@
 package com.fierce.buerjiates.presents;
 
-import com.fierce.buerjiates.bean.Gift_Bean;
+import com.fierce.buerjiates.bean.GiftsBean;
 import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
 import com.fierce.buerjiates.models.RequestInterfaceModel;
@@ -26,10 +26,10 @@ public class IGteGifPresent {
         requestInterface = new RequestInterfaceModel();
     }
 
-    public void getGifts() {
-        requestInterface.getGifts(new IBeanCallback<Gift_Bean>() {
+    public void getGifts(String admcNum) {
+        requestInterface.getGifts(admcNum, new IBeanCallback<GiftsBean>() {
             @Override
-            public void onSuccesd(Gift_Bean giftBean) {
+            public void onSuccesd(GiftsBean giftBean) {
                 view.getGiftSucceed(giftBean);
             }
 

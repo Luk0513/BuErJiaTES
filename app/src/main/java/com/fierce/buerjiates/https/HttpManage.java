@@ -2,7 +2,7 @@ package com.fierce.buerjiates.https;
 
 
 import com.fierce.buerjiates.bean.Banners_Bean;
-import com.fierce.buerjiates.bean.Gift_Bean;
+import com.fierce.buerjiates.bean.GiftsBean;
 import com.fierce.buerjiates.bean.GoodsBean;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.bean.GoodsSort_Bean;
@@ -74,6 +74,8 @@ public interface HttpManage {
     Call<String> updateApp();
 
     @GET(HttpServerInterface.GetGift)
-    Call<Gift_Bean> getGift();
+    Call<GiftsBean> getGift(@Query("admcNum") String admcNum);
 
+    @GET(HttpServerInterface.LOTTERY_VERIFY)
+    Call<String> verifycode(@Query("code") String code);
 }

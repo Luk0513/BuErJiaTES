@@ -12,7 +12,7 @@ public class HttpServerInterface {
     public static final String PRICE_URL = "http://m.bejmall.com/";
 //    http://m.bejmall.com/web/index.php?c=user&a=login&key=fierce&good_sn=ISHYHR0000169";
 //    http://m.bejmall.com/web/index.php?c=user&a=login&ukey=fd&good_sn=ISHYHR0000013
-//    public static final String BASE_URL = "http://192.168.1.110:8080/admin/";
+//    public static final String BASE_URL = "http://192.168.1.111:8080/admin/";
 //    public static final String BASE_URL = "http://192.168.1.105:8080/admin/";
 
 // 分类 http://120.76.159.2:8090/admin/productCategory/queryProCategoryList.shtml
@@ -52,5 +52,8 @@ public class HttpServerInterface {
      */
     static final String GetGift = "activity/queryActivityProductList.shtml";
 
-
+    /**
+     * 抽奖资格验证
+     */
+    static final String LOTTERY_VERIFY = "activity/checkCode.shtml";
 }

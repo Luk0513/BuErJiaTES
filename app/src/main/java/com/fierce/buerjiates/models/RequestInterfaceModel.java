@@ -1,10 +1,9 @@
 package com.fierce.buerjiates.models;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.fierce.buerjiates.bean.Banners_Bean;
-import com.fierce.buerjiates.bean.Gift_Bean;
+import com.fierce.buerjiates.bean.GiftsBean;
 import com.fierce.buerjiates.bean.GoodsBean;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.bean.GoodsSort_Bean;
@@ -27,7 +26,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
@@ -35,7 +33,6 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  */
 
 public class RequestInterfaceModel implements IRequestInterface {
-    private final static String TAG = "RequestInterfaceModel";
 
     @Override
     public void activeDevice(@NonNull final String device_Id, @NonNull String device_Key,
@@ -69,6 +66,7 @@ public class RequestInterfaceModel implements IRequestInterface {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                mlog.e(t.toString());
                 callback.onError("服务器连接失败");
             }
         });
@@ -93,7 +91,7 @@ public class RequestInterfaceModel implements IRequestInterface {
 
             @Override
             public void onFailure(Call<Banners_Bean> call, Throwable t) {
-                Log.e(TAG, "onFailure:getBanner " + t.toString());
+                mlog.e(t.toString());
                 callback.onError("服务器连接失败");
             }
         });
@@ -114,7 +112,7 @@ public class RequestInterfaceModel implements IRequestInterface {
 
             @Override
             public void onFailure(Call<GoodsSort_Bean> call, Throwable t) {
-                Log.e(TAG, "onFailure:getGoodsSort  " + t.toString());
+                mlog.e(t.toString());
                 callback.onError("服务器连接失败");
             }
         });
@@ -155,7 +153,7 @@ public class RequestInterfaceModel implements IRequestInterface {
 
             @Override
             public void onFailure(Call<GoodsBean> call, Throwable t) {
-                mlog.e(TAG, "onFailure:getGoodsInfo  " + t.toString());
+                mlog.e(t.toString());
                 callback.onError("服务器连接失败");
             }
         });
@@ -188,7 +186,7 @@ public class RequestInterfaceModel implements IRequestInterface {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 callback.onError("价格数据丢失……");
-                mlog.e(TAG, "onFailure: getGoodsPrice:::::::::::::::::::::::::" + t.toString());
+                mlog.e(t.toString());
             }
         });
     }
@@ -219,38 +217,85 @@ public class RequestInterfaceModel implements IRequestInterface {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                mlog.e(t.toString());
                 callback.onError("网络错误");
             }
         });
     }
 
     @Override
-    public void getGifts(final IBeanCallback<Gift_Bean> callback) {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
-                .build();
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://192.168.1.111:8080/admin/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-        Call<Gift_Bean> call = retrofit.create(HttpManage.class).getGift();
-        call.enqueue(new Callback<Gift_Bean>() {
+    public void getGifts(@NonNull String admcNum, final IBeanCallback<GiftsBean> callback) {
+
+        Retrofit retrofit = MyApp.getInstance().getGsonRetrofit();
+        Call<GiftsBean> call = retrofit.create(HttpManage.class).getGift(admcNum);
+        call.enqueue(new Callback<GiftsBean>() {
             @Override
-            public void onResponse(Call<Gift_Bean> call, Response<Gift_Bean> response) {
-                Gson gson = new Gson();
-                String json = gson.toJson(response.body());
-                mlog.json(json);
-                MyApp.getInstance().saveLotteryGift(json);
-                callback.onSuccesd(response.body());
+            public void onResponse(Call<GiftsBean> cal, Response<GiftsBean> response) {
+
+                if (response.body() != null) {
+                    if (response.body().getList() != null && response.body().getList().size() > 0) {
+                        Gson gson = new Gson();
+                        String json = gson.toJson(response.body());
+                        mlog.e(json);
+                        MyApp.getInstance().saveLotteryGift(json);
+                        callback.onSuccesd(response.body());
+                    } else {
+                        mlog.json("");
+                        callback.onError("数据集合为空");
+                    }
+                } else {
+                    mlog.json("");
+                    callback.onError("数据集合为空");
+                }
             }
 
             @Override
-            public void onFailure(Call<Gift_Bean> call, Throwable t) {
-
+            public void onFailure(Call<GiftsBean> call, Throwable t) {
                 mlog.e(t);
                 callback.onError(t.toString());
             }
         });
+    }
+
+    @Override
+    public void verify(@NonNull String code, final IBeanCallback callback) {
+
+        Retrofit retrofit = MyApp.getInstance().getStringRetrofit();
+        Call<String> call = retrofit.create(HttpManage.class).verifycode(code);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.body() != null) {
+                    mlog.e("");
+                    try {
+                        JSONObject jsonObject = new JSONObject(response.body());
+                        mlog.e(jsonObject.toString());
+                        if (jsonObject.optInt("state") == 200) {
+                            //验证成功
+                            mlog.e("");
+                            callback.onSuccesd("验证成功");
+                        }
+                        if (jsonObject.optInt("state") == 300) {
+
+                            mlog.e("");
+                            callback.onError("验证失败");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    mlog.e("");
+                    callback.onError("验证失败");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                mlog.e(t);
+                callback.onError("链接服务器错误");
+            }
+        });
+
     }
 
 

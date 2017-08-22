@@ -11,7 +11,7 @@
         android:layout_marginEnd="200dp"
         android:layout_marginStart="200dp"
         android:background="@drawable/custom_bg5"
-        android:padding="30dp">
+        android:padding="40dp">
 
         <ImageView
             android:id="@+id/image_close"
@@ -66,7 +66,7 @@
                 android:paddingTop="2dp"
                 android:text="抽奖码："
                 android:textColor="@color/color_1"
-                android:textSize="22sp" />
+                android:textSize="24sp" />
 
 
             <TextView
@@ -82,7 +82,7 @@
                 android:paddingTop="2dp"
                 android:text="验证"
                 android:textColor="@color/color_1"
-                android:textSize="22sp" />
+                android:textSize="24sp" />
 
             <EditText
                 android:id="@+id/et_verify"
@@ -91,23 +91,36 @@
                 android:layout_toEndOf="@id/tv_yanzhengma"
                 android:layout_toStartOf="@id/tv_yangzheng"
                 android:background="@null"
-                android:paddingStart="20dp"
                 android:hint="请输入六位数抽奖码"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLength="6"
+                android:paddingStart="20dp"
+                android:textSize="22sp" />
+
+            <ImageView
+                android:id="@+id/img_deletenum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="25dp"
+                android:layout_toStartOf="@id/tv_yangzheng"
+                android:src="@mipmap/delete"
+                android:visibility="invisible" />
         </RelativeLayout>
 
 
-        <!--<TextView-->
-        <!--android:id="@+id/tv_backButton"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@id/ll"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:background="@drawable/custom_bg2"-->
-        <!--android:text="关闭"-->
-        <!--android:textColor="@color/color_text2"-->
-        <!--android:textSize="22sp" />-->
+        <TextView
+            android:id="@+id/tv_erro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="验证失败！该抽奖码不存在或者已被使用过\n请向店小二核对抽奖码"
+            android:textColor="@color/color_text2"
+            android:textSize="18sp"
+            android:visibility="invisible" />
 
 
     </RelativeLayout>

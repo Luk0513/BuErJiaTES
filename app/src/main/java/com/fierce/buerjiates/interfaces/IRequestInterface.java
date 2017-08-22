@@ -3,7 +3,7 @@ package com.fierce.buerjiates.interfaces;
 import android.support.annotation.NonNull;
 
 import com.fierce.buerjiates.bean.Banners_Bean;
-import com.fierce.buerjiates.bean.Gift_Bean;
+import com.fierce.buerjiates.bean.GiftsBean;
 import com.fierce.buerjiates.bean.GoodsBean;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.bean.GoodsSort_Bean;
@@ -28,5 +28,8 @@ public interface IRequestInterface {
     void getGoodsPrice(String c, String a, String key, String goodsSn, String categoryId, IBeanCallback callback);
 
     void getTuanGouPrice(String c, String a, String ukey, String goodsSn, String categoryId, IBeanCallback callback);
-    void getGifts(IBeanCallback<Gift_Bean> callback);
+
+    void getGifts(@NonNull String admcNum,IBeanCallback<GiftsBean> callback);
+
+    void verify(@NonNull String code, IBeanCallback callback);
 }

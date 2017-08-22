@@ -64,6 +64,8 @@ public class MyApp extends Application {
         instance = this;
         context = getApplicationContext();
         SPHelper spHelper = new SPHelper(getContext(), "ServerState");
+//        SPHelper sp = new SPHelper(getContext(), "Gifts");
+//        sp.clear();
         spHelper.clear();
         JPushInterface.setDebugMode(true);    // 设置开启日志,发布时请关闭日志
         JPushInterface.init(getApplicationContext());            // 初始化 JPush
@@ -227,6 +229,16 @@ public class MyApp extends Application {
     public String getGiftJson() {
         SPHelper spHelper = new SPHelper(getContext(), "Gifts");
         return spHelper.getString("gift");
+    }
+
+    public void saveQR_Num(int QRNum) {
+        SPHelper spHelper = new SPHelper(getContext(), "QRNUM");
+        spHelper.save(new SPHelper.ContentValue("qr_num", QRNum));
+    }
+
+    public int getQR_Num() {
+        SPHelper spHelper = new SPHelper(getContext(), "QRNUM");
+        return spHelper.getInt("qr_num");
     }
 
     public void updateAPP() {

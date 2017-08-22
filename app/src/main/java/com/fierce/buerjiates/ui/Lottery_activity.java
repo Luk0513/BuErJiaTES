@@ -1,9 +1,14 @@
 package com.fierce.buerjiates.ui;
 
+import android.animation.Keyframe;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -13,13 +18,15 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.fierce.buerjiates.R;
 import com.fierce.buerjiates.base.BaseActivity;
-import com.fierce.buerjiates.bean.Gift_Bean;
+import com.fierce.buerjiates.bean.GiftsBean;
 import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.presents.IGteGifPresent;
+import com.fierce.buerjiates.presents.IVerifyPresent;
 import com.fierce.buerjiates.utils.EncodingUtils;
 import com.fierce.buerjiates.utils.LotteryUtil;
 import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.views.IGetGiftView;
+import com.fierce.buerjiates.views.IVerifyView;
 import com.fierce.buerjiates.widget.CustomDialog;
 import com.fierce.buerjiates.widget.LotteryView;
 import com.google.gson.Gson;
@@ -39,7 +46,7 @@ import butterknife.OnClick;
  * @Date :  2017-07-06
  */
 
-public class Lottery_activity extends BaseActivity implements IGetGiftView, View.OnClickListener {
+public class Lottery_activity extends BaseActivity implements IGetGiftView, View.OnClickListener, IVerifyView {
     @BindView(R.id.img_1)
     ImageView img1;
     @BindView(R.id.img_2)
@@ -69,9 +76,9 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
 
 
     private IGteGifPresent present;
-    private List<Gift_Bean.ListBean> giftList;
+    private List<GiftsBean.ListBean> giftList;
     private List<Double> probability;
-    private Gift_Bean giftBean;
+    private GiftsBean giftBean;
     private int stopPosition;
     private Dialog lotterayDialog;
     private LotteryHolder holder;
@@ -80,6 +87,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     private int mid;
     private int y_id;
 
+    private String admcNum;
 
     @Override
     protected int getLayoutRes() {
@@ -89,7 +97,11 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     @Override
     protected void initView() {
         present = new IGteGifPresent(this);
-        present.getGifts();
+        verifyPresent = new IVerifyPresent(this);
+//        admcNum = "gddg13728133158";
+        admcNum = MyApp.getInstance().getDevice_id();
+        mlog.e(admcNum);
+        present.getGifts(admcNum);
         probability = new ArrayList<>();
         setLottreyLayout();
         lotterayRun();
@@ -146,7 +158,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     /**
      * @param giftList 设置奖项图片
      */
-    private void setGiftImage(List<Gift_Bean.ListBean> giftList) {
+    private void setGiftImage(List<GiftsBean.ListBean> giftList) {
         Glide.with(this).load(giftList.get(0).getImageUrl()).into(img1);
         Glide.with(this).load(giftList.get(1).getImageUrl()).into(img2);
         Glide.with(this).load(giftList.get(2).getImageUrl()).into(img3);
@@ -167,6 +179,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                 .build();
     }
 
+    private int QR_Num = 0;
 
     /**
      * 抽奖结果弹窗
@@ -183,7 +196,6 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                 }
             }
         });
-
         try {
             if (giftList.get(stopPosition).getGoodName().startsWith("谢谢")) {
                 holder.imgQcode.setImageResource(R.mipmap.timg);
@@ -198,14 +210,21 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                 holder.tvDialogTitle.setText("恭喜你中奖啦！");
 
                 //优惠券Id
-                String Yid = giftList.get(stopPosition).getRemark();
+                String Yid = giftList.get(stopPosition).getCoupon();
                 y_id = Integer.parseInt(Yid);
-                mlog.e(y_id);
+                QR_Num = MyApp.getInstance().getQR_Num();
+                QR_Num++;
+                String QRNO = d_Id + QR_Num;
+                mlog.e("TAG", y_id, QR_Num, QRNO);
+
                 String shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-                        "&m=ewei_shopv2&do=mobile&r=goods.youhui&d_id=" + d_Id + "&mid=" + mid + "&y_id=" + y_id;
+                        "&m=ewei_shopv2&do=mobile&r=goods.youhui&d_id="
+                        + d_Id + "&mid=" + mid + "&y_id=" + y_id + "&QR_Num=" + QRNO;
 
                 Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 220);
                 holder.imgQcode.setImageBitmap(bitmap);
+                mlog.e(QR_Num);
+                MyApp.getInstance().saveQR_Num(QR_Num);
             }
             holder.tvGiftname.setText(giftList.get(stopPosition).getGoodName());
             lotterayDialog.show();
@@ -216,10 +235,10 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         }
     }
 
-    private void initStopPosition(List<Gift_Bean.ListBean> giftList) {
+    private void initStopPosition(List<GiftsBean.ListBean> giftList) {
         probability.clear();
         mlog.e(giftList.size());
-        for (Gift_Bean.ListBean bean : giftList) {
+        for (GiftsBean.ListBean bean : giftList) {
             double themProb = bean.getProbability();
             if (themProb < 0)
                 themProb = 0;
@@ -228,7 +247,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     }
 
     @Override
-    public void getGiftSucceed(Gift_Bean giftBean) {
+    public void getGiftSucceed(GiftsBean giftBean) {
         this.giftBean = giftBean;
         giftList = giftBean.getList();
         setGiftImage(giftList);
@@ -241,7 +260,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
             Gson gson = new Gson();
             String json = MyApp.getInstance().getGiftJson();
             mlog.json(json);
-            giftBean = gson.fromJson(json, Gift_Bean.class);
+            giftBean = gson.fromJson(json, GiftsBean.class);
             giftList = giftBean.getList();
             setGiftImage(giftList);
         }
@@ -255,15 +274,16 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
 
     @Override
     public void onClick(View v) {
-        imgHover.setVisibility(View.GONE);
         showeYzDialog();
     }
 
     private Dialog yzDailog;
+    private IVerifyPresent verifyPresent;
+    private YZ_ViewHolder yzHolder;
 
     private void showeYzDialog() {
         View view = View.inflate(this, R.layout.lottery_verify_dialog_layout, null);
-
+        yzHolder = new YZ_ViewHolder(view);
         yzDailog = new CustomDialog.Builder(this)
                 .setIsFloating(false)
                 .setIsFullscreen(false)
@@ -275,7 +295,80 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                     }
                 })
                 .build();
+
+        yzHolder.tvYangzheng.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //验证
+                if (yzHolder.etVerify.getText().toString().length() <= 0) {
+                    ObjectAnimator animator = nope(yzHolder.etVerify);
+                    animator.start();
+                    return;
+                }
+                verifyPresent.verify(yzHolder.etVerify.getText().toString());
+                mlog.e(yzHolder.etVerify.getText().toString());
+            }
+        });
+
+        yzHolder.etVerify.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                yzHolder.tvErro.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+                    yzHolder.imgDelete.setVisibility(View.VISIBLE);
+                } else {
+                    yzHolder.imgDelete.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        yzHolder.imgDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                yzHolder.etVerify.setText("");
+            }
+        });
+
         yzDailog.show();
+    }
+
+    //控件抖动的动画效果
+    private static ObjectAnimator nope(View view) {
+        int delta = view.getResources().getDimensionPixelOffset(R.dimen.spacing_medium);
+        PropertyValuesHolder pvhTranslateX = PropertyValuesHolder.ofKeyframe(View.TRANSLATION_X,
+                Keyframe.ofFloat(0f, 0),
+                Keyframe.ofFloat(.10f, -delta),
+                Keyframe.ofFloat(.26f, delta),
+                Keyframe.ofFloat(.42f, -delta),
+                Keyframe.ofFloat(.58f, delta),
+                Keyframe.ofFloat(.74f, -delta),
+                Keyframe.ofFloat(.90f, delta),
+                Keyframe.ofFloat(1f, 0f)
+        );
+        return ObjectAnimator.ofPropertyValuesHolder(view, pvhTranslateX).setDuration(500);
+    }
+
+    @Override
+    public void verifySucceed(String message) {
+        imgHover.setVisibility(View.GONE);
+        yzDailog.dismiss();
+    }
+
+    @Override
+    public void verifyFailure(String msg) {
+        yzHolder.tvErro.setVisibility(View.VISIBLE);
+        ObjectAnimator animator = nope(yzHolder.tvErro);
+        animator.start();
     }
 
     static class LotteryHolder {
@@ -316,6 +409,10 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         TextView tvYangzheng;
         @BindView(R.id.et_verify)
         EditText etVerify;
+        @BindView(R.id.tv_erro)
+        TextView tvErro;
+        @BindView(R.id.img_deletenum)
+        ImageView imgDelete;
 
         YZ_ViewHolder(View view) {
             ButterKnife.bind(this, view);
