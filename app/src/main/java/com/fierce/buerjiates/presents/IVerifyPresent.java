@@ -1,7 +1,7 @@
 package com.fierce.buerjiates.presents;
 
-import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
+import com.fierce.buerjiates.interfaces.VerifyCallback;
 import com.fierce.buerjiates.models.RequestInterfaceModel;
 import com.fierce.buerjiates.views.IVerifyView;
 
@@ -24,15 +24,15 @@ public class IVerifyPresent {
     }
 
     public void verify(String code) {
-        modle.verify(code, new IBeanCallback() {
+        modle.verify(code, new VerifyCallback() {
             @Override
             public void onSuccesd(Object o) {
                 verifyView.verifySucceed(o.toString());
             }
 
             @Override
-            public void onError(String msg) {
-                verifyView.verifyFailure(msg);
+            public void onError(int errorType, String msg) {
+                verifyView.verifyFailure(errorType, msg);
 
             }
         });

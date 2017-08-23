@@ -31,5 +31,5 @@ public interface IRequestInterface {
 
     void getGifts(@NonNull String admcNum,IBeanCallback<GiftsBean> callback);
 
-    void verify(@NonNull String code, IBeanCallback callback);
+    void verify(@NonNull String code, VerifyCallback callback);
 }

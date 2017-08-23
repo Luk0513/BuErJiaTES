@@ -12,6 +12,7 @@ import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.https.HttpServerInterface;
 import com.fierce.buerjiates.interfaces.IBeanCallback;
 import com.fierce.buerjiates.interfaces.IRequestInterface;
+import com.fierce.buerjiates.interfaces.VerifyCallback;
 import com.fierce.buerjiates.utils.mlog;
 import com.google.gson.Gson;
 
@@ -19,9 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -161,12 +159,8 @@ public class RequestInterfaceModel implements IRequestInterface {
 
     @Override
     public void getGoodsPrice(String c, String a, String key, final String goodsSn, String categoryId, final IBeanCallback callback) {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(800, TimeUnit.MILLISECONDS) //设置请求超时
-                .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.PRICE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .client(client)
                 .build();
         Call<String> call = retrofit.create(HttpManage.class).getGoodsPrice(c, a, key, goodsSn);
         call.enqueue(new Callback<String>() {
@@ -193,12 +187,8 @@ public class RequestInterfaceModel implements IRequestInterface {
 
     @Override
     public void getTuanGouPrice(final String c, String a, String ukey, String goodsSn, String categoryId, final IBeanCallback callback) {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(800, TimeUnit.MILLISECONDS) //设置请求超时
-                .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.PRICE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .client(client)
                 .build();
         Call<String> call = retrofit.create(HttpManage.class).getTGprice(c, a, ukey, goodsSn);
         call.enqueue(new Callback<String>() {
@@ -258,41 +248,37 @@ public class RequestInterfaceModel implements IRequestInterface {
     }
 
     @Override
-    public void verify(@NonNull String code, final IBeanCallback callback) {
+    public void verify(@NonNull String code, final VerifyCallback callback) {
 
         Retrofit retrofit = MyApp.getInstance().getStringRetrofit();
+
         Call<String> call = retrofit.create(HttpManage.class).verifycode(code);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.body() != null) {
-                    mlog.e("");
-                    try {
+                try {
+                    if (response.body() != null) {
                         JSONObject jsonObject = new JSONObject(response.body());
                         mlog.e(jsonObject.toString());
                         if (jsonObject.optInt("state") == 200) {
                             //验证成功
-                            mlog.e("");
                             callback.onSuccesd("验证成功");
                         }
                         if (jsonObject.optInt("state") == 300) {
-
-                            mlog.e("");
-                            callback.onError("验证失败");
+                            callback.onError(300, "验证失败");
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    } else {
+                        callback.onError(300, "验证失败");
                     }
-                } else {
-                    mlog.e("");
-                    callback.onError("验证失败");
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 mlog.e(t);
-                callback.onError("链接服务器错误");
+                callback.onError(0, "网络连接错误,请稍后再试");
             }
         });
 

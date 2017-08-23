@@ -12,6 +12,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -94,13 +95,14 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         return R.layout.lottray_activity;
     }
 
+    /**
+     *
+     */
     @Override
     protected void initView() {
         present = new IGteGifPresent(this);
         verifyPresent = new IVerifyPresent(this);
-//        admcNum = "gddg13728133158";
         admcNum = MyApp.getInstance().getDevice_id();
-        mlog.e(admcNum);
         present.getGifts(admcNum);
         probability = new ArrayList<>();
         setLottreyLayout();
@@ -206,6 +208,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                 holder.tvSao1sao.setText("换个姿势，说不定几率会增加哦~");
                 holder.tvDialogTitle.setText("获得一次抽奖机会！");
             } else {
+
                 holder.tvSao1sao.setText("打开微信扫一扫，大奖领回家~");
                 holder.tvDialogTitle.setText("恭喜你中奖啦！");
 
@@ -216,7 +219,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                 QR_Num++;
                 String QRNO = d_Id + QR_Num;
                 mlog.e("TAG", y_id, QR_Num, QRNO);
-
+                //二维码 链接
                 String shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
                         "&m=ewei_shopv2&do=mobile&r=goods.youhui&d_id="
                         + d_Id + "&mid=" + mid + "&y_id=" + y_id + "&QR_Num=" + QRNO;
@@ -228,9 +231,8 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
             }
             holder.tvGiftname.setText(giftList.get(stopPosition).getGoodName());
             lotterayDialog.show();
-        } catch (Exception e)
 
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -305,8 +307,10 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                     animator.start();
                     return;
                 }
-                verifyPresent.verify(yzHolder.etVerify.getText().toString());
-                mlog.e(yzHolder.etVerify.getText().toString());
+                String verifyCode = yzHolder.etVerify.getText().toString();
+                verifyPresent.verify(verifyCode);
+                yzHolder.progressVerify.setVisibility(View.VISIBLE);
+                mlog.e(verifyCode);
             }
         });
 
@@ -361,12 +365,24 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     @Override
     public void verifySucceed(String message) {
         imgHover.setVisibility(View.GONE);
+        yzHolder.progressVerify.setVisibility(View.INVISIBLE);
         yzDailog.dismiss();
     }
 
     @Override
-    public void verifyFailure(String msg) {
+    public void verifyFailure(int errorType, String msg) {
+        yzHolder.progressVerify.setVisibility(View.INVISIBLE);
+        String errorTips = null;
+        switch (errorType) {
+            case 300://验证失败（验证码失效）
+                errorTips = "验证失败！该抽奖码不存在或者已被使用过\n请向店小二核对抽奖码";
+                break;
+            case 0://网络连接错误
+                errorTips = "连接网络出错！\n请检查你的网络设置后再试";
+                break;
+        }
         yzHolder.tvErro.setVisibility(View.VISIBLE);
+        yzHolder.tvErro.setText(errorTips);
         ObjectAnimator animator = nope(yzHolder.tvErro);
         animator.start();
     }
@@ -413,6 +429,8 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         TextView tvErro;
         @BindView(R.id.img_deletenum)
         ImageView imgDelete;
+        @BindView(R.id.progress_verify)
+        LinearLayout progressVerify;
 
         YZ_ViewHolder(View view) {
             ButterKnife.bind(this, view);

@@ -12,5 +12,5 @@ package com.fierce.buerjiates.views;
 public interface IVerifyView {
     void verifySucceed(String message);
 
-    void verifyFailure(String msg);
+    void verifyFailure(int errotype, String msg);
 }

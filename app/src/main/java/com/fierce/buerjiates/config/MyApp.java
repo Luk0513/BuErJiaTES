@@ -23,10 +23,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import cn.jpush.android.api.JPushInterface;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,7 +41,6 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class MyApp extends Application {
 
-    private final String TAG = "MyApp";
     private static volatile MyApp instance;
     private static Context context;
 
@@ -64,11 +61,9 @@ public class MyApp extends Application {
         instance = this;
         context = getApplicationContext();
         SPHelper spHelper = new SPHelper(getContext(), "ServerState");
-//        SPHelper sp = new SPHelper(getContext(), "Gifts");
-//        sp.clear();
         spHelper.clear();
-        JPushInterface.setDebugMode(true);    // 设置开启日志,发布时请关闭日志
-        JPushInterface.init(getApplicationContext());            // 初始化 JPush
+        JPushInterface.setDebugMode(false);          // 设置开启日志,发布时请关闭日志
+        JPushInterface.init(getApplicationContext());   // 初始化 JPush
     }
 
     public Context getContext() {
@@ -78,24 +73,16 @@ public class MyApp extends Application {
     //打开网络请求
     //返回Gson
     public Retrofit getGsonRetrofit() {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
-                .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
                 .build();
         return retrofit;
     }
 
     //返回字符串
     public Retrofit getStringRetrofit() {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(400, TimeUnit.MILLISECONDS) //设置请求超时
-                .build();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(HttpServerInterface.BASE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .client(client)
                 .build();
         return retrofit;
     }
