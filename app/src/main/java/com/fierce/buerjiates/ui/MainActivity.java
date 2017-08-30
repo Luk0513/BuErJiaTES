@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.view.SurfaceHolder;
@@ -280,8 +279,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         @Override
         public void onReceive(Context context, Intent intent) {
             isPopuShowe = intent.getBooleanExtra("isPopuShowe", false);
-            boolean isDone = intent.getBooleanExtra("isDone", false);//下载完成
-            final String apkPath = intent.getStringExtra("apk");
             if (isPopuShowe) {
                 vHideView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -296,37 +293,35 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 vHideView.setClickable(false);
             }
 
-            if (isDone) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("更新提示：")
-                        .setMessage("发现新版本安装包！" +
-                                "\n请立即更新")
-                        .setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                installApk(apkPath);
-                            }
-                        });
-                builder.setCancelable(false);
-                builder.show();
-            } else {
-
-            }
+//            if (isDone) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                builder.setTitle("更新提示：")
+//                        .setMessage("发现新版本安装包！" +
+//                                "\n请立即更新")
+//                        .setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                installApk(apkPath);
+//                            }
+//                        });
+//                builder.setCancelable(false);
+//                builder.show();
+//            }
         }
     }
 
-    //打开APK程序代码
-    private void installApk(String apkPath) {
-//        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
-//        File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
-        File apk = new File(apkPath);
-        Intent intent = new Intent();
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(apk),
-                "application/vnd.android.package-archive");
-        startActivity(intent);
-    }
+//    //打开APK程序代码
+//    private void installApk(String apkPath) {
+////        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
+////        File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
+//        File apk = new File(apkPath);
+//        Intent intent = new Intent();
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.setAction(Intent.ACTION_VIEW);
+//        intent.setDataAndType(Uri.fromFile(apk),
+//                "application/vnd.android.package-archive");
+//        startActivity(intent);
+//    }
 
 
     private void registrBodcast() {

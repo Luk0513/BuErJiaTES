@@ -267,6 +267,7 @@ public class MyApp extends Application {
                         if (!MyApp.getInstance().getisRunning()) {
                             //在下载apk文件前 先检查本地apk文件的版本号是否等于服务器上的版本号
                             //相等则直接安装 否则开始下载
+                            mlog.e("在下载apk文件前 先检查本地apk文件的版本号是否等于服务器上的版本号");
                             File[] allFiles = new File(downloadFile.getAbsolutePath()).listFiles();
                             int apkCode = 0;
                             File apkfile = null;
@@ -278,10 +279,11 @@ public class MyApp extends Application {
                                     apkCode = packageInfo.versionCode;//apk 版本号；
                                 } catch (NullPointerException e) {
                                     //捕捉到空指针
+                                    mlog.e(e);
                                 }
                             }
                             if (apkCode == versionCode && apkfile != null) {
-                                Intent in = new Intent("PupoState");
+                                Intent in = new Intent("Install");
                                 in.putExtra("isDone", true);
                                 in.putExtra("apk", apkfile.getAbsolutePath());
                                 sendBroadcast(in);
@@ -293,7 +295,7 @@ public class MyApp extends Application {
                                 startService(intent);
                             }
                         } else {
-                            mlog.e("onResponse: KKKKKKKKKKKKKKKKKKKK 已经启动服务");
+                            mlog.e("onResponse: 已经启动下载apk服务");
                         }
                     }
                 } catch (JSONException e) {

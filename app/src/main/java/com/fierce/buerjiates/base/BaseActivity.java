@@ -1,6 +1,12 @@
 package com.fierce.buerjiates.base;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
+
+import com.fierce.buerjiates.R;
+import com.fierce.buerjiates.widget.CustomDialog;
+
+import java.io.File;
 
 import butterknife.ButterKnife;
 
@@ -23,11 +34,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getLayoutRes());
         ButterKnife.bind(this);
         initView();
+        registrBodcast();
     }
 
     protected abstract int getLayoutRes();
 
     protected abstract void initView();
+
+    private APKBroadcastReceiver broadReceiver;
 
     public void showToast(final String msg) {
         //直接将弹出 Toast 方法方在子线程 提高方法的复用性
@@ -78,5 +92,56 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         getWindow().getDecorView().setSystemUiVisibility(uiFlags);
+    }
+
+    private Dialog updateDialog;//更新提示
+
+    public class APKBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isDone = intent.getBooleanExtra("isDone", false);//下载完成
+            final String apkPath = intent.getStringExtra("apk");
+            if (isDone) {
+                updateDialog = new CustomDialog.Builder(getActivity())
+                        .setIsFloating(false)
+                        .setIsFullscreen(false)
+                        .setLayout(R.layout.update_dialog_layout)
+                        .setViewOnClike(R.id.tv_update, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                installApk(apkPath);
+                            }
+                        })
+                        .build();
+                updateDialog.show();
+            }
+        }
+    }
+
+    private void registrBodcast() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("Install");
+        broadReceiver = new APKBroadcastReceiver();
+        registerReceiver(broadReceiver, intentFilter);
+
+    }
+
+    //打开APK程序代码
+    private void installApk(String apkPath) {
+//        File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
+//        File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
+        File apk = new File(apkPath);
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(apk),
+                "application/vnd.android.package-archive");
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadReceiver);
     }
 }

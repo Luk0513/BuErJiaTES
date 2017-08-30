@@ -227,7 +227,7 @@ public class RequestInterfaceModel implements IRequestInterface {
                     if (response.body().getList() != null && response.body().getList().size() > 0) {
                         Gson gson = new Gson();
                         String json = gson.toJson(response.body());
-                        mlog.e(json);
+//                        mlog.e(json);
                         MyApp.getInstance().saveLotteryGift(json);
                         callback.onSuccesd(response.body());
                     } else {

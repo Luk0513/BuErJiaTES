@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.utils.DownloadUtil;
+import com.fierce.buerjiates.utils.mlog;
 
 import java.io.File;
 
@@ -29,7 +29,7 @@ public class DownAPKService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (!MyApp.getInstance().getisRunning()) {
-            Log.e("TAG", "onHandleIntent: <<<<<" + "下载……");
+            mlog.e("TAG", "onHandleIntent: <<<<<" + "下载……");
             //删除本地apk文件
             File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
             File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
@@ -58,10 +58,10 @@ public class DownAPKService extends IntentService {
             @Override
             public void onDownloadSuccess(Object o) {
 
-                Log.e("TAG", "onDownloadSuccess: <><><><><><<<<>>>");
+                mlog.e( "onDownloadSuccess: <><><><><><<<<>>>");
                 File apk = (File) o;
                 String apkPath = apk.getAbsolutePath();
-                Intent in = new Intent("PupoState");
+                Intent in = new Intent("Install");
                 in.putExtra("isDone", true);
                 in.putExtra("apk", apkPath);
                 sendBroadcast(in);

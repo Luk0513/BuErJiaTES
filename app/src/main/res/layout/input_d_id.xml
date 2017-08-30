@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/custom_bg2"
-        android:padding="30dp">
+        android:padding="40dp">
 
         <TableRow>
 
@@ -17,7 +17,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="输入设备ID："
-                android:textSize="18sp" />
+                android:textSize="24sp" />
 
             <EditText
                 android:id="@+id/et_did"
@@ -30,18 +30,18 @@
                 android:maxWidth="170dp"
                 android:padding="3dp"
                 android:singleLine="true"
-                android:textSize="18sp"
+                android:textSize="22sp"
                 android:inputType="text" />
         </TableRow>
 
-        <TableRow android:layout_marginTop="10dp">
+        <TableRow android:layout_marginTop="15dp">
 
             <TextView
                 android:id="@+id/tv_paw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="输入秘钥   ："
-                android:textSize="18sp" />
+                android:textSize="24sp" />
 
 
             <EditText
@@ -53,12 +53,12 @@
                 android:maxWidth="170dp"
                 android:padding="3dp"
                 android:singleLine="true"
-                android:textSize="18sp"
+                android:textSize="22sp"
                 android:inputType="text" />
         </TableRow>
 
         <TableRow
-            android:layout_marginTop="13dp"
+            android:layout_marginTop="20dp"
             android:gravity="center">
 
             <TextView
@@ -68,7 +68,7 @@
                 android:background="@drawable/custome_bg_pressed"
                 android:gravity="center"
                 android:padding="5dp"
-                android:textSize="18sp"
+                android:textSize="24sp"
                 android:text="确定" />
         </TableRow>
 

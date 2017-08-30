@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="200dp"
+        android:layout_marginStart="200dp"
+        android:background="@drawable/custom_bg55"
+        android:padding="40dp">
+
+
+        <TextView
+            android:id="@+id/tv_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:drawablePadding="5dp"
+            android:drawableStart="@mipmap/update"
+            android:text="软件更新提示："
+            android:textColor="@color/color_4"
+            android:textSize="38sp" />
+
+        <TextView
+            android:id="@+id/tv_tipMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_tip"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:gravity="center_horizontal"
+            android:maxWidth="600dp"
+            android:text="新版本软件安装包下载完成\n请立即更新！"
+            android:textColor="@color/color_1"
+            android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/tv_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_tipMessage"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/lottery_yanzheng"
+            android:gravity="center_vertical"
+            android:paddingBottom="3dp"
+            android:paddingEnd="30dp"
+            android:paddingStart="30dp"
+            android:paddingTop="3dp"
+            android:text="立即更新"
+            android:textColor="@color/color_1"
+            android:textSize="28sp" />
+    </RelativeLayout>
+
+
+</LinearLayout>

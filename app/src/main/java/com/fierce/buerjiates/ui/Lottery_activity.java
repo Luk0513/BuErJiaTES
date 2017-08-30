@@ -99,9 +99,6 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         return R.layout.lottray_activity;
     }
 
-    /**
-     *
-     */
     @Override
     protected void initView() {
         present = new IGteGifPresent(this);
