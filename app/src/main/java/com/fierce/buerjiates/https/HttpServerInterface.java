@@ -56,4 +56,9 @@ public class HttpServerInterface {
      * 抽奖资格验证
      */
     static final String LOTTERY_VERIFY = "activity/checkCode.shtml";
+
+    /**
+     * 获取门店信息
+     */
+    static final String GETSHOPINFO = "advertising/queryAdvList.shtml";
 }

@@ -29,6 +29,7 @@ import com.fierce.buerjiates.base.BaseActivity;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.presents.IGetGoodsPricePresent;
+import com.fierce.buerjiates.presents.IGetShopInfoPresent;
 import com.fierce.buerjiates.presents.IgetTuanGouPricePresent;
 import com.fierce.buerjiates.utils.EncodingUtils;
 import com.fierce.buerjiates.utils.ImageCacheUtils;
@@ -74,7 +75,6 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
     private MyGridviewAdapter adapter;
     private Handler mHandler;
 
-    private String banner2Image;
 
     @Override
     protected int getLayoutRes() {
@@ -91,13 +91,14 @@ public class GoodsShelfActivity extends BaseActivity implements AdapterView.OnIt
         mHandler = new MyHandler(this);
         mHandler.sendEmptyMessageDelayed(1, 20 * 1000);
         currentTime = System.currentTimeMillis();
-        banner2Image = getIntent().getStringExtra("bannerImage");
+        String banner2Image = getIntent().getStringExtra("bannerImage");
         cacheUtils = new ImageCacheUtils(this);
         d_Id = MyApp.getInstance().getDevice_id();
         gvGoodslist.setOnTouchListener(this);
         mThread.start();
         Glide.with(getApplicationContext()).load(banner2Image)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT).into(ivAdpictuer);
+        new IGetShopInfoPresent().getShopInfo_nocallbacke(d_Id);
     }
 
     Thread mThread = new Thread(new Runnable() {

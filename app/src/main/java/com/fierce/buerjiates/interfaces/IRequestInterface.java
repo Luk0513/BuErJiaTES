@@ -7,6 +7,7 @@ import com.fierce.buerjiates.bean.GiftsBean;
 import com.fierce.buerjiates.bean.GoodsBean;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.bean.GoodsSort_Bean;
+import com.fierce.buerjiates.bean.ShopInfo_Bean;
 
 
 /**
@@ -29,7 +30,9 @@ public interface IRequestInterface {
 
     void getTuanGouPrice(String c, String a, String ukey, String goodsSn, String categoryId, IBeanCallback callback);
 
-    void getGifts(@NonNull String admcNum,IBeanCallback<GiftsBean> callback);
+    void getGifts(@NonNull String admcNum, IBeanCallback<GiftsBean> callback);
 
     void verify(@NonNull String code, VerifyCallback callback);
+
+    void getShopInfo(@NonNull String device_num, IBeanCallback<ShopInfo_Bean> callback);
 }

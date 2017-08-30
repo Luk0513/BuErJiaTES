@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="200dp"
+        android:layout_marginStart="200dp"
+        android:background="@drawable/custom_bg5"
+        android:padding="40dp">
+
+
+        <TextView
+            android:id="@+id/tv_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:maxWidth="300dp"
+            android:text="提示："
+            android:textColor="@color/color_1"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/tv_tipMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_tip"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:gravity="center_horizontal"
+            android:maxWidth="600dp"
+            android:text="活动暂时未开放呦~\n敬请期待…"
+            android:textColor="@color/color_1"
+            android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/tv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_tipMessage"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/lottery_yanzheng"
+            android:gravity="center_vertical"
+            android:paddingBottom="3dp"
+            android:paddingEnd="30dp"
+            android:paddingStart="30dp"
+            android:paddingTop="3dp"
+            android:text="返回"
+            android:textColor="@color/color_1"
+            android:textSize="24sp" />
+    </RelativeLayout>
+
+
+</LinearLayout>

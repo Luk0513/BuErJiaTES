@@ -107,6 +107,11 @@ public class MyApp extends Application {
         return spHelper.getString("mid");
     }
 
+    public void saveM_id(String m_id) {
+        SPHelper spHelper = new SPHelper(this, "M_id");
+        spHelper.save(new SPHelper.ContentValue("mid", m_id));
+    }
+
     //保存数据
     public void saveDevice_id(String device_id, String mid) {
         this.device_id = device_id;

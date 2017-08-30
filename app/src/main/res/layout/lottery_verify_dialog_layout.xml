@@ -91,9 +91,9 @@
                 android:layout_toEndOf="@id/tv_yanzhengma"
                 android:layout_toStartOf="@id/tv_yangzheng"
                 android:background="@null"
-                android:hint="请输入六位数抽奖码"
+                android:hint="请输入4位数抽奖码"
                 android:inputType="number"
-                android:maxLength="6"
+                android:maxLength="4"
                 android:paddingStart="20dp"
                 android:textSize="22sp" />
 

@@ -7,6 +7,7 @@ import com.fierce.buerjiates.bean.GiftsBean;
 import com.fierce.buerjiates.bean.GoodsBean;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.bean.GoodsSort_Bean;
+import com.fierce.buerjiates.bean.ShopInfo_Bean;
 import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.https.HttpServerInterface;
@@ -279,6 +280,32 @@ public class RequestInterfaceModel implements IRequestInterface {
             public void onFailure(Call<String> call, Throwable t) {
                 mlog.e(t);
                 callback.onError(0, "网络连接错误,请稍后再试");
+            }
+        });
+
+    }
+
+    @Override
+    public void getShopInfo(@NonNull String device_num, final IBeanCallback<ShopInfo_Bean> callback) {
+        Retrofit retrofit = MyApp.getInstance().getGsonRetrofit();
+        Call<ShopInfo_Bean> call = retrofit.create(HttpManage.class).getShopInfo(device_num);
+        call.enqueue(new Callback<ShopInfo_Bean>() {
+            @Override
+            public void onResponse(Call<ShopInfo_Bean> call, Response<ShopInfo_Bean> response) {
+
+                mlog.e(response.body());
+                if (response.body() != null && response.body().getList().size() > 0) {
+                    MyApp.getInstance().saveM_id(response.body().getList().get(0).getMId());
+                    callback.onSuccesd(response.body());
+                } else {
+                    callback.onError("获取数据失败");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ShopInfo_Bean> call, Throwable t) {
+                callback.onError("网络异常");
+                mlog.e(t);
             }
         });
 

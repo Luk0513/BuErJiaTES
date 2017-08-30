@@ -100,7 +100,6 @@ public class MyGridviewAdapter extends ListItemAdapter<GoodsList_Bean.ListBean> 
             @Override
             public void getTGPriceSucceed(Object o) {
                 JSONObject tgInfoJson = (JSONObject) o;
-                mlog.json("tag",tgInfoJson.toString());
                 holder.tvGoodsName.setText(tgInfoJson.optString("title"));
                 String goodsImgUrl = "http://fx.bejmall.com/" + tgInfoJson.optString("thumb");
                 holder.ivGoodsIV.setScaleType(ImageView.ScaleType.FIT_XY);

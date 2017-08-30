@@ -128,12 +128,12 @@ public class LotteryView extends ViewGroup {
 //                            getChildAt(mIndex).setBackgroundColor(Color.WHITE);
                             getChildAt(mIndex).setBackgroundResource(R.mipmap.probj);
                             mIndex = 0;
-                            getChildAt(mIndex).setBackgroundResource(R.mipmap.active);
+                            getChildAt(mIndex).setBackgroundResource(R.mipmap.active2);
                             mTimes += 1;
                         } else {
 //                            getChildAt(mIndex).setBackgroundColor(Color.WHITE);
                             getChildAt(mIndex).setBackgroundResource(R.mipmap.probj);
-                            getChildAt(++mIndex).setBackgroundResource(R.mipmap.active);
+                            getChildAt(++mIndex).setBackgroundResource(R.mipmap.active2);
                         }
                     }
                 });

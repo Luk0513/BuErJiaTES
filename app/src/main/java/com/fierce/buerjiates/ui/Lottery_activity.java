@@ -20,13 +20,16 @@ import com.bumptech.glide.Glide;
 import com.fierce.buerjiates.R;
 import com.fierce.buerjiates.base.BaseActivity;
 import com.fierce.buerjiates.bean.GiftsBean;
+import com.fierce.buerjiates.bean.ShopInfo_Bean;
 import com.fierce.buerjiates.config.MyApp;
+import com.fierce.buerjiates.presents.IGetShopInfoPresent;
 import com.fierce.buerjiates.presents.IGteGifPresent;
 import com.fierce.buerjiates.presents.IVerifyPresent;
 import com.fierce.buerjiates.utils.EncodingUtils;
 import com.fierce.buerjiates.utils.LotteryUtil;
 import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.views.IGetGiftView;
+import com.fierce.buerjiates.views.IGetShopInfoView;
 import com.fierce.buerjiates.views.IVerifyView;
 import com.fierce.buerjiates.widget.CustomDialog;
 import com.fierce.buerjiates.widget.LotteryView;
@@ -47,7 +50,8 @@ import butterknife.OnClick;
  * @Date :  2017-07-06
  */
 
-public class Lottery_activity extends BaseActivity implements IGetGiftView, View.OnClickListener, IVerifyView {
+public class Lottery_activity extends BaseActivity implements IGetGiftView, View.OnClickListener,
+        IVerifyView, IGetShopInfoView {
     @BindView(R.id.img_1)
     ImageView img1;
     @BindView(R.id.img_2)
@@ -71,7 +75,6 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
 
     @BindView(R.id.tv_backHome)
     TextView tvBackHome;
-
     @BindView(R.id.lottery_view)
     LotteryView lotteryView;
 
@@ -84,11 +87,12 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     private Dialog lotterayDialog;
     private LotteryHolder holder;
 
-    private String d_Id;
-    private int mid;
-    private int y_id;
-
-    private String admcNum;
+    private String d_Id;//设备id
+    private int mid;   //分销商id
+    private int y_id;  //优惠券id
+    private String shopname; //门店名称
+    private IGetShopInfoPresent getShopInfoPresent;
+    private ShopInfo_Bean shopInfo_bean;
 
     @Override
     protected int getLayoutRes() {
@@ -102,17 +106,16 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     protected void initView() {
         present = new IGteGifPresent(this);
         verifyPresent = new IVerifyPresent(this);
-        admcNum = MyApp.getInstance().getDevice_id();
-        present.getGifts(admcNum);
+        d_Id = MyApp.getInstance().getDevice_id();
+        getShopInfoPresent = new IGetShopInfoPresent(this);
+        present.getGifts(d_Id);
         probability = new ArrayList<>();
         setLottreyLayout();
         lotterayRun();
         setDialog();
         imgHover.setOnClickListener(this);
         d_Id = MyApp.getInstance().getDevice_id();
-        String m_id = MyApp.getInstance().getM_id();
-        mid = Integer.parseInt(m_id);
-
+        getShopInfoPresent.getShopInfo(d_Id);
     }
 
     private void setLottreyLayout() {
@@ -212,6 +215,8 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                 holder.tvSao1sao.setText("打开微信扫一扫，大奖领回家~");
                 holder.tvDialogTitle.setText("恭喜你中奖啦！");
 
+                String m_id = MyApp.getInstance().getM_id();
+                mid = Integer.parseInt(m_id);
                 //优惠券Id
                 String Yid = giftList.get(stopPosition).getCoupon();
                 y_id = Integer.parseInt(Yid);
@@ -222,7 +227,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                 //二维码 链接
                 String shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
                         "&m=ewei_shopv2&do=mobile&r=goods.youhui&d_id="
-                        + d_Id + "&mid=" + mid + "&y_id=" + y_id + "&QR_Num=" + QRNO;
+                        + d_Id + "&mid=" + mid + "&y_id=" + y_id + "&QR_Num=" + QRNO + "&shopname=" + shopname;
 
                 Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 220);
                 holder.imgQcode.setImageBitmap(bitmap);
@@ -265,7 +270,28 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
             giftBean = gson.fromJson(json, GiftsBean.class);
             giftList = giftBean.getList();
             setGiftImage(giftList);
+        } else {
+            showUnStartTipDialog();
         }
+    }
+
+    private Dialog unStartTipDialog;
+
+    private void showUnStartTipDialog() {
+        unStartTipDialog = new CustomDialog.Builder(this)
+                .setIsFullscreen(false)
+                .setIsFloating(false)
+                .setLayout(R.layout.lottery_unstart_dialog_layout)
+                .setViewOnClike(R.id.tv_back, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        unStartTipDialog.dismiss();
+                        startActivity(new Intent(Lottery_activity.this, MainActivity.class));
+                        finish();
+                    }
+                })
+                .build();
+        unStartTipDialog.show();
     }
 
     @OnClick(R.id.tv_backHome)
@@ -385,6 +411,18 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         yzHolder.tvErro.setText(errorTips);
         ObjectAnimator animator = nope(yzHolder.tvErro);
         animator.start();
+    }
+
+    @Override
+    public void getTGetShopInfoSucceed(Object o) {
+        shopInfo_bean = (ShopInfo_Bean) o;
+        ShopInfo_Bean.ListBean listBean = shopInfo_bean.getList().get(0);
+        shopname = listBean.getUsername();
+    }
+
+    @Override
+    public void getGetShopInfoFailure(String msg) {
+
     }
 
     static class LotteryHolder {

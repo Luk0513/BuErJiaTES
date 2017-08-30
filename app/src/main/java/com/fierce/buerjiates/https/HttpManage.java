@@ -6,6 +6,7 @@ import com.fierce.buerjiates.bean.GiftsBean;
 import com.fierce.buerjiates.bean.GoodsBean;
 import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.bean.GoodsSort_Bean;
+import com.fierce.buerjiates.bean.ShopInfo_Bean;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -78,4 +79,7 @@ public interface HttpManage {
 
     @GET(HttpServerInterface.LOTTERY_VERIFY)
     Call<String> verifycode(@Query("code") String code);
+
+    @GET(HttpServerInterface.GETSHOPINFO)
+    Call<ShopInfo_Bean> getShopInfo(@Query("admcNum") String admcNum);
 }
