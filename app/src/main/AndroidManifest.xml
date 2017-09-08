@@ -23,6 +23,15 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!--仅在支持ble的设备上运行-->
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+
     <application
         android:name=".config.MyApp"
         android:allowBackup="true"
@@ -51,9 +60,10 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.Lottery_activity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
 
+        <activity android:name=".ui.HealthscaleActivity" />
         <!--注册广播接收器-->
         <receiver android:name=".widget.CustomBroadcastReciver">
             <intent-filter>
@@ -64,6 +74,8 @@
 
         <service android:name=".services.LoadDataSevice" />
         <service android:name=".services.DownAPKService" />
+        <service android:name=".services.BLEBluetoothService" />
+
 
         <!--结束极光推送的 广播接收器-->
         <receiver

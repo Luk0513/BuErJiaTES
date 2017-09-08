@@ -12,6 +12,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.fierce.buerjiates.R;
 import com.fierce.buerjiates.base.BaseActivity;
@@ -34,6 +35,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     SurfaceView suvAdvideo;
     @BindView(R.id.v_hideView)
     View vHideView;
+
+    @BindView(R.id.tv_ble)
+    TextView tvBLe;
 
     private CustomDialog actDialog;
     private int lastPosition;
@@ -62,16 +66,22 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         suvAdvideo.getHolder().addCallback(this);
         netWorkUtils = new NetWorkUtils(this);
         //检查网络状态
-        if (!MyApp.getInstance().isActivateDevice()) {
+       /* if (!MyApp.getInstance().isActivateDevice()) {
             devicePresent = new IActdevicePresent(this);
             inputDid();
             netWorkUtils.checkNetworkState();
-        }
+        }*/
 //        if (!videoIsExsit()) {
 //            vidoDownlod();
 //        }
 
         mlog.e(MyApp.getInstance().getDevice_id());
+        tvBLe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, HealthscaleActivity.class));
+            }
+        });
     }
 
     @Override

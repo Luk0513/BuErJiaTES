@@ -2,6 +2,8 @@ package com.fierce.buerjiates.base;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         initView();
         registrBodcast();
+        openBle();
     }
 
     protected abstract int getLayoutRes();
@@ -55,6 +58,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         });
     }
 
+
+    private void openBle() {
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        if (!bluetoothAdapter.isEnabled()) {
+            bluetoothAdapter.enable();
+        }
+    }
 
     public Activity getActivity() {
         return this;
@@ -99,9 +110,26 @@ public abstract class BaseActivity extends AppCompatActivity {
     public class APKBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean isDone = intent.getBooleanExtra("isDone", false);//下载完成
-            final String apkPath = intent.getStringExtra("apk");
-            if (isDone) {
+            if (intent.getAction().equals("Install")) {
+                boolean isDone = intent.getBooleanExtra("isDone", false);//下载完成
+                final String apkPath = intent.getStringExtra("apk");
+                if (isDone) {
+                    updateDialog = new CustomDialog.Builder(getActivity())
+                            .setIsFloating(false)
+                            .setIsFullscreen(false)
+                            .setLayout(R.layout.update_dialog_layout)
+                            .setViewOnClike(R.id.tv_update, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    installApk(apkPath);
+                                }
+                            })
+                            .build();
+                    updateDialog.show();
+                }
+            }
+            if (intent.getAction().equals("BlE")) {
+
                 updateDialog = new CustomDialog.Builder(getActivity())
                         .setIsFloating(false)
                         .setIsFullscreen(false)
@@ -109,7 +137,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                         .setViewOnClike(R.id.tv_update, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                installApk(apkPath);
+                                updateDialog.dismiss();
                             }
                         })
                         .build();
@@ -121,6 +149,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     private void registrBodcast() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("Install");
+        intentFilter.addAction("BLE");
         broadReceiver = new APKBroadcastReceiver();
         registerReceiver(broadReceiver, intentFilter);
 
