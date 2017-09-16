@@ -6,17 +6,24 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.View;
 
 import com.fierce.buerjiates.utils.mlog;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author : Lukang
@@ -29,14 +36,20 @@ import java.util.List;
 
 public class BLEBluetoothService extends Service {
 
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothGatt gatt;
-    private static final int REQUEST_PERMISSION = 112;
-    public static final int BLE_CONNECTED = 113;
-    public static final int BLE_DISCONNECTED = 114;
 
-    //特征列表集
-    private List<BluetoothGattCharacteristic> mCharacteristics;
+    BluetoothAdapter bluetoothAdapter;
+    BluetoothDevice bluetoothDevice;
+    BluetoothGatt bluetoothGatt;
+    Handler mHandler;
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        BluetoothManager manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        bluetoothAdapter = manager.getAdapter();
+        mHandler = new Handler(this.getMainLooper());
+    }
 
     @Nullable
     @Override
@@ -44,135 +57,225 @@ public class BLEBluetoothService extends Service {
         return null;
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        initBleutooth();
-        mlog.e("开始ble服务");
+        registBrodcast();
+        openBLE();
         return super.onStartCommand(intent, flags, startId);
     }
 
 
-    private void initBleutooth() {
-        //如果蓝牙没有打开 打开蓝牙
-        if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()) {
-            mBluetoothAdapter.enable();
+    /**
+     * 打开蓝牙
+     */
+    private void openBLE() {
+
+        //版本低于6。0
+        if (!bluetoothAdapter.isEnabled()) {
+            bluetoothAdapter.enable();
+            mlog.e("____?");
         }
-        scanBle();//扫描
+
+        if (bluetoothAdapter.isEnabled()) {
+            if (bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.stopLeScan(leScanCallback);
+                mlog.e("::");
+            }
+            mlog.e("++++");
+            scanBLe();
+        }
+    }
+
+    private void scanBLe() {
+        if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
+            mlog.e("___");
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2000);
+                        bluetoothAdapter.startLeScan(leScanCallback);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-            mlog.e(device.getName());
-            gatt = device.connectGatt(getApplicationContext(), true, gattCallback);
-            //连接
-            final boolean connect = gatt.connect();
-            mlog.e(connect);
+            mlog.e(">>>>>>>发现设备" + device.getName() + " : " + device.getAddress());
+            if (device.getName() != null && device.getName().startsWith("TGF")) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        linkBle(device);
+                    }
+                });
+            }
         }
     };
+
+    private void linkBle(BluetoothDevice device) {
+        bluetoothDevice = device;
+//        if (bluetoothDevice.getName() != null && bluetoothDevice.getName().startsWith("TGF")) {
+        //连接
+        mlog.e("开始连接");
+        if (bluetoothGatt != null) {
+            bluetoothGatt.close();
+            bluetoothGatt = null;
+            mlog.e(">>>>>>>");
+        }
+        bluetoothGatt = device.connectGatt(getApplicationContext(), false, gattCallback);
+        if (bluetoothGatt.connect()) {
+            //连接上了就停止扫描
+            mlog.e("停止扫描");
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    bluetoothAdapter.stopLeScan(leScanCallback);
+                }
+            });
+        }
+//        }
+    }
+
+    private void sendBLEBrodcast() {
+        Intent intent = new Intent("BLE");
+        sendBroadcast(intent);
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (bluetoothGatt != null) {
+            bluetoothGatt.disconnect();
+            bluetoothGatt.close();
+            bluetoothGatt = null;
+        }
+        stopSelf();
+        mlog.e("onDestroy");
+        bluetoothAdapter.stopLeScan(leScanCallback);
+        mHandler.removeCallbacksAndMessages(null);
+        unregisterReceiver(bleBroadcastReceiver);
+    }
+
+
+    public void test(View v) {
+    }
+
+
     BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            mlog.e(status);
             super.onConnectionStateChange(gatt, status, newState);
             switch (newState) {//newState顾名思义，表示当前最新状态。status可以获取之前的状态。
                 case BluetoothProfile.STATE_CONNECTED:
-                    //这里表示已经成功连接，如果成功连接，我们就会执行discoverServices()方法去发现设备所包含的服务
                     mlog.e("连接成功");
-                    sendBrodcast(BLE_CONNECTED);
+                    //开启发现服务
                     gatt.discoverServices();
+                    sendBLEBrodcast();
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
-                    sendBrodcast(BLE_DISCONNECTED);
                     //表示gatt连接已经断开。
-                    mlog.e("connection broken.");
+                    mlog.e("断开连接");
+                    gatt.disconnect();
                     gatt.close();
+                    scanBLe();
+                    break;
+                case BluetoothProfile.STATE_CONNECTING:
+                    mlog.e("连接中");
                     break;
             }
         }
 
-        //有设备服务时，也就是设备上的Service被发现时。
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
-            mlog.e(" ");
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                //gatt.getServices()可以获得外设的所有服务。
-                for (BluetoothGattService service : gatt.getServices()) {//接下来遍历所有服务
-                    //每发现一个服务，我们再次遍历服务当中所包含的特征，service.getCharacteristics()可以获得当前服务所包含的所有特征
-                    for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
-                        mCharacteristics.add(characteristic);//通常可以把所发现的特征放进一个列表当中以便后续操作。
-                        mlog.e(characteristic.getUuid().toString());//打印特征的UUID。
-                    }
+            mlog.e(" 发现服务");
+            List<BluetoothGattService> services = gatt.getServices();
+            for (BluetoothGattService service : services) {
+                Log.e("TAG", "---------------" + service.getUuid());
+                for (BluetoothGattCharacteristic bluetoothGattCharacteristic : service.getCharacteristics()) {
+                    Log.e("TAG", "------------->>>" + bluetoothGattCharacteristic.getUuid());
                 }
             }
-            //当方法执行完后，我们就获取了设备所有的特征了。
-            //如果你想知道每个特征都包含哪些描述符，很简单，再用一个循环去遍历每一个特征的getDescriptor()方法。
+
+            //打开读取开关
+            BluetoothGattService readerService = gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
+            BluetoothGattCharacteristic reader = readerService
+                    .getCharacteristic(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"));
+            gatt.readCharacteristic(reader);
+            for (BluetoothGattDescriptor descriptor : reader.getDescriptors()) {
+                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                gatt.writeDescriptor(descriptor);
+            }
+            gatt.setCharacteristicNotification(reader, true);
+
         }
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
-            //读取特征回调。
-            mlog.e(" ");
-
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                //如果程序执行到这里，证明特征的读取已经完成，我们可以在回调当中取出特征的值。
-                //特征所包含的值包含在一个byte数组内，我们可以定义一个临时变量来获取。
-
-                byte[] characteristicValueBytes = characteristic.getValue();
-                //如果这个特征返回的是一串字符串，那么可以直接获得其值
-                String bytesToString = new String(characteristicValueBytes);
-
-                //如果只需要取得其中的几个byte，可以直接指定获取特定的数组位置的byte值.
-                //例如协议当中定义了这串数据当中前2个byte表示特定一个数值，那么获取这个值，可以直接写成
-                byte[] aValueBytes = new byte[]{
-                        characteristic.getValue()[0], characteristic.getValue()[1]
-                };
-//                Log.i("c-u", "" + Integer.parseInt(UUID.bytesToHexString(characteristic.getValue()), 16));
-                //至于这个值时表示什么，十进制数值？或是一个字符串？还是翻开协议慢慢找吧。
-                //到这里为止，我们已经成功采用读的方式，获得了存在于特征当中的值。
-                //characteristic还能为我们提供什么东西呢？属性，权限等是比较常用的。
+            Log.e("TAG", "----------->onCharacteristicRead");
+            for (int i = 0; i < characteristic.getValue().length; i++) {
+                Log.e("TAG", "------------>>>>>获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
             }
-
         }
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
-            //写入特征。
-            mlog.e(" ");
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            mlog.e(" ");
             super.onCharacteristicChanged(gatt, characteristic);
-        }
+            Log.e("TAG", "----------->onCharacteristicChanged");
+            for (int i = 0; i < characteristic.getValue().length; i++) {
+                Log.e("TAG", "------------获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
+            }
 
+            String date = String.valueOf(characteristic.getValue()[7]);
+            Intent intents = new Intent("BLE");
+            intents.putExtra("data", date);
+            sendBroadcast(intents);
+        }
     };
 
-    private void sendBrodcast(int sdate) {
-        Intent intent = new Intent("BLE");
-        intent.putExtra("sdate", sdate);
-        sendBroadcast(intent);
+    BleBroadcastReceiver bleBroadcastReceiver;
+
+    private void registBrodcast() {
+        bleBroadcastReceiver = new BleBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+        registerReceiver(bleBroadcastReceiver, intentFilter);
     }
 
-    private void scanBle() {
-        mBluetoothAdapter.startLeScan(leScanCallback);
-    }
+    private class BleBroadcastReceiver extends BroadcastReceiver {
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopSelf();
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().equals(BluetoothAdapter.ACTION_DISCOVERY_STARTED)) {
+                mlog.e("ACTION_DISCOVERY_STARTED");
+            }
+            if (intent.getAction().equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
+                mlog.e("ACTION_DISCOVERY_FINISHED");
+            }
+            if (intent.getAction().equals(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)) {
+                mlog.e("ACTION_CONNECTION_STATE_CHANGED");
+            }
+            if (intent.getAction().equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
+                mlog.e("ACTION_BOND_STATE_CHANGED");
+            }
+        }
     }
 }
 

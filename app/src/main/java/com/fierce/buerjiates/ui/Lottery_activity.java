@@ -274,6 +274,9 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
 
     private Dialog unStartTipDialog;
 
+    /**
+     * 提示 抽奖活动未开放
+     */
     private void showUnStartTipDialog() {
         unStartTipDialog = new CustomDialog.Builder(this)
                 .setIsFullscreen(false)
@@ -302,7 +305,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         showeYzDialog();
     }
 
-    private Dialog yzDailog;
+    private Dialog yzDailog;//验证对话框
     private IVerifyPresent verifyPresent;
     private YZ_ViewHolder yzHolder;
 

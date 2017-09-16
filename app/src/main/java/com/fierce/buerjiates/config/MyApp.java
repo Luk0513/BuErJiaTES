@@ -11,7 +11,6 @@ import com.fierce.buerjiates.bean.GoodsList_Bean;
 import com.fierce.buerjiates.https.HttpManage;
 import com.fierce.buerjiates.https.HttpServerInterface;
 import com.fierce.buerjiates.presents.IGetGoodsListPresent;
-import com.fierce.buerjiates.services.BLEBluetoothService;
 import com.fierce.buerjiates.services.DownAPKService;
 import com.fierce.buerjiates.utils.SPHelper;
 import com.fierce.buerjiates.utils.mlog;
@@ -55,6 +54,7 @@ public class MyApp extends Application {
         return instance;
     }
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -64,12 +64,13 @@ public class MyApp extends Application {
         spHelper.clear();
         JPushInterface.setDebugMode(false);          // 设置开启日志,发布时请关闭日志
         JPushInterface.init(getApplicationContext());   // 初始化 JPush
-        startService(new Intent(this, BLEBluetoothService.class));
     }
 
     public Context getContext() {
         return context;
     }
+
+
 
     //打开网络请求
     //返回Gson

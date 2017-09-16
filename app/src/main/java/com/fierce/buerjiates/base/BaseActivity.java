@@ -2,8 +2,6 @@ package com.fierce.buerjiates.base;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.fierce.buerjiates.R;
+import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.widget.CustomDialog;
 
 import java.io.File;
@@ -36,8 +35,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getLayoutRes());
         ButterKnife.bind(this);
         initView();
-        registrBodcast();
-        openBle();
     }
 
     protected abstract int getLayoutRes();
@@ -56,15 +53,6 @@ public abstract class BaseActivity extends AppCompatActivity {
                 toast.show();
             }
         });
-    }
-
-
-    private void openBle() {
-        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-        if (!bluetoothAdapter.isEnabled()) {
-            bluetoothAdapter.enable();
-        }
     }
 
     public Activity getActivity() {
@@ -128,28 +116,20 @@ public abstract class BaseActivity extends AppCompatActivity {
                     updateDialog.show();
                 }
             }
-            if (intent.getAction().equals("BlE")) {
-
-                updateDialog = new CustomDialog.Builder(getActivity())
-                        .setIsFloating(false)
-                        .setIsFullscreen(false)
-                        .setLayout(R.layout.update_dialog_layout)
-                        .setViewOnClike(R.id.tv_update, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                updateDialog.dismiss();
-                            }
-                        })
-                        .build();
-                updateDialog.show();
+            if (intent.getAction().equals("BLE")) {
+                String s = intent.getStringExtra("data");
+                mlog.e("0000");
+                if (s != null) {
+                    showToast(s);
+                } else {
+                }
             }
         }
     }
 
     private void registrBodcast() {
-        IntentFilter intentFilter = new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter("BLE");
         intentFilter.addAction("Install");
-        intentFilter.addAction("BLE");
         broadReceiver = new APKBroadcastReceiver();
         registerReceiver(broadReceiver, intentFilter);
 
@@ -166,6 +146,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         intent.setDataAndType(Uri.fromFile(apk),
                 "application/vnd.android.package-archive");
         startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registrBodcast();
     }
 
     @Override
