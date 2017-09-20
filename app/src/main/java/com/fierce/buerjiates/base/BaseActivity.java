@@ -117,6 +117,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
             }
             if (intent.getAction().equals("BLE")) {
+                //连接上蓝牙
                 String s = intent.getStringExtra("data");
                 mlog.e("0000");
                 if (s != null) {

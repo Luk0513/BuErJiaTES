@@ -5,7 +5,6 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,7 +24,6 @@ import com.fierce.buerjiates.config.MyApp;
 import com.fierce.buerjiates.presents.IGetShopInfoPresent;
 import com.fierce.buerjiates.presents.IGteGifPresent;
 import com.fierce.buerjiates.presents.IVerifyPresent;
-import com.fierce.buerjiates.utils.EncodingUtils;
 import com.fierce.buerjiates.utils.LotteryUtil;
 import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.views.IGetGiftView;
@@ -110,7 +108,8 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         setLottreyLayout();
         lotterayRun();
         setDialog();
-        imgHover.setOnClickListener(this);
+        //前期不需要抽奖验证
+//        imgHover.setOnClickListener(this);
         d_Id = MyApp.getInstance().getDevice_id();
         getShopInfoPresent.getShopInfo(d_Id);
     }
@@ -198,40 +197,42 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
                 }
             }
         });
+        String giftName = giftList.get(stopPosition).getGoodName();
         try {
-            if (giftList.get(stopPosition).getGoodName().startsWith("谢谢")) {
+            if (giftName.startsWith("谢谢")) {
                 holder.imgQcode.setImageResource(R.mipmap.timg);
                 holder.tvSao1sao.setText("不要灰心~");
                 holder.tvDialogTitle.setText("真遗憾呐~");
-            } else if (giftList.get(stopPosition).getGoodName().startsWith("再")) {
+            } else if (giftName.startsWith("再")) {
                 holder.imgQcode.setImageResource(R.mipmap.again);
                 holder.tvSao1sao.setText("换个姿势，说不定几率会增加哦~");
                 holder.tvDialogTitle.setText("获得一次抽奖机会！");
             } else {
 
-                holder.tvSao1sao.setText("打开微信扫一扫，大奖领回家~");
+//                holder.tvSao1sao.setText("打开微信扫一扫，大奖领回家~");
+                holder.tvSao1sao.setText("赶紧在活动期间去找店小二兑奖吧~");
                 holder.tvDialogTitle.setText("恭喜你中奖啦！");
 
-                String m_id = MyApp.getInstance().getM_id();
-                mid = Integer.parseInt(m_id);
-                //优惠券Id
-                String Yid = giftList.get(stopPosition).getCoupon();
-                y_id = Integer.parseInt(Yid);
-                QR_Num = MyApp.getInstance().getQR_Num();
-                QR_Num++;
-                String QRNO = d_Id + QR_Num;
-                mlog.e("TAG", y_id, QR_Num, QRNO);
-                //二维码 链接
-                String shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
-                        "&m=ewei_shopv2&do=mobile&r=goods.youhui&d_id="
-                        + d_Id + "&mid=" + mid + "&y_id=" + y_id + "&QR_Num=" + QRNO + "&shopname=" + shopname;
+                Glide.with(this).load(giftList.get(stopPosition).getImageUrl()).into(holder.imgQcode);
+//                String m_id = MyApp.getInstance().getM_id();
+//                mid = Integer.parseInt(m_id);
+//                //优惠券Id
+//                String Yid = giftList.get(stopPosition).getCoupon();
+//                y_id = Integer.parseInt(Yid);
+//                QR_Num = MyApp.getInstance().getQR_Num();
+//                QR_Num++;
+//                String QRNO = d_Id + QR_Num;
+//                mlog.e("TAG", y_id, QR_Num, QRNO);
+//                //二维码 链接
+//                String shopUrl = "http://m.bejmall.com/app/index.php?i=4&c=entry" +
+//                        "&m=ewei_shopv2&do=mobile&r=goods.youhui&d_id="
+//                        + d_Id + "&mid=" + mid + "&y_id=" + y_id + "&QR_Num=" + QRNO + "&shopname=" + (shopname + giftName);
 
-                Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 220);
-                holder.imgQcode.setImageBitmap(bitmap);
-                mlog.e(QR_Num);
-                MyApp.getInstance().saveQR_Num(QR_Num);
+//                Bitmap bitmap = EncodingUtils.createQRCode(shopUrl, null, 220);
+//                holder.imgQcode.setImageBitmap(bitmap);
+//                MyApp.getInstance().saveQR_Num(QR_Num);
             }
-            holder.tvGiftname.setText(giftList.get(stopPosition).getGoodName());
+            holder.tvGiftname.setText(giftName);
             lotterayDialog.show();
 
         } catch (Exception e) {
@@ -329,7 +330,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
             public void onClick(View v) {
                 //验证
                 if (yzHolder.etVerify.getText().toString().length() <= 0) {
-                    ObjectAnimator animator = nope(yzHolder.etVerify);
+                    ObjectAnimator animator = shake(yzHolder.etVerify);
                     animator.start();
                     return;
                 }
@@ -373,8 +374,8 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
     }
 
     //控件抖动的动画效果
-    private static ObjectAnimator nope(View view) {
-        int delta = view.getResources().getDimensionPixelOffset(R.dimen.spacing_medium);
+    private static ObjectAnimator shake(View view) {
+        int delta = view.getResources().getDimensionPixelOffset(R.dimen.spacing_medium);//8dp 左右抖动的幅度
         PropertyValuesHolder pvhTranslateX = PropertyValuesHolder.ofKeyframe(View.TRANSLATION_X,
                 Keyframe.ofFloat(0f, 0),
                 Keyframe.ofFloat(.10f, -delta),
@@ -409,7 +410,7 @@ public class Lottery_activity extends BaseActivity implements IGetGiftView, View
         }
         yzHolder.tvErro.setVisibility(View.VISIBLE);
         yzHolder.tvErro.setText(errorTips);
-        ObjectAnimator animator = nope(yzHolder.tvErro);
+        ObjectAnimator animator = shake(yzHolder.tvErro);
         animator.start();
     }
 

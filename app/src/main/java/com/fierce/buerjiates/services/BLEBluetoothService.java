@@ -14,11 +14,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.View;
 
 import com.fierce.buerjiates.utils.mlog;
 
@@ -37,18 +35,18 @@ import java.util.UUID;
 public class BLEBluetoothService extends Service {
 
 
-    BluetoothAdapter bluetoothAdapter;
-    BluetoothDevice bluetoothDevice;
-    BluetoothGatt bluetoothGatt;
-    Handler mHandler;
-
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothDevice bluetoothDevice;
+    private BluetoothGatt bluetoothGatt;
+    //    private Handler mHandler;
+    private boolean isConnect = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
         BluetoothManager manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         bluetoothAdapter = manager.getAdapter();
-        mHandler = new Handler(this.getMainLooper());
+//        mHandler = new Handler(this.getMainLooper());
     }
 
     @Nullable
@@ -71,36 +69,35 @@ public class BLEBluetoothService extends Service {
      */
     private void openBLE() {
 
-        //版本低于6。0
-        if (!bluetoothAdapter.isEnabled()) {
-            bluetoothAdapter.enable();
-            mlog.e("____?");
-        }
+//        if (!bluetoothAdapter.isEnabled()) {
+//            bluetoothAdapter.enable();
+//            mlog.e("____?");
+//        }
 
-        if (bluetoothAdapter.isEnabled()) {
-            if (bluetoothAdapter.isDiscovering()) {
-                bluetoothAdapter.stopLeScan(leScanCallback);
-                mlog.e("::");
-            }
+        if (bluetoothAdapter.isEnabled() && !isConnect) {
             mlog.e("++++");
-            scanBLe();
+            scanBLe();//扫描
         }
     }
 
     private void scanBLe() {
         if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
             mlog.e("___");
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(2000);
-                        bluetoothAdapter.startLeScan(leScanCallback);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+//            mHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
+            try {
+                bluetoothAdapter.stopLeScan(leScanCallback);//防止程序意外退出 没有结束上一次的扫描
+                Thread.sleep(2000);
+                bluetoothAdapter.startLeScan(leScanCallback);
+                Intent intent = new Intent("scan");
+                intent.putExtra("scan", true);
+                sendBroadcast(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//                }
+//            });
         }
     }
 
@@ -109,19 +106,21 @@ public class BLEBluetoothService extends Service {
         public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
             mlog.e(">>>>>>>发现设备" + device.getName() + " : " + device.getAddress());
             if (device.getName() != null && device.getName().startsWith("TGF")) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        linkBle(device);
-                    }
-                });
+                bluetoothAdapter.stopLeScan(leScanCallback);
+                mlog.e("停止扫描");
+                linkBle(device);
+                Intent intent = new Intent("scan");
+                intent.putExtra("scan", false);
+                sendBroadcast(intent);
             }
         }
     };
 
-    private void linkBle(BluetoothDevice device) {
+    private void linkBle(final BluetoothDevice device) {
+//        mHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
         bluetoothDevice = device;
-//        if (bluetoothDevice.getName() != null && bluetoothDevice.getName().startsWith("TGF")) {
         //连接
         mlog.e("开始连接");
         if (bluetoothGatt != null) {
@@ -130,17 +129,8 @@ public class BLEBluetoothService extends Service {
             mlog.e(">>>>>>>");
         }
         bluetoothGatt = device.connectGatt(getApplicationContext(), false, gattCallback);
-        if (bluetoothGatt.connect()) {
-            //连接上了就停止扫描
-            mlog.e("停止扫描");
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    bluetoothAdapter.stopLeScan(leScanCallback);
-                }
-            });
-        }
-//        }
+//            }
+//        });
     }
 
     private void sendBLEBrodcast() {
@@ -160,12 +150,8 @@ public class BLEBluetoothService extends Service {
         stopSelf();
         mlog.e("onDestroy");
         bluetoothAdapter.stopLeScan(leScanCallback);
-        mHandler.removeCallbacksAndMessages(null);
+//        mHandler.removeCallbacksAndMessages(null);
         unregisterReceiver(bleBroadcastReceiver);
-    }
-
-
-    public void test(View v) {
     }
 
 
@@ -177,18 +163,22 @@ public class BLEBluetoothService extends Service {
                 case BluetoothProfile.STATE_CONNECTED:
                     mlog.e("连接成功");
                     //开启发现服务
+                    isConnect = true;
                     gatt.discoverServices();
-                    sendBLEBrodcast();
+                    Intent intent = new Intent("connect");
+                    intent.putExtra("connect", true);
+                    sendBroadcast(intent);
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
                     //表示gatt连接已经断开。
                     mlog.e("断开连接");
+                    isConnect = false;
                     gatt.disconnect();
                     gatt.close();
                     scanBLe();
-                    break;
-                case BluetoothProfile.STATE_CONNECTING:
-                    mlog.e("连接中");
+                    Intent intent2 = new Intent("connect");
+                    intent2.putExtra("connect", false);
+                    sendBroadcast(intent2);
                     break;
             }
         }
@@ -241,7 +231,7 @@ public class BLEBluetoothService extends Service {
             }
 
             String date = String.valueOf(characteristic.getValue()[7]);
-            Intent intents = new Intent("BLE");
+            Intent intents = new Intent("w");
             intents.putExtra("data", date);
             sendBroadcast(intents);
         }

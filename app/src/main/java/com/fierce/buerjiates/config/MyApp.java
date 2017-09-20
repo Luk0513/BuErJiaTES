@@ -54,7 +54,6 @@ public class MyApp extends Application {
         return instance;
     }
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -69,7 +68,6 @@ public class MyApp extends Application {
     public Context getContext() {
         return context;
     }
-
 
 
     //打开网络请求

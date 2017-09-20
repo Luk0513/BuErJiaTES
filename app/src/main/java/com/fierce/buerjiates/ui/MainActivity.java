@@ -1,6 +1,7 @@
 package com.fierce.buerjiates.ui;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,11 +10,13 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.fierce.buerjiates.R;
 import com.fierce.buerjiates.base.BaseActivity;
@@ -37,7 +40,15 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     SurfaceView suvAdvideo;
     @BindView(R.id.v_hideView)
     View vHideView;
+    @BindView(R.id.tv_startscan)
+    TextView tvStartscan;
+    @BindView(R.id.tv_connect)
+    TextView tvConnect;
+    @BindView(R.id.tv_w)
+    TextView tvW;
 
+    private static final int REQUEST_ENABLE = 121;
+    private static final int REQUEST_LOCATION = 131;
     private CustomDialog actDialog;
     private int lastPosition;
     private MediaPlayer mediaPlayer;
@@ -50,12 +61,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private NetWorkUtils netWorkUtils;
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-    }
-
-    @Override
     protected int getLayoutRes() {
         return R.layout.activity_main;
     }
@@ -65,27 +70,67 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         suvAdvideo.getHolder().addCallback(this);
         netWorkUtils = new NetWorkUtils(this);
         //检查网络状态
-       /* if (!MyApp.getInstance().isActivateDevice()) {
+        if (!MyApp.getInstance().isActivateDevice()) {
             devicePresent = new IActdevicePresent(this);
             inputDid();
             netWorkUtils.checkNetworkState();
-        }*/
+        }
 //        if (!videoIsExsit()) {
 //            vidoDownlod();
 //        }
-        requsetPermisson();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                requsetPermisson();
+            }
+        }).start();
         mlog.e(MyApp.getInstance().getDevice_id());
     }
 
+    /**
+     * android6.0以上需要动态获取定位权限
+     */
     public void requsetPermisson() {
         if (Build.VERSION.SDK_INT >= 23) {
             int check = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
             if (check != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 121);
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
             }
-            startService(new Intent(MainActivity.this, BLEBluetoothService.class));
+        }
+
+        if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE);
         } else {
             startService(new Intent(MainActivity.this, BLEBluetoothService.class));
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mlog.e("——————————————————————————");
+            startService(new Intent(MainActivity.this, BLEBluetoothService.class));
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ENABLE) {
+            if (resultCode == RESULT_OK) {
+                mlog.e("))))))________");
+                startService(new Intent(MainActivity.this, BLEBluetoothService.class));
+            } else {
+                mlog.e("打开蓝牙失败");
+            }
         }
     }
 
@@ -201,7 +246,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         });
     }
 
-
     // 激活设备 inputDid()
     private void inputDid() {
         index = 0;
@@ -293,27 +337,54 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            isPopuShowe = intent.getBooleanExtra("isPopuShowe", false);
-            if (isPopuShowe) {
-                vHideView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        sendBroadcast(new Intent("dismmisPopu"));//发送广播关闭popuwindow
-                    }
-                });
-                vHideView.setBackgroundResource(R.color.color_2);
-            } else {
-                vHideView.setBackgroundResource(R.color.color_9);
-                sendBroadcast(new Intent("dismmisPopu"));
-                vHideView.setClickable(false);
+            if (intent.getAction().equals("PupoState")) {
+                isPopuShowe = intent.getBooleanExtra("isPopuShowe", false);
+                if (isPopuShowe) {
+                    vHideView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            sendBroadcast(new Intent("dismmisPopu"));//发送广播关闭popuwindow
+                        }
+                    });
+                    vHideView.setBackgroundResource(R.color.color_2);
+                } else {
+                    vHideView.setBackgroundResource(R.color.color_9);
+                    sendBroadcast(new Intent("dismmisPopu"));
+                    vHideView.setClickable(false);
+                }
             }
+
+            if (intent.getAction().equals("scan")) {
+
+                boolean isC = intent.getBooleanExtra("scan", false);
+                if (isC) {
+                    tvStartscan.setText("扫描设备");
+                } else
+                    tvStartscan.setText("停止扫描");
+            }
+            if (intent.getAction().equals("connect")) {
+                boolean isC = intent.getBooleanExtra("connect", false);
+                if (isC) {
+                    tvConnect.setText("连接设备中");
+                } else
+                    tvConnect.setText("断开连接");
+            }
+
+            if (intent.getAction().equals("w")) {
+
+                String s = intent.getStringExtra("data");
+                tvW.setText(s);
+            }
+
         }
     }
 
 
     private void registrBodcast() {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("PupoState");
+        IntentFilter intentFilter = new IntentFilter("PupoState");
+        intentFilter.addAction("scan");
+        intentFilter.addAction("connect");
+        intentFilter.addAction("w");
         broadReceiver = new MyBroadcastReceiver();
         registerReceiver(broadReceiver, intentFilter);
 
