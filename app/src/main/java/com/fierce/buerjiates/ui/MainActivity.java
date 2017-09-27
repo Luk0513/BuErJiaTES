@@ -1,6 +1,8 @@
 package com.fierce.buerjiates.ui;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -16,6 +19,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.fierce.buerjiates.R;
@@ -29,10 +33,15 @@ import com.fierce.buerjiates.utils.NetWorkUtils;
 import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.views.IActiveDeviceView;
 import com.fierce.buerjiates.widget.CustomDialog;
+import com.fierce.buerjiates.widget.DashboardView;
+import com.fierce.buerjiates.widget.HighlightCR;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity implements SurfaceHolder.Callback, IActiveDeviceView {
@@ -70,11 +79,11 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         suvAdvideo.getHolder().addCallback(this);
         netWorkUtils = new NetWorkUtils(this);
         //检查网络状态
-        if (!MyApp.getInstance().isActivateDevice()) {
-            devicePresent = new IActdevicePresent(this);
-            inputDid();
-            netWorkUtils.checkNetworkState();
-        }
+//        if (!MyApp.getInstance().isActivateDevice()) {
+//            devicePresent = new IActdevicePresent(this);
+//            inputDid();
+//            netWorkUtils.checkNetworkState();
+//        }
 //        if (!videoIsExsit()) {
 //            vidoDownlod();
 //        }
@@ -82,7 +91,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             @Override
             public void run() {
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(2500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -91,6 +100,33 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             }
         }).start();
         mlog.e(MyApp.getInstance().getDevice_id());
+        initDialog();
+        showeDialog();
+    }
+
+
+    private Dialog mDialog;
+
+    private void showeDialog() {
+
+        mDialog.show();
+        setDashboardview();
+    }
+
+    private void initDialog() {
+        View view = View.inflate(getBaseContext(), R.layout.scales_layout, null);
+        viewHolder = new ViewHolder(view);
+        mDialog = new CustomDialog.Builder(this)
+                .setIsFloating(false)
+                .setIsFullscreen(true)
+                .setView(view)
+                .setViewOnClike(R.id.tv_close, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDialog.dismiss();
+                    }
+                })
+                .build();
     }
 
     /**
@@ -378,8 +414,70 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
         }
     }
+    private ViewHolder viewHolder;
+    static class ViewHolder {
+        @BindView(R.id.tv_close)
+        TextView tvClose;
+        @BindView(R.id.img_v)
+        ImageView imgV;
+        @BindView(R.id.dashboard_view_4)
+        DashboardView dashboardView4;
 
+        ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
+    }
+    private void setDashboardview(){
+        viewHolder.dashboardView4.setRadius(210);
+        viewHolder.dashboardView4.setArcColor(getResources().getColor(android.R.color.holo_green_dark));
+        viewHolder.dashboardView4.setTextColor(Color.parseColor("#212121"));
+//        viewHolder.dashboardView4.setBgColor(getResources().getColor(android.R.color.white));
+        viewHolder.dashboardView4.setPointerRadius(160);
+        viewHolder.dashboardView4.setCircleRadius(8);
+        viewHolder.dashboardView4.setBigSliceCount(12);
+        viewHolder.dashboardView4.setMaxValue(150);
+        viewHolder.dashboardView4.setRealTimeValue(80);
+        viewHolder.dashboardView4.setMeasureTextSize(14);
+        viewHolder.dashboardView4.setHeaderRadius(120);
+        viewHolder.dashboardView4.setHeaderTitle("KG");
+        viewHolder.dashboardView4.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+        viewHolder.dashboardView4.setHeaderTextSize(20);
+        viewHolder.dashboardView4.setStripeWidth(26);
+        viewHolder.dashboardView4.setStripeMode(DashboardView.StripeMode.OUTER);
+        List<HighlightCR> highlight3 = new ArrayList<>();
+        highlight3.add(new HighlightCR(180, 80, Color.parseColor("#4CAF50")));
+        highlight3.add(new HighlightCR(260, 60, Color.parseColor("#FFEB3B")));
+        highlight3.add(new HighlightCR(320, 40, Color.parseColor("#F44336")));
+        viewHolder.dashboardView4.setStripeHighlightColorAndRange(highlight3);
+//        dashboardView4.setRealTimeValue(65,true,1000);
 
+        final ValueAnimator valueAnimator = ValueAnimator.ofInt(40, 60, 45, 65, 50, 75, 60, 75, 50, 65, 70, 60, 70, 50, 65, 50, 60,40);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                viewHolder.dashboardView4.setRealTimeValue((int) animation.getAnimatedValue());
+            }
+        });
+        valueAnimator.setDuration(10000);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            valueAnimator.start();
+                        }
+                    });
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
     private void registrBodcast() {
         IntentFilter intentFilter = new IntentFilter("PupoState");
         intentFilter.addAction("scan");

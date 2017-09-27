@@ -305,7 +305,6 @@ public class MyApp extends Application {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-//                Log.e("TAG", "onFailure: ::::::::::::::" + t.toString());
             }
         });
     }

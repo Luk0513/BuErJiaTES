@@ -1,8 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/cbg_1"
     android:orientation="vertical">
 
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/img_v"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/img_monkey"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/monky" />
+
+    <ImageView
+        android:id="@+id/img_point_1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/point_1" />
+
+    <ImageView
+        android:id="@+id/img_point_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/point_2" />
+
+    <ImageView
+        android:id="@+id/img_point_3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/point_3" />
+
+    <!--<ImageView-->
+        <!--android:id="@+id/img_afterpoint"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="@mipmap/afterpoint" />-->
+
+
+
+    <TextView
+        android:id="@+id/tv_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/color_1"
+        android:clickable="true"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="close"
+        android:textColor="@color/color_4"
+        android:textSize="20sp" />
+    <com.fierce.buerjiates.widget.DashboardView
+        android:id="@+id/dashboard_view_4"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="400dp"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

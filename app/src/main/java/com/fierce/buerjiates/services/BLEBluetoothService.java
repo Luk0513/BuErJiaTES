@@ -17,6 +17,7 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.View;
 
 import com.fierce.buerjiates.utils.mlog;
 
@@ -40,6 +41,9 @@ public class BLEBluetoothService extends Service {
     private BluetoothGatt bluetoothGatt;
     //    private Handler mHandler;
     private boolean isConnect = false;
+    private BluetoothGattCharacteristic writer;
+    private UUID readerID = UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb");
+    private UUID writeID = UUID.fromString("0000fff3-0000-1000-8000-00805f9b34fb");
 
     @Override
     public void onCreate() {
@@ -105,7 +109,7 @@ public class BLEBluetoothService extends Service {
         @Override
         public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
             mlog.e(">>>>>>>发现设备" + device.getName() + " : " + device.getAddress());
-            if (device.getName() != null && device.getName().startsWith("TGF")) {
+            if (device.getName() != null && device.getName().startsWith("LWB")) {
                 bluetoothAdapter.stopLeScan(leScanCallback);
                 mlog.e("停止扫描");
                 linkBle(device);
@@ -133,11 +137,39 @@ public class BLEBluetoothService extends Service {
 //        });
     }
 
+    //写入指令
+    public void stateOdert(View view) {
+//        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0, 0x04, 0x1C};
+        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x50, 0x6C, 0x04, 0x1C};
+        writer.setValue(buf);
+        bluetoothGatt.writeCharacteristic(writer);
+    }
+    public void weightOdert(View view) {
+//        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0, 0x04, 0x1C};
+        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x50, 0x6C, 0x04, 0x1C};
+        writer.setValue(buf);
+        bluetoothGatt.writeCharacteristic(writer);
+    }
+    public void bioOdert(View view) {
+//        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0, 0x04, 0x1C};
+        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x50, 0x6C, 0x04, 0x1C};
+        writer.setValue(buf);
+        bluetoothGatt.writeCharacteristic(writer);
+    }
+    public void writeOdert() {
+        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0, 0x04, 0x1C};
+//        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x50, 0x6C, 0x04, 0x1C};
+        writer.setValue(buf);
+        bluetoothGatt.writeCharacteristic(writer);
+    }
+
+
+
+
     private void sendBLEBrodcast() {
         Intent intent = new Intent("BLE");
         sendBroadcast(intent);
     }
-
 
     @Override
     public void onDestroy() {
@@ -147,6 +179,7 @@ public class BLEBluetoothService extends Service {
             bluetoothGatt.close();
             bluetoothGatt = null;
         }
+
         stopSelf();
         mlog.e("onDestroy");
         bluetoothAdapter.stopLeScan(leScanCallback);
@@ -165,6 +198,7 @@ public class BLEBluetoothService extends Service {
                     //开启发现服务
                     isConnect = true;
                     gatt.discoverServices();
+                    sendBLEBrodcast();
                     Intent intent = new Intent("connect");
                     intent.putExtra("connect", true);
                     sendBroadcast(intent);
@@ -173,7 +207,6 @@ public class BLEBluetoothService extends Service {
                     //表示gatt连接已经断开。
                     mlog.e("断开连接");
                     isConnect = false;
-                    gatt.disconnect();
                     gatt.close();
                     scanBLe();
                     Intent intent2 = new Intent("connect");
@@ -196,22 +229,33 @@ public class BLEBluetoothService extends Service {
             }
 
             //打开读取开关
-            BluetoothGattService readerService = gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
+            BluetoothGattService readerService =
+                    gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
+
+            //读服务特征值
             BluetoothGattCharacteristic reader = readerService
-                    .getCharacteristic(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"));
-            gatt.readCharacteristic(reader);
+                    .getCharacteristic(readerID);
+
+            //写服务特征值
+            writer = readerService.getCharacteristic(writeID);
+
             for (BluetoothGattDescriptor descriptor : reader.getDescriptors()) {
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 gatt.writeDescriptor(descriptor);
             }
+            gatt.readCharacteristic(reader);//读
             gatt.setCharacteristicNotification(reader, true);
 
+            gatt.setCharacteristicNotification(writer, true);
+//            writeOdert();
         }
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
-            Log.e("TAG", "----------->onCharacteristicRead");
+            //设备发来数据
+            if (status == BluetoothGatt.GATT_SUCCESS)
+                Log.e("TAG", "----------->onCharacteristicRead");
             for (int i = 0; i < characteristic.getValue().length; i++) {
                 Log.e("TAG", "------------>>>>>获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
             }
@@ -220,6 +264,11 @@ public class BLEBluetoothService extends Service {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
+            //数据写入结果回调
+            mlog.e("onCharacteristicWrite");
+            for (int i = 0; i < characteristic.getValue().length; i++) {
+                Log.e("TAG", "------------12获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
+            }
         }
 
         @Override
@@ -235,6 +284,32 @@ public class BLEBluetoothService extends Service {
             intents.putExtra("data", date);
             sendBroadcast(intents);
         }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorWrite(gatt, descriptor, status);
+            mlog.e("___");
+            for (int i = 0; i < descriptor.getValue().length; i++) {
+                mlog.e("TAG", "-----------12333->>>>>获取数据  value[" + i + "]: " + descriptor.getValue()[i]);
+            }
+        }
+
+        @Override
+        public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorRead(gatt, descriptor, status);
+            mlog.e(status);
+            mlog.e("=====" + descriptor.getUuid());
+            for (int i = 0; i < descriptor.getValue().length; i++) {
+                mlog.e("TAG", "------------>>>>>获取数据  value[" + i + "]: " + descriptor.getValue()[i]);
+            }
+        }
+
+        @Override
+        public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
+            super.onReliableWriteCompleted(gatt, status);
+            mlog.e("==-=");
+        }
+
     };
 
     BleBroadcastReceiver bleBroadcastReceiver;
