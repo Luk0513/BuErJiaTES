@@ -278,7 +278,6 @@ public class DashboardView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         if (mBgColor != 0) canvas.drawColor(mBgColor);
-
         drawStripe(canvas);
         drawMeasures(canvas);
         drawArc(canvas);
@@ -809,11 +808,13 @@ public class DashboardView extends View {
     }
 
     private int dpToPx(int dp) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics());
     }
 
     private int spToPx(int sp) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp,
+                getResources().getDisplayMetrics());
     }
 
     private class MyHandler extends Handler {

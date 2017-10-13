@@ -1,1 +1,1 @@
-include ':app', ':ArcProgressBarLibrary'
+include ':app'

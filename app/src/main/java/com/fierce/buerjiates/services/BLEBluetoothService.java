@@ -17,7 +17,6 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.View;
 
 import com.fierce.buerjiates.utils.mlog;
 
@@ -137,33 +136,66 @@ public class BLEBluetoothService extends Service {
 //        });
     }
 
-    //写入指令
-    public void stateOdert(View view) {
-//        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0, 0x04, 0x1C};
-        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x50, 0x6C, 0x04, 0x1C};
-        writer.setValue(buf);
-        bluetoothGatt.writeCharacteristic(writer);
-    }
-    public void weightOdert(View view) {
-//        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0, 0x04, 0x1C};
-        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x50, 0x6C, 0x04, 0x1C};
-        writer.setValue(buf);
-        bluetoothGatt.writeCharacteristic(writer);
-    }
-    public void bioOdert(View view) {
-//        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0, 0x04, 0x1C};
-        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x50, 0x6C, 0x04, 0x1C};
-        writer.setValue(buf);
-        bluetoothGatt.writeCharacteristic(writer);
-    }
-    public void writeOdert() {
-        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0, 0x04, 0x1C};
-//        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x50, 0x6C, 0x04, 0x1C};
+    //标定点
+    public void stateOdert() {
+        byte[] buf = new byte[17];
+//        {
+//            0x4C, 0x77, 0x0f, 0x01, 0x61, 0x04, ,0x04, 0x1C
+//        } ;
+        buf[0] = 0x4C;
+        buf[1] = 0x77;
+        buf[2] = 0x0f;
+        buf[3] = 0x01;
+        buf[4] = 0x61;
+        buf[5] = 0x04;
+        //5
+        buf[6] = 0x00;
+        buf[7] = 0x05;
+        //40
+        buf[8] = 0x00;
+        buf[9] = 0x28;
+        //80
+        buf[10] = 0x0;
+        buf[11] = 0x50;
+        //120
+        buf[12] = 0x00;
+        buf[13] = (byte) 0x78;
+        //verify
+        buf[14] = 0x55;
+
+        mlog.e("TAG", 120 >> 8 & 0xff, 120 & 0xff);
+
+        buf[15] = 0x04;
+        buf[16] = 0x1c;
+
+        mlog.e(buf[0] ^ buf[1] ^ buf[2] ^ buf[3] ^ buf[4] ^ buf[5] ^ buf[6] ^ buf[7] ^ buf[8] ^ buf[9] ^ buf[10] ^ buf[11] ^ buf[12] ^ buf[13]);
         writer.setValue(buf);
         bluetoothGatt.writeCharacteristic(writer);
     }
 
+    //重量
+    public void weightOdert() {
+        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x51, 0x6D, 0x04, 0x1C};
+        writer.setValue(buf);
 
+        boolean b = bluetoothGatt.writeCharacteristic(writer);
+        mlog.e(b);
+    }
+
+    //阻抗
+    public void bioOdert() {
+        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x52, 0x6E, 0x04, 0x1C};
+        writer.setValue(buf);
+        bluetoothGatt.writeCharacteristic(writer);
+        mlog.e("===");
+    }
+
+    //置零
+    public void zeroOdert() {
+        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x72, 0x4E, 0x04, 0x1C};
+        writer.setValue(buf);
+        bluetoothGatt.writeCharacteristic(writer);
+    }
 
 
     private void sendBLEBrodcast() {
@@ -242,12 +274,10 @@ public class BLEBluetoothService extends Service {
             for (BluetoothGattDescriptor descriptor : reader.getDescriptors()) {
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 gatt.writeDescriptor(descriptor);
+                gatt.readDescriptor(descriptor);
             }
             gatt.readCharacteristic(reader);//读
             gatt.setCharacteristicNotification(reader, true);
-
-            gatt.setCharacteristicNotification(writer, true);
-//            writeOdert();
         }
 
         @Override
@@ -255,59 +285,40 @@ public class BLEBluetoothService extends Service {
             super.onCharacteristicRead(gatt, characteristic, status);
             //设备发来数据
             if (status == BluetoothGatt.GATT_SUCCESS)
-                Log.e("TAG", "----------->onCharacteristicRead");
+                mlog.e("TAG", "----------->onCharacteristicRead");
             for (int i = 0; i < characteristic.getValue().length; i++) {
-                Log.e("TAG", "------------>>>>>获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
+                mlog.e("TAG", "------------>>>>>获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
             }
         }
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
-            //数据写入结果回调
+            //数据写入结果回调   characteristic为你写入的指令 这可以判断数据是否完整写入
             mlog.e("onCharacteristicWrite");
-            for (int i = 0; i < characteristic.getValue().length; i++) {
-                Log.e("TAG", "------------12获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
-            }
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
-            Log.e("TAG", "----------->onCharacteristicChanged");
+            mlog.e("TAG", "----------->onCharacteristicChanged");
             for (int i = 0; i < characteristic.getValue().length; i++) {
                 Log.e("TAG", "------------获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
             }
+            byte h8 = characteristic.getValue()[6];
+            byte l8 = characteristic.getValue()[7];
+            byte H8 = characteristic.getValue()[5];
+            byte L8 = characteristic.getValue()[6];
 
+
+            int w = (h8 << 8) | (l8 & 0xff);
+            int Z = (H8 << 8) | (L8 & 0xff);
+            mlog.e("ZK" + Z);
+            mlog.e("TAG", w, (h8), l8);
             String date = String.valueOf(characteristic.getValue()[7]);
             Intent intents = new Intent("w");
             intents.putExtra("data", date);
             sendBroadcast(intents);
-        }
-
-        @Override
-        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-            super.onDescriptorWrite(gatt, descriptor, status);
-            mlog.e("___");
-            for (int i = 0; i < descriptor.getValue().length; i++) {
-                mlog.e("TAG", "-----------12333->>>>>获取数据  value[" + i + "]: " + descriptor.getValue()[i]);
-            }
-        }
-
-        @Override
-        public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-            super.onDescriptorRead(gatt, descriptor, status);
-            mlog.e(status);
-            mlog.e("=====" + descriptor.getUuid());
-            for (int i = 0; i < descriptor.getValue().length; i++) {
-                mlog.e("TAG", "------------>>>>>获取数据  value[" + i + "]: " + descriptor.getValue()[i]);
-            }
-        }
-
-        @Override
-        public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
-            super.onReliableWriteCompleted(gatt, status);
-            mlog.e("==-=");
         }
 
     };
@@ -316,10 +327,11 @@ public class BLEBluetoothService extends Service {
 
     private void registBrodcast() {
         bleBroadcastReceiver = new BleBroadcastReceiver();
-        IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        intentFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("reader");
+        intentFilter.addAction("readerB");
+        intentFilter.addAction("readerBD");
+        intentFilter.addAction("readerZ");
         registerReceiver(bleBroadcastReceiver, intentFilter);
     }
 
@@ -328,17 +340,21 @@ public class BLEBluetoothService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (intent.getAction().equals(BluetoothAdapter.ACTION_DISCOVERY_STARTED)) {
-                mlog.e("ACTION_DISCOVERY_STARTED");
+            if (intent.getAction().equals("reader")) {
+                mlog.e("  ");
+                weightOdert();
             }
-            if (intent.getAction().equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
-                mlog.e("ACTION_DISCOVERY_FINISHED");
+            if (intent.getAction().equals("readerB")) {
+                mlog.e("  ");
+                bioOdert();
             }
-            if (intent.getAction().equals(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)) {
-                mlog.e("ACTION_CONNECTION_STATE_CHANGED");
+            if (intent.getAction().equals("readerBD")) {
+                mlog.e("  ");
+                stateOdert();
             }
-            if (intent.getAction().equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
-                mlog.e("ACTION_BOND_STATE_CHANGED");
+            if (intent.getAction().equals("readerZ")) {
+                mlog.e("  ");
+                zeroOdert();
             }
         }
     }

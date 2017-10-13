@@ -63,6 +63,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
+        <activity android:name=".ui.ElectronicScale_Activity"/>
         <!--注册广播接收器-->
         <receiver android:name=".widget.CustomBroadcastReciver">
             <intent-filter>
