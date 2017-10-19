@@ -82,4 +82,8 @@ public interface HttpManage {
 
     @GET(HttpServerInterface.GETSHOPINFO)
     Call<ShopInfo_Bean> getShopInfo(@Query("admcNum") String admcNum);
+
+
+    @GET(HttpServerInterface.GETVIDEO)
+    Call<String> getVideoURL(@Query("admcNum") String admcNum);
 }

@@ -35,4 +35,6 @@ public interface IRequestInterface {
     void verify(@NonNull String code, VerifyCallback callback);
 
     void getShopInfo(@NonNull String device_num, IBeanCallback<ShopInfo_Bean> callback);
+
+    void getVideoURL(@NonNull String admcNum, IBeanCallback<Object> callback);
 }

@@ -3,6 +3,7 @@ package com.fierce.buerjiates.ui;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -68,6 +69,20 @@ public class ElectronicScale_Activity extends AppCompatActivity {
         setDashboardview();
         showeAnim();
         initResDialog();
+
+
+        tvReader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendBroadcast(new Intent("reader"));
+            }
+        });
+        tvReaderZ.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendBroadcast(new Intent("readerZ"));
+            }
+        });
     }
 
 

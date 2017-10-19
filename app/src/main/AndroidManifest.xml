@@ -63,7 +63,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".ui.ElectronicScale_Activity"/>
         <!--注册广播接收器-->
         <receiver android:name=".widget.CustomBroadcastReciver">
             <intent-filter>
@@ -75,6 +74,7 @@
         <service android:name=".services.LoadDataSevice" />
         <service android:name=".services.DownAPKService" />
         <service android:name=".services.BLEBluetoothService" />
+        <service android:name=".services.DownloadVideoService"/>
 
         <!--结束极光推送的 广播接收器-->
         <receiver

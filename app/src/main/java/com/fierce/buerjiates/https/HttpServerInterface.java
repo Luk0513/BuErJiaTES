@@ -8,6 +8,7 @@ public class HttpServerInterface {
     /**
      * 基地址
      */
+//    public static final String BASE_URL = "http://192.168.1.11:8080/admin/";
     public static final String BASE_URL = "http://120.76.159.2:8090/admin/";
     public static final String PRICE_URL = "http://m.bejmall.com/";
 //    http://m.bejmall.com/web/index.php?c=user&a=login&key=fierce&good_sn=ISHYHR0000169";
@@ -61,4 +62,11 @@ public class HttpServerInterface {
      * 获取门店信息
      */
     static final String GETSHOPINFO = "advertising/queryAdvList.shtml";
+
+    /**
+     * 获取广告视频
+     */
+    static final String GETVIDEO = "advertising/queryAdvVideo.shtml";
+
+
 }

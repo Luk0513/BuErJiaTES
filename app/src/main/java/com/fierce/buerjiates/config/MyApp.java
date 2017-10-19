@@ -59,8 +59,8 @@ public class MyApp extends Application {
         super.onCreate();
         instance = this;
         context = getApplicationContext();
-        SPHelper spHelper = new SPHelper(getContext(), "ServerState");
-        spHelper.clear();
+
+        cleanState();
         JPushInterface.setDebugMode(false);          // 设置开启日志,发布时请关闭日志
         JPushInterface.init(getApplicationContext());   // 初始化 JPush
     }
@@ -147,8 +147,18 @@ public class MyApp extends Application {
 
     public int getVideoPosition() {
         SPHelper helper = new SPHelper(getApplicationContext(), "VideoPosit");
+        return helper.getInt("position");
+    }
+
+    public void saveVideo(int ID) {
+        SPHelper helper = new SPHelper(getApplicationContext(), "VideoID");
+        helper.save(new SPHelper.ContentValue("vID", ID));
+    }
+
+    public int getVideoID() {
+        SPHelper helper = new SPHelper(getApplicationContext(), "VideoID");
         if (helper != null)
-            return helper.getInt("position");
+            return helper.getInt("vID");
         return 0;
     }
 
@@ -199,8 +209,18 @@ public class MyApp extends Application {
     public String getGoodsInfoJson(String key) {
         SPHelper spHelper = new SPHelper(getApplicationContext(), "GoodsInfoJson");
         return spHelper.getString(key);
+    }
 
+    //清除
+    public void cleanState() {
+        SPHelper spHelper = new SPHelper(getContext(), "ServerState");
+        spHelper.clear();
 
+        SPHelper VideoSpHelper = new SPHelper(getContext(), "DownloadVideoServerState");
+        VideoSpHelper.clear();
+
+        SPHelper videoHelper = new SPHelper(getContext(), "VideoPosit");
+        videoHelper.clear();
     }
 
     public void saveisRunning(boolean isRunning) {
@@ -211,6 +231,17 @@ public class MyApp extends Application {
     public boolean getisRunning() {
         SPHelper spHelper = new SPHelper(getContext(), "ServerState");
         return spHelper.getBoolean("state");
+    }
+
+
+    public void saveDownloadVideoIsRunning(boolean isRunning) {
+        SPHelper spHelper = new SPHelper(getContext(), "DownloadVideoServerState");
+        spHelper.save(new SPHelper.ContentValue("DownloadVideoState", isRunning));
+    }
+
+    public boolean getDownloadVideoIsRunning() {
+        SPHelper spHelper = new SPHelper(getContext(), "DownloadVideoServerState");
+        return spHelper.getBoolean("DownloadVideoState");
     }
 
     public void saveLotteryGift(String giftJson) {

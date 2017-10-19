@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="3dp"
+    android:layout_height="match_parent"
     android:background="@color/color_1"
-    android:layout_height="match_parent">
+    android:padding="3dp">
 
-    <ImageView
-        android:id="@+id/iv_imag"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@mipmap/file_photo" />
+        android:fillViewport="true">
+
+        <ImageView
+            android:id="@+id/iv_imag"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="fitXY"
+            android:src="@mipmap/file_photo" />
+    </ScrollView>
+
 
     <ImageView
         android:id="@+id/iv_close3"

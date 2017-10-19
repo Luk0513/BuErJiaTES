@@ -12,11 +12,11 @@ import com.fierce.buerjiates.utils.mlog;
 
 import java.io.File;
 
-public class DownAPKService extends IntentService {
+public class DownloadVideoService extends IntentService {
 
     DownloadUtil downloadUtil;
 
-    public DownAPKService() {
+    public DownloadVideoService() {
         super("DownAPKService");
     }
 
@@ -28,10 +28,10 @@ public class DownAPKService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        if (!MyApp.getInstance().getisRunning()) {
-            mlog.e("TAG", "onHandleIntent: <<<<<" + "下载……");
+        if (!MyApp.getInstance().getDownloadVideoIsRunning()) {
+            mlog.e("o>>>>>Video下载ing……");
             //删除本地apk文件
-            File downloadFile = new File(Environment.getExternalStorageDirectory(), "update");
+            File downloadFile = new File(Environment.getExternalStorageDirectory(), "adVideo");
             File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
             if (files != null && files.length != 0) {
                 for (File file : files) {
@@ -41,8 +41,8 @@ public class DownAPKService extends IntentService {
                     }
                 }
             }
-            downloadApk(intent);
-            MyApp.getInstance().saveisRunning(true);
+            downloadViedo(intent);
+            MyApp.getInstance().saveDownloadVideoIsRunning(true);
         }
     }
 
@@ -52,30 +52,26 @@ public class DownAPKService extends IntentService {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void downloadApk(@Nullable final Intent intent) {
-        final String apkUrl = intent.getStringExtra("url");
-        downloadUtil.download(apkUrl, "update", new DownloadUtil.OnDownloadListener() {
+    private void downloadViedo(@Nullable final Intent intent) {
+        String videoUrl = intent.getStringExtra("videourl");
+        DownloadUtil.get().download(videoUrl, "adVideo", new DownloadUtil.OnDownloadListener() {
             @Override
             public void onDownloadSuccess(Object o) {
-
-                mlog.e("onDownloadSuccess: <><><><><><<<<>>>");
-                File apk = (File) o;
-                String apkPath = apk.getAbsolutePath();
-                Intent in = new Intent("Install");
-                in.putExtra("isDone", true);
-                in.putExtra("apk", apkPath);
-                sendBroadcast(in);
-                MyApp.getInstance().saveisRunning(false);
+//                Log.e("TAG", "onDownloadSuccess: ______下载完成______");
+                MyApp.getInstance().saveDownloadVideoIsRunning(false);
             }
 
             @Override
             public void onDownloading(int progress) {
 
+                //视频加载中
+
             }
 
             @Override
             public void onDownloadFailed() {
-                MyApp.getInstance().saveisRunning(false);
+//                Log.e("TAG", "onDownloadFailed: ______下载失败______");
+                MyApp.getInstance().saveDownloadVideoIsRunning(false);
             }
         });
     }

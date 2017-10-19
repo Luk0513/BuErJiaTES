@@ -30,7 +30,7 @@ public class BannerPagerAdapter extends PagerAdapter {
     private Context context;
     private List<View> mList;
     private List<String> imgUrl;
-//    private ImageCacheUtils cacheUtils;
+    //    private ImageCacheUtils cacheUtils;
     private View v;
     private ImageView imageView;
 

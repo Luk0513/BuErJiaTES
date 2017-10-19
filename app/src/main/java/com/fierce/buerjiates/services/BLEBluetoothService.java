@@ -199,7 +199,7 @@ public class BLEBluetoothService extends Service {
 
 
     private void sendBLEBrodcast() {
-        Intent intent = new Intent("BLE");
+        Intent intent = new Intent("BLEConnect");
         sendBroadcast(intent);
     }
 
@@ -219,7 +219,6 @@ public class BLEBluetoothService extends Service {
         unregisterReceiver(bleBroadcastReceiver);
     }
 
-
     BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -230,6 +229,7 @@ public class BLEBluetoothService extends Service {
                     //开启发现服务
                     isConnect = true;
                     gatt.discoverServices();
+                    //发送通知连接成功，跳出交互页
                     sendBLEBrodcast();
                     Intent intent = new Intent("connect");
                     intent.putExtra("connect", true);
@@ -274,7 +274,7 @@ public class BLEBluetoothService extends Service {
             for (BluetoothGattDescriptor descriptor : reader.getDescriptors()) {
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 gatt.writeDescriptor(descriptor);
-                gatt.readDescriptor(descriptor);
+//                gatt.readDescriptor(descriptor);
             }
             gatt.readCharacteristic(reader);//读
             gatt.setCharacteristicNotification(reader, true);
@@ -316,9 +316,6 @@ public class BLEBluetoothService extends Service {
             mlog.e("ZK" + Z);
             mlog.e("TAG", w, (h8), l8);
             String date = String.valueOf(characteristic.getValue()[7]);
-            Intent intents = new Intent("w");
-            intents.putExtra("data", date);
-            sendBroadcast(intents);
         }
 
     };

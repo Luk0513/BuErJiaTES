@@ -311,5 +311,35 @@ public class RequestInterfaceModel implements IRequestInterface {
 
     }
 
+    @Override
+    public void getVideoURL(@NonNull String admcNum, final IBeanCallback<Object> callback) {
+        Retrofit retrofit = MyApp.getInstance().getStringRetrofit();
+        Call<String> call = retrofit.create(HttpManage.class).getVideoURL(admcNum);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (!response.body().equals("null") && response.body() != null) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response.body());
+//                        String videoURL = jsonObject.optString("filePath");
+                        callback.onSuccesd(jsonObject);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        mlog.e("获取视频地址失败");
+                    }
+                } else {
+                    mlog.e("获取视频地址失败");
+                    callback.onError("获取视频地址失败");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                mlog.e(t);
+                callback.onError("连接服务器出错");
+            }
+        });
+    }
+
 
 }
