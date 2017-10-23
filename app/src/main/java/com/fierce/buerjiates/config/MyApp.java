@@ -140,14 +140,14 @@ public class MyApp extends Application {
     }
 
 
-    public void saveVideoPosition(int position) {
+    public void saveVideoPosition(long position) {
         SPHelper helper = new SPHelper(getApplicationContext(), "VideoPosit");
         helper.save(new SPHelper.ContentValue("position", position));
     }
 
-    public int getVideoPosition() {
+    public long getVideoPosition() {
         SPHelper helper = new SPHelper(getApplicationContext(), "VideoPosit");
-        return helper.getInt("position");
+        return helper.getLong("position");
     }
 
     public void saveVideo(int ID) {

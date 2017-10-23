@@ -29,13 +29,13 @@ import com.fierce.buerjiates.presents.IActdevicePresent;
 import com.fierce.buerjiates.presents.IGteViedoURL_Present;
 import com.fierce.buerjiates.services.BLEBluetoothService;
 import com.fierce.buerjiates.services.LoadDataSevice;
+import com.fierce.buerjiates.utils.FileUtils;
 import com.fierce.buerjiates.utils.NetWorkUtils;
 import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.video.EmptyControlVideo;
 import com.fierce.buerjiates.views.IActiveDeviceView;
 import com.fierce.buerjiates.views.IgetVideoURL_View;
 import com.fierce.buerjiates.widget.CustomDialog;
-import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 
@@ -59,12 +59,11 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private static final int REQUEST_ENABLE = 121;
     private static final int REQUEST_LOCATION = 131;
     private CustomDialog actDialog;
-    private int lastPosition;
+    private long lastPosition;
     private MediaPlayer mediaPlayer;
     private String deviceId;
     private String deviceKey;
     private IActdevicePresent devicePresent;
-    private String videoUrl;
     private String vedioPath = "/storage/emulated/0/adVideo/big_buck_bunny.mp4";
     private MyBroadcastReceiver broadReceiver;
     private NetWorkUtils netWorkUtils;
@@ -80,7 +79,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private OrientationUtils orientationUtils;
     private boolean isTransition;
     private Transition transition;
-
+    private File filepath;
 
     @Override
     protected int getLayoutRes() {
@@ -89,8 +88,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void initView() {
+//        视频框架DEbug模式
+//        Debuger.enable();
         isTransition = getIntent().getBooleanExtra(TRANSITION, false);
-        suvAdvideo.getHolder().addCallback(this);
         netWorkUtils = new NetWorkUtils(this);
         getViedoURL_present = new IGteViedoURL_Present(this);
         //检查网络状态
@@ -99,20 +99,19 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             inputDid();
             netWorkUtils.checkNetworkState();
         }
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(2500);
-////                requsetPermisson();
-////                startActivity(new Intent(MainActivity.this, ElectronicScale_Activity.class));
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
-//        mlog.e(MyApp.getInstance().getDevice_id());
-
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2500);
+                requsetPermisson();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        mlog.e(MyApp.getInstance().getDevice_id());
+        getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
     }
 
     /**
@@ -158,8 +157,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         surfaceHolder = holder;
-//        sendBroadcast(new Intent("surfaceView"));
-        getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
+        videoPlay();
         mlog.e("4545");
     }
 
@@ -191,7 +189,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             mediaPlayer.start();
             lastPosition = MyApp.getInstance().getVideoPosition();
             if (lastPosition > 0) {
-                mediaPlayer.seekTo(lastPosition);
+                mediaPlayer.seekTo((int) lastPosition);
                 lastPosition = 0;
             }
         } catch (Exception e) {
@@ -245,47 +243,50 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 });
         builder.setCancelable(false);
         builder.show();
-
     }
 
-    private boolean videoIsExsit() {
-        File file = new File("/storage/emulated/0/adVideo",
-                videoUrl.substring(videoUrl.lastIndexOf("/") + 1));
-        return file.exists();
-    }
 
     @Override
     public void getURLSucceed(final String videoUrl, int urlid) {
-        //视频连接获取成功
-//        playUrl(videoUrl);
-        videoPlayer.setVisibility(View.VISIBLE);
-        suvAdvideo.setVisibility(View.GONE);
-        //如果网络视频更新清除当前缓存
-        if (urlid != MyApp.getInstance().getVideoID()) {
-//        if (urlid != 9) {
-            try {
-                mlog.e("  ");
-//                videoPlayer.clearCurrentCache();
-                GSYVideoManager.clearAllDefaultCache(this);
-            } catch (Exception e) {
-                mlog.e("");
+        //播放视频
+        URLVideoPlay(videoUrl, urlid);
 
-            }
-
-            MyApp.getInstance().saveVideo(urlid);
-        }
-        videoPlayer.setUp(videoUrl, true, "BEJVideo");
-        initTransition();
-        mlog.e("DS");
     }
+
 
     @Override
     public void getTGPriceFailure(String msg) {
         //没有上传网络视频
-        videoPlay();
-        mlog.e("DssS");
+        videoPlayer.setVisibility(View.GONE);
+        suvAdvideo.setVisibility(View.VISIBLE);
+        suvAdvideo.getHolder().addCallback(this);
+        mlog.e("DssS..............");
     }
 
+    private void URLVideoPlay(String videoUrl, int urlid) {
+        //视频连接获取成功
+        mlog.e(videoUrl);
+        videoPlayer.setVisibility(View.VISIBLE);
+        suvAdvideo.setVisibility(View.GONE);
+        //如果网络视频更新清除当前缓存
+        if (urlid != MyApp.getInstance().getVideoID()) {
+            try {
+                mlog.e("  清除缓存");
+                FileUtils.cleanAllVidepoCache();
+                MyApp.getInstance().saveVideo(urlid);
+                MyApp.getInstance().saveVideoPosition(0);
+            } catch (Exception e) {
+                mlog.e(e);
+            }
+        }
+
+        File pathFile = new File(FileUtils.getPath());
+        videoPlayer.setUp(videoUrl, true, pathFile, "");
+        videoPlayer.setLooping(true);
+        mlog.e("DS");
+        initTransition();
+
+    }
 
     // 激活设备 inputDid()
     private void inputDid() {
@@ -347,6 +348,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     protected void onResume() {
         super.onResume();
         registrBodcast();
+        mlog.e("onResume");
         index = 1;
         if (MyApp.getInstance().getDevice_id() != null) {
             deviceId = MyApp.getInstance().getDevice_id();
@@ -354,12 +356,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             devicePresent = new IActdevicePresent(this);
             devicePresent.acvDevice();
         }
-        videoPlayer.onVideoResume();
         MyApp.getInstance().updateAPP();
-        int currentPositionWhenPlaying = MyApp.getInstance().getVideoPosition();
+        videoPlayer.onVideoResume();
+        long currentPositionWhenPlaying = MyApp.getInstance().getVideoPosition();
         if (currentPositionWhenPlaying > 0) {
             videoPlayer.setSeekOnStart(currentPositionWhenPlaying);
             videoPlayer.setLooping(true);
+            initTransition();
         }
     }
 
@@ -369,16 +372,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         super.onStop();
         mlog.e("onStop");
         unregisterReceiver(broadReceiver);
-        //释放所有
-        videoPlayer.setStandardVideoAllCallBack(null);
-        GSYVideoPlayer.releaseAllVideos();
+        releasVideo();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        int currentPositionWhenPlaying = videoPlayer.getCurrentPositionWhenPlaying();
-        MyApp.getInstance().saveVideoPosition(currentPositionWhenPlaying);
+        MyApp.getInstance().saveVideoPosition(videoPlayer.getCurrentPositionWhenPlaying());
         videoPlayer.onVideoPause();
         mlog.e("onPause");
     }
@@ -391,8 +391,15 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         if (orientationUtils != null)
             orientationUtils.releaseListener();
         //释放所有
+        videoPlayer.setStandardVideoAllCallBack(null);
+        GSYVideoPlayer.releaseAllVideos();
     }
 
+
+    private void releasVideo() {
+        videoPlayer.release();
+        videoPlayer.onVideoReset();
+    }
 
     /**
      * 接受Fragment发来的广播 根据发来广播获取 popuWindo的状态 设置VhideView
@@ -419,32 +426,32 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 }
             }
 
-            if (intent.getAction().equals("surfaceView")) {
-                mlog.e("00000");
-                getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
-            }
-            if (intent.getAction().equals("scan")) {
-                boolean isC = intent.getBooleanExtra("scan", false);
-                if (isC) {
-                    tvStartscan.setText("扫描设备");
-                } else
-                    tvStartscan.setText("停止扫描");
-            }
-            if (intent.getAction().equals("connect")) {
-                boolean isC = intent.getBooleanExtra("connect", false);
-                if (isC) {
-                    tvConnect.setText("连接设备中");
-                } else
-                    tvConnect.setText("断开连接");
-            }
+//            if (intent.getAction().equals("surfaceView")) {
+//                mlog.e("00000");
+//                getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
+//            }
+//            if (intent.getAction().equals("scan")) {
+//                boolean isC = intent.getBooleanExtra("scan", false);
+//                if (isC) {
+//                    tvStartscan.setText("扫描设备");
+//                } else
+//                    tvStartscan.setText("停止扫描");
+//            }
+//            if (intent.getAction().equals("connect")) {
+//                boolean isC = intent.getBooleanExtra("connect", false);
+//                if (isC) {
+//                    tvConnect.setText("连接设备中");
+//                } else
+//                    tvConnect.setText("断开连接");
+//            }
         }
     }
 
     private void registrBodcast() {
         IntentFilter intentFilter = new IntentFilter("PupoState");
-        intentFilter.addAction("surfaceView");
-        intentFilter.addAction("scan");
-        intentFilter.addAction("connect");
+//        intentFilter.addAction("surfaceView");
+//        intentFilter.addAction("scan");
+//        intentFilter.addAction("connect");
         broadReceiver = new MyBroadcastReceiver();
         registerReceiver(broadReceiver, intentFilter);
 

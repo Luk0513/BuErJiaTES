@@ -31,7 +31,7 @@ public class DownloadVideoService extends IntentService {
         if (!MyApp.getInstance().getDownloadVideoIsRunning()) {
             mlog.e("o>>>>>Video下载ing……");
             //删除本地apk文件
-            File downloadFile = new File(Environment.getExternalStorageDirectory(), "adVideo");
+            File downloadFile = new File(Environment.getExternalStorageDirectory(), "ADVideo");
             File[] files = new File(downloadFile.getAbsolutePath()).listFiles();
             if (files != null && files.length != 0) {
                 for (File file : files) {
