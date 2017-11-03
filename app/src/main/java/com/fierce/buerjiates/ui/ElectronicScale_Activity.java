@@ -3,13 +3,19 @@ package com.fierce.buerjiates.ui;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -20,7 +26,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.fierce.buerjiates.R;
+import com.fierce.buerjiates.services.BLEBluetoothService;
 import com.fierce.buerjiates.utils.EncodingUtils;
+import com.fierce.buerjiates.utils.mlog;
 import com.fierce.buerjiates.widget.CustomDialog;
 import com.fierce.buerjiates.widget.DashboardView;
 import com.fierce.buerjiates.widget.HighlightCR;
@@ -46,18 +54,9 @@ public class ElectronicScale_Activity extends AppCompatActivity {
     ImageView imgMonkey;
     @BindView(R.id.img_v)
     ImageView imgV;
-    @BindView(R.id.tv_close)
-    TextView tvClose;
     @BindView(R.id.dashboard_view_4)
     DashboardView dashboardView4;
-    @BindView(R.id.tv_reader)
-    TextView tvReader;
-    @BindView(R.id.tv_readerB)
-    TextView tvReaderB;
-    @BindView(R.id.tv_readerZ)
-    TextView tvReaderZ;
-    @BindView(R.id.tv_readerBD)
-    TextView tvReaderBD;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,28 +65,60 @@ public class ElectronicScale_Activity extends AppCompatActivity {
         setContentView(R.layout.scales_layout);
         ButterKnife.bind(this);
         screenWidth = getResources().getDisplayMetrics().widthPixels;
+        Intent mIntent = new Intent(getApplicationContext(), BLEBluetoothService.class);
+        bindService(mIntent, serviceCon, Context.BIND_AUTO_CREATE);
+        showTips();
         setDashboardview();
-        showeAnim();
-        initResDialog();
-
-
-        tvReader.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendBroadcast(new Intent("reader"));
-            }
-        });
-        tvReaderZ.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendBroadcast(new Intent("readerZ"));
-            }
-        });
     }
 
 
+    BLEBluetoothService.LocalBinder localBinder;
+    ServiceConnection serviceCon = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            localBinder = (BLEBluetoothService.LocalBinder) service;
+            mlog.e("getSevice");
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
+    private Dialog tipsDialog;
+
+    private void showTips() {
+        tipsDialog = new CustomDialog.Builder(this)
+                .setIsFloating(false)
+                .setIsFullscreen(false)
+                .setLayout(R.layout.arfirsr_tips_layout)
+                .setViewOnClike(R.id.tv_starwork, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //开始动画 开始获取重量
+                        tipsDialog.dismiss();
+                        showeAnim();
+                        localBinder.getWeight();
+                    }
+                })
+                .setViewOnClike(R.id.tv_exit, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tipsDialog.dismiss();
+                        finish();
+                    }
+                })
+                .build();
+        tipsDialog.show();
+    }
+
+    private ValueAnimator anim;
+
     private void showeAnim() {
-        ValueAnimator anim = ValueAnimator.ofFloat(getResources().getDisplayMetrics().heightPixels, 0);
+        imgMonkey.setVisibility(View.VISIBLE);
+        anim = ValueAnimator.ofFloat(getResources().getDisplayMetrics().heightPixels, 0);
         anim.setDuration(1000 * 2);
         anim.setInterpolator(new LinearInterpolator());
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -121,20 +152,11 @@ public class ElectronicScale_Activity extends AppCompatActivity {
             }
         });
         anim.start();
-
-
-        tvClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showRes();
-            }
-        });
     }
 
-
-    Dialog resultrDialog;
-    float screenWidth;
-    ResHolder resHolder;
+    private Dialog resultrDialog;
+    private float screenWidth;
+    private ResHolder resHolder;
 
     private void initResDialog() {
         View view = View.inflate(this, R.layout.test_result_layout, null);
@@ -144,6 +166,21 @@ public class ElectronicScale_Activity extends AppCompatActivity {
                 .setIsFullscreen(true)
                 .setView(view)
                 .build();
+        showRes();
+        resHolder.tvClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        resHolder.tvRe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resultrDialog.dismiss();
+                anim.end();
+                tipsDialog.show();
+            }
+        });
     }
 
     private void showRes() {
@@ -165,6 +202,7 @@ public class ElectronicScale_Activity extends AppCompatActivity {
         sunMove();
         adMove();
     }
+
     private void cloud1Move() {
         ValueAnimator animatorCloud1 = ValueAnimator.ofFloat(screenWidth, -200);
         animatorCloud1.setDuration(1000 * 120);
@@ -211,7 +249,6 @@ public class ElectronicScale_Activity extends AppCompatActivity {
         animatorSun.start();
     }
 
-    String url = "http://ksw.ec-8.cn/app/index.php?i=2&c=entry&name=xm_housekeep&do=adata&m=xm_housekeep&weight=111&zukang=120";
 
     private void adMove() {
         ValueAnimator animatorAD = ValueAnimator.ofFloat(-screenWidth, 0);
@@ -235,7 +272,7 @@ public class ElectronicScale_Activity extends AppCompatActivity {
                 monkeyAnim();
                 try {
                     Bitmap logo = BitmapFactory.decodeResource(getResources(), R.mipmap.logo);
-                    Bitmap qrCode = EncodingUtils.createQRCode(url, logo, 280);
+                    Bitmap qrCode = EncodingUtils.createQRCode(restUrl, logo, 280);
                     resHolder.imgEwm.setImageBitmap(qrCode);
                     ValueAnimator alpha = ValueAnimator.ofFloat(0, 100);
                     alpha.setDuration(4000);
@@ -281,6 +318,7 @@ public class ElectronicScale_Activity extends AppCompatActivity {
         AnimationDrawable monkeyDraw = (AnimationDrawable) resHolder.imgMonkey1.getBackground();
         monkeyDraw.start();
     }
+
     //设置仪表盘
     private void setDashboardview() {
         dashboardView4.setRadius(220);
@@ -334,7 +372,7 @@ public class ElectronicScale_Activity extends AppCompatActivity {
         }).start();
     }
 
-    public void hideNavigationBar() {
+    private void hideNavigationBar() {
         int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -354,6 +392,7 @@ public class ElectronicScale_Activity extends AppCompatActivity {
     }
 
     static class ResHolder {
+
         @BindView(R.id.img_sun)
         ImageView imgSun;
         @BindView(R.id.cloud_2)
@@ -368,9 +407,65 @@ public class ElectronicScale_Activity extends AppCompatActivity {
         ImageView imgEwmResult;
         @BindView(R.id.img_ewm)
         ImageView imgEwm;
+        @BindView(R.id.tv_close)
+        TextView tvClose;
+        @BindView(R.id.tv_re)
+        TextView tvRe;
 
         ResHolder(View view) {
             ButterKnife.bind(this, view);
         }
+    }
+
+    private MyBleReciver myBleReciver;
+
+    private float weight;
+    private int zukan;
+    private String restUrl;
+
+    class MyBleReciver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("BleReciver")) {
+                // TODO: 2017-11-02  测量结束
+                weight = intent.getFloatExtra("weight", 0);
+                zukan = intent.getIntExtra("zk", 0);
+                restUrl = "http://ksw.ec-8.cn/app/index.php?i=2&c=entry&name=xm_housekeep&do=" +
+                        "adata&m=xm_housekeep&weight=" + weight + "&zukang=" + zukan;
+
+                initResDialog();
+            }
+
+        }
+    }
+
+    ;
+
+    private void registBroadcast() {
+        myBleReciver = new MyBleReciver();
+
+        IntentFilter bleIntentFilter = new IntentFilter("BleReciver");
+
+        registerReceiver(myBleReciver, bleIntentFilter);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registBroadcast();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(myBleReciver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(serviceCon);
+
     }
 }

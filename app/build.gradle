@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.fierce.buerjiates"
         minSdkVersion 18
@@ -24,6 +24,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -48,11 +49,8 @@ dependencies {
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'com.google.code.gson:gson:2.8.0'
-    compile 'cn.jiguang.sdk:jpush:3.0.7'
-    // 此处以JPush 3.0.3 版本为例。
-    compile 'cn.jiguang.sdk:jcore:1.1.5'
-    // 此处以JCore 1.1.1 版本为例。
-//    compile 'com.shuyu:GSYVideoPlayer:2.1.0'
+    compile 'cn.jiguang.sdk:jpush:3.0.9'  // 此处以JPush 3.0.9 版本为例。
+    compile 'cn.jiguang.sdk:jcore:1.1.7'  // 此处以JCore 1.1.7 版本为例。
 
     compile 'com.shuyu:gsyVideoPlayer-java:2.1.0'
 

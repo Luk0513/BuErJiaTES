@@ -26,7 +26,7 @@
     <!--仅在支持ble的设备上运行-->
     <uses-feature
         android:name="android.hardware.bluetooth_le"
-        android:required="false" />
+        android:required="true" />
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -62,6 +62,7 @@
             android:name=".ui.Lottery_activity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.ElectronicScale_Activity"/>
 
         <!--注册广播接收器-->
         <receiver android:name=".widget.CustomBroadcastReciver">
@@ -75,6 +76,7 @@
         <service android:name=".services.DownAPKService" />
         <service android:name=".services.BLEBluetoothService" />
         <service android:name=".services.DownloadVideoService"/>
+
 
         <!--结束极光推送的 广播接收器-->
         <receiver
@@ -99,6 +101,23 @@
                 <action android:name="cn.jpush.android.intent.CONNECTION" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name="cn.jpush.android.service.DaemonService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="cn.jpush.android.intent.DaemonService" />
+                <category android:name="fierce_luk.com.jiguandemo" />
+            </intent-filter>
+
+        </service>
+        <meta-data
+            android:name="JPUSH_CHANNEL"
+            android:value="developer-default" />
+        <meta-data
+            android:name="JPUSH_APPKEY"
+            android:value="47d0ee8270704fad4b679924" /> <!--  </>值来自开发者平台取得的AppKey-->
     </application>
 
 </manifest>

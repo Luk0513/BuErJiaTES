@@ -87,6 +87,7 @@ public class BannerPagerAdapter extends PagerAdapter {
                     popupWindow.showAtLocation(v, Gravity.CENTER, 0, -100);
                 }
 //                cacheUtils.loadBitmaps(imageView, imgUrl.get(position), null);
+                mlog.e(imgUrl.get(position));
                 Glide.with(MyApp.getInstance().getApplicationContext()).load(imgUrl.get(position))
                         .diskCacheStrategy(DiskCacheStrategy.RESULT).into(imageView);
                 timer = new ICountDownTimer(15000, 1000);

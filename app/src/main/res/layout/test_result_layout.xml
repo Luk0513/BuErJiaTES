@@ -51,11 +51,28 @@
     <ImageView
         android:id="@+id/img_ewm"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="553dp"
-        android:layout_marginEnd="245dp"
-        android:layout_alignParentBottom="true"
-        android:layout_height="wrap_content" />
+        android:layout_marginEnd="245dp" />
 
+    <TextView
+        android:id="@+id/tv_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/color_2_1"
+        android:padding="10dp"
+        android:text="去逛一逛" />
+
+    <TextView
+        android:id="@+id/tv_re"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_close"
+        android:layout_marginTop="5dp"
+        android:background="@color/color_2_1"
+        android:padding="10dp"
+        android:text="重新秤量" />
 
 </RelativeLayout>

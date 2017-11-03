@@ -117,6 +117,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
             }
             if (intent.getAction().equals("BLEConnect")) {
+
                 //连接上蓝牙
                 startActivity(new Intent(BaseActivity.this, ElectronicScale_Activity.class));
             }
@@ -151,8 +152,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(broadReceiver);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(broadReceiver);
     }
 }

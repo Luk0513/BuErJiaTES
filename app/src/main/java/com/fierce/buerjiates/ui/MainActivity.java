@@ -4,13 +4,16 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
@@ -99,45 +102,55 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             inputDid();
             netWorkUtils.checkNetworkState();
         }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2500);
-                requsetPermisson();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        requsetPermisson();
+        if (MyApp.getInstance().getDevice_id() != null) {
+            getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
+        }
+        Intent mIntent = new Intent(getApplicationContext(), BLEBluetoothService.class);
+        bindService(mIntent, serviceCon, Context.BIND_AUTO_CREATE);
         mlog.e(MyApp.getInstance().getDevice_id());
-        getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
     }
+
+    BLEBluetoothService.LocalBinder localBinder;
+    ServiceConnection serviceCon = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            localBinder = (BLEBluetoothService.LocalBinder) service;
+            mlog.e("getSevice");
+
+            if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+                startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE);
+            } else {
+                localBinder.starScanDevices();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 
     /**
      * android6.0以上需要动态获取定位权限
      */
-    public void requsetPermisson() {
+    private void requsetPermisson() {
         if (Build.VERSION.SDK_INT >= 23) {
             int check = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
             if (check != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
+            } else {
+
             }
         }
-
-        if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE);
-        } else {
-            startService(new Intent(MainActivity.this, BLEBluetoothService.class));
-        }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startService(new Intent(MainActivity.this, BLEBluetoothService.class));
-        }
+        if (requestCode == REQUEST_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            mlog.e("——————————————————————————");
     }
 
     @Override
@@ -145,8 +158,11 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE) {
             if (resultCode == RESULT_OK) {
-                startService(new Intent(MainActivity.this, BLEBluetoothService.class));
+                mlog.e("蓝牙打开 开始扫描________");
+//                MyApp.getInstance().getBleService().startScan();
+                localBinder.starScanDevices();
             } else {
+                finish();
                 mlog.e("打开蓝牙失败");
             }
         }
@@ -214,6 +230,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         return "fierce321";
     }
 
+
+    //激活成功
     @Override
     public void onSucceed() {
         startService(new Intent(this, LoadDataSevice.class));
@@ -223,9 +241,12 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         for (int i = 1; i <= 6; i++) {
             MyApp.getInstance().getGoodsListBean(i + "", MyApp.getInstance().getDevice_id());
         }
+        requsetPermisson();
+        getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
     }
 
 
+    //设备被禁用
     @Override
     public void onOFF() {
         if (actDialog != null && actDialog.isShowing())
@@ -253,9 +274,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     }
 
-
     @Override
     public void getTGPriceFailure(String msg) {
+        if (netWorkUtils.checkNetworkState()) {
+            //没有视频
+        } else {
+            //没有联网
+        }
         //没有上传网络视频
         videoPlayer.setVisibility(View.GONE);
         suvAdvideo.setVisibility(View.VISIBLE);
@@ -387,6 +412,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     protected void onDestroy() {
         super.onDestroy();
         mlog.e("onDestroy");
+        unbindService(serviceCon);
         videoPlayer.release();
         if (orientationUtils != null)
             orientationUtils.releaseListener();
@@ -425,33 +451,20 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                     vHideView.setClickable(false);
                 }
             }
-
-//            if (intent.getAction().equals("surfaceView")) {
-//                mlog.e("00000");
-//                getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
-//            }
-//            if (intent.getAction().equals("scan")) {
-//                boolean isC = intent.getBooleanExtra("scan", false);
-//                if (isC) {
-//                    tvStartscan.setText("扫描设备");
-//                } else
-//                    tvStartscan.setText("停止扫描");
-//            }
-//            if (intent.getAction().equals("connect")) {
-//                boolean isC = intent.getBooleanExtra("connect", false);
-//                if (isC) {
-//                    tvConnect.setText("连接设备中");
-//                } else
-//                    tvConnect.setText("断开连接");
+//            if (intent.getAction().equals("BindBleService")) {
+//                if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+//                    startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE);
+//                } else {
+//                    MyApp.getInstance().getBleService().startScan();
+//                }
+////                startActivity(new Intent(getBaseContext(),ElectronicScale_Activity.class));
 //            }
         }
     }
 
     private void registrBodcast() {
         IntentFilter intentFilter = new IntentFilter("PupoState");
-//        intentFilter.addAction("surfaceView");
-//        intentFilter.addAction("scan");
-//        intentFilter.addAction("connect");
+        intentFilter.addAction("BindBleService");
         broadReceiver = new MyBroadcastReceiver();
         registerReceiver(broadReceiver, intentFilter);
 

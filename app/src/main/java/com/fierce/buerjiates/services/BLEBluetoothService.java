@@ -14,13 +14,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.fierce.buerjiates.utils.mlog;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,216 +36,161 @@ import java.util.UUID;
 
 public class BLEBluetoothService extends Service {
 
+    IBinder mIBinder = new LocalBinder();
 
-    private BluetoothAdapter bluetoothAdapter;
-    private BluetoothDevice bluetoothDevice;
-    private BluetoothGatt bluetoothGatt;
-    //    private Handler mHandler;
-    private boolean isConnect = false;
-    private BluetoothGattCharacteristic writer;
-    private UUID readerID = UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb");
-    private UUID writeID = UUID.fromString("0000fff3-0000-1000-8000-00805f9b34fb");
+    @Override
+    public IBinder onBind(Intent intent) {
+//        registBrodcast();
+        mlog.e("onBind");
+        return mIBinder;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        BluetoothManager manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        bluetoothAdapter = manager.getAdapter();
-//        mHandler = new Handler(this.getMainLooper());
+        bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+        scanHandler = new Handler(getBaseContext().getMainLooper());
+        mLeHandle = new BlEHandle();
+        mlog.e("onCreate");
     }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        registBrodcast();
-        openBLE();
+        mlog.e(" onStartCommand ");
+//        registBrodcast();
+//        if (mLeHandle != null && !mLeHandle.hasMessages(SCANBLE))
+//            mLeHandle.sendEmptyMessageDelayed(SCANBLE, 800);
         return super.onStartCommand(intent, flags, startId);
     }
 
+    private boolean mScanning = false;
+    private static final long SCAN_PERIOD = 10000;
+    private static UUID WRITESERVICE = UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb");
+    private static UUID READERID = UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb");
+    private static UUID WRITEID = UUID.fromString("0000fff3-0000-1000-8000-00805f9b34fb");
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothGatt mBluetoothGatt;
+    private BluetoothManager bluetoothManager;
+    private BluetoothDevice mBluetoothDevice;
+    private BluetoothGattCharacteristic writer;
+    private Handler scanHandler;
+    private String mBluetoothDeviceAddress;
+    private static final int STATE_CONNECTING = 1001;
+    private static final int STATE_DISCONNECT = 1002;
+    private int mConnectionState = -1;
+    private int order;
+    private BluetoothGattCharacteristic gattCharacteristic;
+    private float weights;
+    private int zukan;
 
-    /**
-     * 打开蓝牙
-     */
-    private void openBLE() {
 
-//        if (!bluetoothAdapter.isEnabled()) {
-//            bluetoothAdapter.enable();
-//            mlog.e("____?");
-//        }
-
-        if (bluetoothAdapter.isEnabled() && !isConnect) {
-            mlog.e("++++");
-            scanBLe();//扫描
-        }
-    }
-
-    private void scanBLe() {
-        if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
-            mlog.e("___");
-//            mHandler.post(new Runnable() {
-//                @Override
-//                public void run() {
-            try {
-                bluetoothAdapter.stopLeScan(leScanCallback);//防止程序意外退出 没有结束上一次的扫描
-                Thread.sleep(2000);
-                bluetoothAdapter.startLeScan(leScanCallback);
-                Intent intent = new Intent("scan");
-                intent.putExtra("scan", true);
-                sendBroadcast(intent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-//                }
-//            });
-        }
-    }
-
-    BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
+    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
-        public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-            mlog.e(">>>>>>>发现设备" + device.getName() + " : " + device.getAddress());
+        public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            mlog.e(">>>>>>>发现设备  【" + device.getName() + "】 : " + device.getAddress());
             if (device.getName() != null && device.getName().startsWith("LWB")) {
-                bluetoothAdapter.stopLeScan(leScanCallback);
-                mlog.e("停止扫描");
-                linkBle(device);
-                Intent intent = new Intent("scan");
-                intent.putExtra("scan", false);
-                sendBroadcast(intent);
+                mLeHandle.sendEmptyMessage(UNSCAN);
+                Message handelMes = Message.obtain();
+                handelMes.what = LINKDEVICE;
+                handelMes.obj = device.getAddress();
+                mLeHandle.sendMessage(handelMes);
             }
         }
     };
 
-    private void linkBle(final BluetoothDevice device) {
-//        mHandler.post(new Runnable() {
-//            @Override
-//            public void run() {
-        bluetoothDevice = device;
-        //连接
-        mlog.e("开始连接");
-        if (bluetoothGatt != null) {
-            bluetoothGatt.close();
-            bluetoothGatt = null;
-            mlog.e(">>>>>>>");
+    private void startScan() {
+        if (mLeHandle != null && !mLeHandle.hasMessages(SCANBLE))
+            mLeHandle.sendEmptyMessageDelayed(SCANBLE, 800);
+    }
+
+    //扫描
+    private void scanLeDevice(final boolean enable) {
+        if (enable) {
+            mlog.e("扫描");
+            // Stops scanning after a pre-defined scan period.
+            scanHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScanning = false;
+                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    mlog.e("停止扫描1");
+                    sendBroadcast(new Intent("stopSCAN"));
+                }
+            }, SCAN_PERIOD); //10秒后停止搜索
+            mScanning = true;
+            mBluetoothAdapter.startLeScan(mLeScanCallback); //开始搜索
+            sendBroadcast(new Intent("SCANING"));
+        } else {
+            mScanning = false;
+            mlog.e("停止扫描2");
+            sendBroadcast(new Intent("stopSCAN"));
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);//停止搜索
+            if (mLeHandle.hasMessages(SCANBLE)) {
+                mLeHandle.removeMessages(SCANBLE);
+            }
         }
-        bluetoothGatt = device.connectGatt(getApplicationContext(), false, gattCallback);
-//            }
-//        });
     }
 
-    //标定点
-    public void stateOdert() {
-        byte[] buf = new byte[17];
-//        {
-//            0x4C, 0x77, 0x0f, 0x01, 0x61, 0x04, ,0x04, 0x1C
-//        } ;
-        buf[0] = 0x4C;
-        buf[1] = 0x77;
-        buf[2] = 0x0f;
-        buf[3] = 0x01;
-        buf[4] = 0x61;
-        buf[5] = 0x04;
-        //5
-        buf[6] = 0x00;
-        buf[7] = 0x05;
-        //40
-        buf[8] = 0x00;
-        buf[9] = 0x28;
-        //80
-        buf[10] = 0x0;
-        buf[11] = 0x50;
-        //120
-        buf[12] = 0x00;
-        buf[13] = (byte) 0x78;
-        //verify
-        buf[14] = 0x55;
-
-        mlog.e("TAG", 120 >> 8 & 0xff, 120 & 0xff);
-
-        buf[15] = 0x04;
-        buf[16] = 0x1c;
-
-        mlog.e(buf[0] ^ buf[1] ^ buf[2] ^ buf[3] ^ buf[4] ^ buf[5] ^ buf[6] ^ buf[7] ^ buf[8] ^ buf[9] ^ buf[10] ^ buf[11] ^ buf[12] ^ buf[13]);
-        writer.setValue(buf);
-        bluetoothGatt.writeCharacteristic(writer);
-    }
-
-    //重量
-    public void weightOdert() {
-        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x51, 0x6D, 0x04, 0x1C};
-        writer.setValue(buf);
-
-        boolean b = bluetoothGatt.writeCharacteristic(writer);
-        mlog.e(b);
-    }
-
-    //阻抗
-    public void bioOdert() {
-        byte[] buf = {0x4C, 0x77, 0x06, 0x01, 0x52, 0x6E, 0x04, 0x1C};
-        writer.setValue(buf);
-        bluetoothGatt.writeCharacteristic(writer);
-        mlog.e("===");
-    }
-
-    //置零
-    public void zeroOdert() {
-        byte[] buf = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x72, 0x4E, 0x04, 0x1C};
-        writer.setValue(buf);
-        bluetoothGatt.writeCharacteristic(writer);
-    }
-
-
-    private void sendBLEBrodcast() {
-        Intent intent = new Intent("BLEConnect");
-        sendBroadcast(intent);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (bluetoothGatt != null) {
-            bluetoothGatt.disconnect();
-            bluetoothGatt.close();
-            bluetoothGatt = null;
+    //连接
+    private boolean connect(final String address) {
+        if (mBluetoothAdapter == null || address == null) {
+            mlog.e("BluetoothAdapter not initialized or unspecified address.");
+            return false;
         }
-
-        stopSelf();
-        mlog.e("onDestroy");
-        bluetoothAdapter.stopLeScan(leScanCallback);
-//        mHandler.removeCallbacksAndMessages(null);
-        unregisterReceiver(bleBroadcastReceiver);
+        final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+        if (device == null) {
+            mlog.e("??????Device not found.  Unable to connect.");
+            return false;
+        }
+        if (mBluetoothGatt != null) {
+            mlog.e("???????");
+            mBluetoothGatt.close();
+            mBluetoothGatt = null;
+        }
+        mBluetoothGatt = device.connectGatt(getApplication(), false, mGattCallback); //该函数才是真正的去进行连接
+//        mBluetoothGatt.connect();
+        mlog.e("Trying to create a new connection.");
+        mBluetoothDeviceAddress = address;
+        mConnectionState = STATE_CONNECTING;
+        return true;
     }
 
-    BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+    BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
-            switch (newState) {//newState顾名思义，表示当前最新状态。status可以获取之前的状态。
+
+            mlog.e("TAG", "status: " + status, "newState: " + newState);
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                String err = "Cannot connect device with error status: " + status;
+                // 当尝试连接失败的时候调用 disconnect 方法是不会引起这个方法回调的，所以这里
+                //   直接回调就可以了。
+                mBluetoothGatt.close();
+                if (!mLeHandle.hasMessages(SCANBLE)) {
+                    mLeHandle.sendEmptyMessageDelayed(SCANBLE, 2000);
+                }
+                mlog.e(err);
+                return;
+            }
+
+            switch (newState) {
                 case BluetoothProfile.STATE_CONNECTED:
-                    mlog.e("连接成功");
-                    //开启发现服务
-                    isConnect = true;
-                    gatt.discoverServices();
-                    //发送通知连接成功，跳出交互页
-                    sendBLEBrodcast();
-                    Intent intent = new Intent("connect");
-                    intent.putExtra("connect", true);
-                    sendBroadcast(intent);
+                    mlog.e("已连接");
+                    sendBLEBrodcast(true);
+                    mConnectionState = STATE_CONNECTING;
+                    mBluetoothGatt.discoverServices();
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
-                    //表示gatt连接已经断开。
-                    mlog.e("断开连接");
-                    isConnect = false;
-                    gatt.close();
-                    scanBLe();
-                    Intent intent2 = new Intent("connect");
-                    intent2.putExtra("connect", false);
-                    sendBroadcast(intent2);
+                    sendBLEBrodcast(false);
+                    mlog.e("未连接");
+                    mConnectionState = STATE_DISCONNECT;
+                    mBluetoothGatt.close();
+                    if (!mLeHandle.hasMessages(SCANBLE)) {
+                        mLeHandle.sendEmptyMessageDelayed(SCANBLE, 2000);
+                    }
+                    break;
+                default:
                     break;
             }
         }
@@ -251,51 +198,36 @@ public class BLEBluetoothService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
-            mlog.e(" 发现服务");
-            List<BluetoothGattService> services = gatt.getServices();
-            for (BluetoothGattService service : services) {
-                Log.e("TAG", "---------------" + service.getUuid());
-                for (BluetoothGattCharacteristic bluetoothGattCharacteristic : service.getCharacteristics()) {
-                    Log.e("TAG", "------------->>>" + bluetoothGattCharacteristic.getUuid());
-                }
-            }
-
-            //打开读取开关
-            BluetoothGattService readerService =
-                    gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
-
-            //读服务特征值
-            BluetoothGattCharacteristic reader = readerService
-                    .getCharacteristic(readerID);
-
-            //写服务特征值
-            writer = readerService.getCharacteristic(writeID);
-
-            for (BluetoothGattDescriptor descriptor : reader.getDescriptors()) {
-                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                gatt.writeDescriptor(descriptor);
-//                gatt.readDescriptor(descriptor);
-            }
-            gatt.readCharacteristic(reader);//读
-            gatt.setCharacteristicNotification(reader, true);
+            mlog.e(" 发现服务  > " + status);
+            mLeHandle.sendEmptyMessageDelayed(SETWRITER, 1000);
         }
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
-            //设备发来数据
-            if (status == BluetoothGatt.GATT_SUCCESS)
-                mlog.e("TAG", "----------->onCharacteristicRead");
-            for (int i = 0; i < characteristic.getValue().length; i++) {
-                mlog.e("TAG", "------------>>>>>获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
-            }
+            mlog.e("onCharacteristicRead > " + status);
         }
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
             //数据写入结果回调   characteristic为你写入的指令 这可以判断数据是否完整写入
-            mlog.e("onCharacteristicWrite");
+            byte[] value_1 = characteristic.getValue();
+            if (value_1 == buf_Weight) {
+                order = 1001;
+            }
+            if (value_1 == buf_ZK) {
+                order = 1002;
+            }
+            if (value_1 == buf_queryStatus) {
+                order = 1006;
+                mlog.e("查询状态");
+            }
+            if (value_1 == buf_modelsleep) {
+                mlog.e("休眠指令");
+                order = 1008;
+            }
+            mlog.e("onCharacteristicWrite  > " + status);
         }
 
         @Override
@@ -305,55 +237,243 @@ public class BLEBluetoothService extends Service {
             for (int i = 0; i < characteristic.getValue().length; i++) {
                 Log.e("TAG", "------------获取数据  value[" + i + "]: " + characteristic.getValue()[i]);
             }
-            byte h8 = characteristic.getValue()[6];
-            byte l8 = characteristic.getValue()[7];
-            byte H8 = characteristic.getValue()[5];
-            byte L8 = characteristic.getValue()[6];
-
-
-            int w = (h8 << 8) | (l8 & 0xff);
-            int Z = (H8 << 8) | (L8 & 0xff);
-            mlog.e("ZK" + Z);
-            mlog.e("TAG", w, (h8), l8);
-            String date = String.valueOf(characteristic.getValue()[7]);
+            gattCharacteristic = characteristic;
+            mLeHandle.sendEmptyMessageDelayed(RECIVECHAR, 500);
         }
-
     };
 
-    BleBroadcastReceiver bleBroadcastReceiver;
+    private void readerCharact(BluetoothGattCharacteristic characteristic) {
+        switch (order) {
+            case 1001:
+                int stat = characteristic.getValue()[5];
+                byte wh8 = characteristic.getValue()[6];
+                byte wl8 = characteristic.getValue()[7];
+                float w = (wh8 << 8) | (wl8 & 0xff);
+
+                if (stat == 1) {
+                    //稳定重量值
+                    mLeHandle.sendEmptyMessageDelayed(GETZK, 1000);
+                    weights = w / 10;
+                } else {
+                    mLeHandle.sendEmptyMessageDelayed(GETWEIGH, 1000);
+                }
+                mlog.e(weights);
+                break;
+            case 1002:
+                Intent intent = new Intent("BleReciver");
+                byte zk_h8 = characteristic.getValue()[5];
+                byte zk_l8 = characteristic.getValue()[6];
+                int zk = (zk_h8 << 8) | (zk_l8 & 0xff);
+
+                intent.putExtra("zk", zk);
+                intent.putExtra("weight", weights);
+                mlog.e(zk);
+
+                sendBroadcast(intent);
+                break;
+            case 1006:
+                Intent intentQS = new Intent("QUERYSTATUS");
+                int qres = characteristic.getValue()[5];
+                intentQS.putExtra("qs", qres);
+                sendBroadcast(intentQS);
+                break;
+
+        }
+    }
+
+    private void setWrite() {
+        //打开读写服务
+        BluetoothGattService readerService = mBluetoothGatt.getService(WRITESERVICE);
+        //读服务特征值
+        BluetoothGattCharacteristic reader = readerService.getCharacteristic(READERID);
+        //写服务特征值
+        writer = readerService.getCharacteristic(WRITEID);
+
+        for (BluetoothGattDescriptor descriptor : reader.getDescriptors()) {
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+
+            mBluetoothGatt.writeDescriptor(descriptor);
+        }
+        mBluetoothGatt.setCharacteristicNotification(reader, true);
+        mLeHandle.sendEmptyMessageDelayed(QUIRESTATE, 800);
+    }
+
+    private void sendBLEBrodcast(boolean isconnect) {
+        Intent intent = new Intent("BLEConnect");
+        intent.putExtra("isconnected", isconnect);
+        sendBroadcast(intent);
+    }
+
+    private byte[] buf_modelsleep;
+
+    //休眠指令
+    public void modelsleep() {
+        buf_modelsleep = new byte[]{0x4C, 0x77, 0x07, 0x01, 0x63, 0x40, 0, 0x04, 0x1C};
+        buf_modelsleep[6] = (byte) (buf_modelsleep[0] ^ buf_modelsleep[1] ^ buf_modelsleep[2]
+                ^ buf_modelsleep[3] ^ buf_modelsleep[4] ^ buf_modelsleep[5]);
+        writer.setValue(buf_modelsleep);
+        mBluetoothGatt.writeCharacteristic(writer);
+    }
+
+    //重量
+    private byte[] buf_Weight;
+
+    private void weightOdert() {
+        buf_Weight = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x51, 0x6D, 0x04, 0x1C};
+        writer.setValue(buf_Weight);
+        mBluetoothGatt.writeCharacteristic(writer);
+    }
+
+    //阻抗
+    private byte[] buf_ZK;
+
+    private void bioOdert() {
+        buf_ZK = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x52, 0x6E, 0x04, 0x1C};
+        buf_ZK[5] = (byte) (buf_ZK[0] ^ buf_ZK[1] ^ buf_ZK[2] ^ buf_ZK[3] ^ buf_ZK[4]);
+        writer.setValue(buf_ZK);
+        mBluetoothGatt.writeCharacteristic(writer);
+        mlog.e("===");
+    }
+
+    private byte[] buf_queryStatus;
+
+    //查询状态
+    private void inquireState() {
+        buf_queryStatus = new byte[]{0x4C, 0x77, 0x06, 0x01, 0x50, 0, 0x04, 0x1C};
+        buf_queryStatus[5] = (byte) (buf_queryStatus[0] ^ buf_queryStatus[1]
+                ^ buf_queryStatus[2] ^ buf_queryStatus[3] ^ buf_queryStatus[4]);
+        writer.setValue(buf_queryStatus);
+        mBluetoothGatt.writeCharacteristic(writer);
+    }
+
+    private BleReceiver bleReceiver;
 
     private void registBrodcast() {
-        bleBroadcastReceiver = new BleBroadcastReceiver();
+        bleReceiver = new BleReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("reader");
         intentFilter.addAction("readerB");
-        intentFilter.addAction("readerBD");
-        intentFilter.addAction("readerZ");
-        registerReceiver(bleBroadcastReceiver, intentFilter);
+        intentFilter.addAction("readerLook");
+        intentFilter.addAction("sleep");
+        intentFilter.addAction("SCANBLE");
+        registerReceiver(bleReceiver, intentFilter);
     }
 
-    private class BleBroadcastReceiver extends BroadcastReceiver {
+    private class BleReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("SCANBLE")) {
+                startScan();
+            }
 
-            if (intent.getAction().equals("reader")) {
-                mlog.e("  ");
-                weightOdert();
-            }
-            if (intent.getAction().equals("readerB")) {
-                mlog.e("  ");
-                bioOdert();
-            }
-            if (intent.getAction().equals("readerBD")) {
-                mlog.e("  ");
-                stateOdert();
-            }
-            if (intent.getAction().equals("readerZ")) {
-                mlog.e("  ");
-                zeroOdert();
+            try {
+                if (mConnectionState == STATE_CONNECTING) {
+                    if (intent.getAction().equals("reader")) {
+                        weightOdert();
+                    }
+                    if (intent.getAction().equals("sleep")) {
+                        modelsleep();
+                    }
+                    if (intent.getAction().equals("readerB")) {
+                        bioOdert();
+                    }
+                    if (intent.getAction().equals("readerLook")) {
+                        inquireState();
+                    }
+                } else {
+                    Toast.makeText(getBaseContext(), "蓝牙未连接", Toast.LENGTH_SHORT).show();
+                }
+            } catch (NullPointerException e) {
+                Toast.makeText(getBaseContext(), "未建立连接", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
+    private static final int SCANBLE = 0x01;
+    private static final int UNSCAN = 0x02;
+    private static final int GETWEIGH = 0x03;
+    private static final int GETZK = 0x04;
+    private static final int QUIRESTATE = 0x05;
+    private static final int LINKDEVICE = 0x06;
+    private static final int SETWRITER = 0x07;
+    private static final int RECIVECHAR = 0x08;
+
+    private BlEHandle mLeHandle;
+
+    class BlEHandle extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case SCANBLE:
+                    scanLeDevice(true);
+
+                    if (!mLeHandle.hasMessages(SCANBLE))
+                        mLeHandle.sendEmptyMessageDelayed(SCANBLE, (SCAN_PERIOD + 1000));
+                    break;
+                case UNSCAN:
+                    scanLeDevice(false);
+                    break;
+                case GETWEIGH:
+                    weightOdert();
+                    break;
+                case GETZK:
+                    bioOdert();
+                    break;
+                case QUIRESTATE:
+                    inquireState();
+                    break;
+                case LINKDEVICE:
+                    String bleAddress = (String) msg.obj;
+                    connect(bleAddress);
+                    break;
+                case SETWRITER:
+                    setWrite();
+                    break;
+                case RECIVECHAR:
+                    readerCharact(gattCharacteristic);
+                    break;
+            }
+        }
+    }
+
+    public class LocalBinder extends Binder {
+        public LocalBinder() {
+        }
+
+        public BLEBluetoothService getService() {
+            return BLEBluetoothService.this;
+        }
+
+        public void starScanDevices() {
+            startScan();
+        }
+
+        public void getWeight() {
+            weightOdert();
+        }
+
+        public void getZuKan() {
+            bioOdert();
+        }
+
+        public void initSleep() {
+            modelsleep();
+        }
+
+
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(bleReceiver);
+        mLeHandle.removeCallbacksAndMessages(null);
+    }
+
+
 }
+
 

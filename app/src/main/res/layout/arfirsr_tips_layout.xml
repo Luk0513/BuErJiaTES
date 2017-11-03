@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        android:background="@drawable/custom_bg5"
+        android:padding="40dp">
+
+
+        <TextView
+            android:id="@+id/tv_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:maxWidth="300dp"
+            android:text="健康秤使用提示："
+            android:textColor="@color/color_1"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_tipMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_tip"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:gravity="center_horizontal"
+            android:maxWidth="600dp"
+            android:text="为确保数据准确请双脚站在健康秤范围内，双手握住手柄以便得到体脂含量等数据；测量结束之后会弹出二维码微信扫码获取测量结果"
+            android:textColor="@color/color_1"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_starwork"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_tipMessage"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/tips_butt"
+            android:gravity="center_vertical"
+            android:paddingBottom="3dp"
+            android:paddingEnd="40dp"
+            android:paddingStart="40dp"
+            android:paddingTop="3dp"
+            android:text="开始秤量"
+            android:textColor="@color/color_1"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/tv_exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_starwork"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/lottery_yanzheng"
+            android:gravity="center_vertical"
+            android:paddingBottom="3dp"
+            android:paddingEnd="40dp"
+            android:paddingStart="40dp"
+            android:paddingTop="3dp"
+            android:text="本王不想称量"
+            android:textColor="@color/color_1"
+            android:textSize="24sp" />
+    </RelativeLayout>
+</LinearLayout>

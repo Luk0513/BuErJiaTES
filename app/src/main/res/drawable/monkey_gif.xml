@@ -3,10 +3,10 @@
     android:oneshot="false">
 
     <item
-        android:drawable="@mipmap/monky_1"
+        android:drawable="@mipmap/monky1"
         android:duration="1000" />
     <item
-        android:drawable="@mipmap/monky_2"
+        android:drawable="@mipmap/monky2"
         android:duration="500" />
 
 
