@@ -12,5 +12,5 @@ package com.fierce.buerjiates.views;
 public interface IgetVideoURL_View {
     void getURLSucceed(String videoUrl, int urlid);
 
-    void getTGPriceFailure(String msg);
+    void getURLFailure(String msg);
 }

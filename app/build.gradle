@@ -6,8 +6,8 @@ android {
         applicationId "com.fierce.buerjiates"
         minSdkVersion 18
         targetSdkVersion 25
-        versionCode 17
-        versionName "2.7.3"
+        versionCode 18
+        versionName "2.8.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库。
@@ -60,4 +60,7 @@ dependencies {
     compile 'com.shuyu:gsyVideoPlayer-arm64:2.1.0'
     compile 'com.shuyu:gsyVideoPlayer-x64:2.1.0'
     compile 'com.shuyu:gsyVideoPlayer-x86:2.1.0'
+
+    compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.7.2'
+
 }

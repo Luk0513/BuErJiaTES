@@ -93,6 +93,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     protected void initView() {
 //        视频框架DEbug模式
 //        Debuger.enable();
+        suvAdvideo.getHolder().addCallback(this);
         isTransition = getIntent().getBooleanExtra(TRANSITION, false);
         netWorkUtils = new NetWorkUtils(this);
         getViedoURL_present = new IGteViedoURL_Present(this);
@@ -102,12 +103,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             inputDid();
             netWorkUtils.checkNetworkState();
         }
-        requsetPermisson();
-        if (MyApp.getInstance().getDevice_id() != null) {
-            getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
-        }
-        Intent mIntent = new Intent(getApplicationContext(), BLEBluetoothService.class);
-        bindService(mIntent, serviceCon, Context.BIND_AUTO_CREATE);
+//        requsetPermisson();
+//        Intent mIntent = new Intent(getApplicationContext(), BLEBluetoothService.class);
+//        bindService(mIntent, serviceCon, Context.BIND_AUTO_CREATE);
+
         mlog.e(MyApp.getInstance().getDevice_id());
     }
 
@@ -173,8 +172,11 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         surfaceHolder = holder;
-        videoPlay();
-        mlog.e("4545");
+        if (MyApp.getInstance().getDevice_id() != null) {
+            getViedoURL_present.getVideoURL(MyApp.getInstance().getDevice_id());
+        }
+//        getViedoURL_present.getVideoURL("gddg15918348688");
+        mlog.e(">>>>>>>>>>>>>>surfaceCreated>>>>>>>>>>>>>");
     }
 
     @Override
@@ -271,11 +273,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     public void getURLSucceed(final String videoUrl, int urlid) {
         //播放视频
         URLVideoPlay(videoUrl, urlid);
-
     }
 
     @Override
-    public void getTGPriceFailure(String msg) {
+    public void getURLFailure(String msg) {
         if (netWorkUtils.checkNetworkState()) {
             //没有视频
         } else {
@@ -284,7 +285,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         //没有上传网络视频
         videoPlayer.setVisibility(View.GONE);
         suvAdvideo.setVisibility(View.VISIBLE);
-        suvAdvideo.getHolder().addCallback(this);
+
+        videoPlay();
         mlog.e("DssS..............");
     }
 
@@ -292,7 +294,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         //视频连接获取成功
         mlog.e(videoUrl);
         videoPlayer.setVisibility(View.VISIBLE);
-        suvAdvideo.setVisibility(View.GONE);
+        suvAdvideo.setVisibility(View.INVISIBLE);
         //如果网络视频更新清除当前缓存
         if (urlid != MyApp.getInstance().getVideoID()) {
             try {
@@ -391,7 +393,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -470,7 +471,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     }
 
-
     private void initTransition() {
         if (isTransition && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             postponeEnterTransition();
@@ -498,5 +498,4 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
         return false;
     }
-
 }

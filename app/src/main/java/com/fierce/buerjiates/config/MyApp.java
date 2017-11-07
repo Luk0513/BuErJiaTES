@@ -64,7 +64,7 @@ public class MyApp extends Application {
         cleanState();
         JPushInterface.setDebugMode(false);          // 设置开启日志,发布时请关闭日志
         JPushInterface.init(getApplicationContext());   // 初始化 JPush
-        startService(new Intent(getApplicationContext(), BLEBluetoothService.class));
+//        startService(new Intent(getApplicationContext(), BLEBluetoothService.class));
     }
 
 

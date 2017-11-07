@@ -40,7 +40,7 @@ public class IGteViedoURL_Present {
 
             @Override
             public void onError(String msg) {
-                view.getTGPriceFailure(msg);
+                view.getURLFailure(msg);
             }
         });
     }

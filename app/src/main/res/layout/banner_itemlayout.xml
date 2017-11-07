@@ -5,19 +5,27 @@
     android:background="@color/color_1"
     android:padding="3dp">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+    <!--<ScrollView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:fillViewport="true">-->
 
-        <ImageView
-            android:id="@+id/iv_imag"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:scaleType="fitXY"
-            android:src="@mipmap/file_photo" />
-    </ScrollView>
+    <!--<ImageView-->
+    <!--android:id="@+id/iv_imag"-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="fill_parent"-->
+    <!--android:scaleType="fitXY"-->
+    <!--android:src="@mipmap/file_photo" />-->
+    <!--</ScrollView>-->
 
+    <!--<com.fierce.buerjiates.widget.LongImageView-->
+        <!--android:id="@+id/iv_imag"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent" />-->
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:id="@+id/iv_imag"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 
     <ImageView
         android:id="@+id/iv_close3"

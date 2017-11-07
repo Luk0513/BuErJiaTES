@@ -11,10 +11,13 @@ import android.util.LruCache;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.fierce.buerjiates.widget.LongImageView;
 import com.jakewharton.disklrucache.DiskLruCache;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -155,6 +158,23 @@ public class ImageCacheUtils {
         }
     }
 
+    public Bitmap loadBitmaps(@NonNull LongImageView imageView, @NonNull String imageUrl) {
+        Bitmap bitmap;
+        String key = hashKeyForDisk(imageUrl);
+        //从内存中查找
+        bitmap = getBitmapFromMemoryCache(key);
+        if (bitmap == null) {
+            BitmapWorkerTask task = new BitmapWorkerTask(imageView);
+            taskCollection.add(task);
+            task.execute(imageUrl);
+        } else {
+            if (imageView != null)
+                imageView.setBitmap(bitmap);
+            imageView.setNeedSlide(true);
+        }
+        return bitmap;
+    }
+
     /**
      * @param imageUrl url
      *                 可以用于后台预先缓存 不需ui显示
@@ -167,6 +187,7 @@ public class ImageCacheUtils {
 
     /**
      * 离线时 直接到磁盘查找
+     *
      * @param url 图片地址
      * @return
      */
@@ -194,6 +215,50 @@ public class ImageCacheUtils {
             }
         }
         return null;
+    }
+
+    public Bitmap getLongBitmap(String imgurl) {
+        Bitmap bitmap;
+        String key = hashKeyForDisk(imgurl);
+        //从内存中查找
+        bitmap = getBitmapFromMemoryCache(key);
+        if (bitmap == null) {
+            BitmapWorkerTask task = new BitmapWorkerTask();
+            taskCollection.add(task);
+            task.execute(imgurl);
+
+        } else {
+
+        }
+        return bitmap;
+    }
+
+    public Bitmap netPicToBmp(String src) {
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            Bitmap oBitmap = null;
+            ByteArrayOutputStream outputs = new ByteArrayOutputStream();
+            oBitmap.compress(Bitmap.CompressFormat.JPEG, 60, outputs); //
+//
+//            while ( outputs.toByteArray().length /  1024 > 32 ) {
+//                outputs.reset();
+//                oBitmap.compress(Bitmap.CompressFormat.JPEG, options, outputs);
+//                options -=  10 ;
+//            }
+
+            ByteArrayInputStream inputs = new ByteArrayInputStream(outputs.toByteArray());
+            Bitmap bitmap = BitmapFactory.decodeStream(inputs);
+
+
+            return bitmap;
+        } catch (IOException e) {
+            // Log exception
+            mlog.e("  ");
+            return null;
+        }
     }
 
     /**
@@ -283,6 +348,7 @@ public class ImageCacheUtils {
 
         private ViewGroup view;
         private ImageView imageView;
+        private LongImageView longImageView;
 
         private BitmapWorkerTask(ViewGroup view) {
             this.view = view;
@@ -290,6 +356,10 @@ public class ImageCacheUtils {
 
         private BitmapWorkerTask(ImageView imageView) {
             this.imageView = imageView;
+        }
+
+        private BitmapWorkerTask(LongImageView longImageView) {
+            this.longImageView = longImageView;
         }
 
         private BitmapWorkerTask() {
@@ -321,6 +391,7 @@ public class ImageCacheUtils {
                     DiskLruCache.Editor editor = mDiskLruCache.edit(key);
                     if (editor != null) {
                         OutputStream outputStream = editor.newOutputStream(0);
+
                         if (downloadUrlToStream(imageUrl, outputStream)) {
                             editor.commit();
                         } else {
@@ -341,7 +412,12 @@ public class ImageCacheUtils {
                         bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
                     }
                 }
-                if (bitmap != null) {
+                if (longImageView != null) {
+                    if (fileDescriptor != null) {
+                        bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+                    }
+                }
+                if (bitmap != null && imageView != null) {
                     // 将Bitmap对象添加到内存缓存当中
                     addBitmapToMemoryCache(params[0], bitmap);
                 }
@@ -374,6 +450,10 @@ public class ImageCacheUtils {
                     imageView.setImageBitmap(bitmap);
                     addBitmapToMemoryCache(hashKeyForDisk(imageUrl), bitmap);
                 }
+            }
+            if (longImageView != null) {
+                longImageView.setBitmap(bitmap);
+                longImageView.setNeedSlide(true);
             }
             //下载完成 移除任务
             taskCollection.remove(this);
